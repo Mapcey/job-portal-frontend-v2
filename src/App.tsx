@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import SeekerProfile from "./pages/Seeker/Profile";
+import SeekerProfile from "./pages/Seeker/ProfilePage";
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 
 import ProtectedRoute from "./routes/PrivatRoute";
