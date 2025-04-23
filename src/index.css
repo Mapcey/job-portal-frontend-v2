@@ -1,5 +1,6 @@
-@import "./components/ComponentStyles.css";
-@import "./pages/PageStyles.css";
+@import "./components/_Styles.css";
+@import "./components/Seeker/_Styles.css";
+@import "./pages/_Styles.css";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

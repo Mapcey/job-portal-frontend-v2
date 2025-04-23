@@ -1,8 +1,8 @@
-import React from "react";
+// import React from "react";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import FormSection_1 from "../../components/Seeker/FormSection_1";
-import FormSection_2 from "../../components/Seeker/formSection_2";
+// import FormSection_2 from "../../components/Seeker/formSection_2";
 
 const CreateNewAcSeeker = () => {
   return (

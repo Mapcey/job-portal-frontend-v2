@@ -107,6 +107,10 @@
 }
 
 /* -------------- category section------------ */
+.category-section-container {
+  margin-top: 100px;
+}
+
 .category-section-header {
   display: flex;
   flex-direction: column;
@@ -173,121 +177,189 @@
   opacity: 0.8;
 }
 
-/* -------------- create new account ------------ */
-.create-ac-form-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* center horizontally */
-  justify-content: center; /* center vertically */
-  min-height: 50vh; /* take full screen height */
-  padding: 20px;
-  background-color: #f5f5f5; /* optional background */
+/* ------------------- feature section ------------------ */
+.feature-container {
+  margin-top: 100px;
 }
 
-/* Form section rows */
-.create-ac-form-section {
+.feature-content {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  margin-top: 20px;
-  gap: 40px;
-  width: 100%;
-  max-width: 1000px;
+  padding: 30px;
 }
 
-.create-ac-form-section-2 {
+.feature-content-left {
   display: flex;
-  flex-direction: row;
-  justify-content: left;
-  align-items: flex-start;
-  margin-top: 20px;
-  gap: 40px;
-  width: 100%;
-  max-width: 1000px;
-}
-
-/* Profile image container */
-.fs-profile-image-container {
-  width: 25%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-/* Profile image avatar */
-.fs-profile-image {
-  background: #f36d00;
-}
-
-/* Input containers */
-.fs-text-inputs-1,
-.fs-text-inputs-2 {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
   flex: 1;
+  flex-direction: row;
+  padding: 40px 50px;
+  gap: 10px;
 }
 
-/* Text field base style */
-.text-input-1 {
-  border-radius: 8px;
+.f-c-l-set-1 {
+  flex-direction: column;
 }
 
-/* Input border radius */
-.text-input-1 .MuiOutlinedInput-root {
-  border-radius: 8px;
+.f-c-l-set-2 {
+  flex-direction: column;
 }
 
-/* Focused input outline */
-.text-input-1
-  .MuiOutlinedInput-root.Mui-focused
-  .MuiOutlinedInput-notchedOutline {
-  border-color: var(--color-primary);
-  border-width: 2px;
+.f-c-l-set-1-img {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 20px;
+  padding: 10px;
 }
 
-/* Label style */
-.text-input-1 label {
-  color: var(--color-secondary, #9c27b0);
-  font-size: 16px;
+.feature-content-right {
+  flex: 1.5;
 }
 
-/* Upload button hover (optional override for button class) */
-.upload-btn:hover {
-  background-color: var(--color-primary-dark, #d53c00);
+.f-c-r-sections {
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
 }
 
-.form-area {
-  background: var(--color-secondary-light, #f3e5f5); /* fallback light purple */
-  border-radius: 12px;
-  height: 300px;
+.f-c-r-img {
+  height: 50px;
+  margin: 20px;
+}
+/* --------------- */
+
+.upload-resume-container {
+  margin-top: 50px;
+  position: relative;
+  padding: 50px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px 40px;
-}
-
-.form-area-content {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   text-align: center;
-  /* gap: 15px; */
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  color: white;
+  z-index: 1;
 }
 
-.form-area-content h4 {
-  font-size: 22px;
+/* Blurred background image */
+.upload-resume-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/imgs/img1.jpg"); /* your image path */
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px);
+  opacity: 0.8;
+  z-index: -2;
+}
+
+/* Color overlay */
+.upload-resume-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 77, 0, 0.6),
+    rgba(214, 214, 214, 0.6)
+  ); /* You can adjust these colors */
+  opacity: 0.8;
+  z-index: -1;
+}
+
+.upload-resume-content-1 {
+  background-color: white;
+  color: var(--color-primary);
   font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 10px;
 }
 
-.form-area-content svg {
-  font-size: 78px;
-  color: var(--color-primary, #f36d00);
-  margin-bottom: 20px;
+.upload-resume-content-2 {
+  font-size: 38px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.create-ac-form-button {
-  width: 30%;
+.upload-resume-content-3 {
+  margin-bottom: 50px;
+  width: 60%;
+}
+
+.upload-resume-content-button {
+  padding: 20px;
+}
+
+/* ----------------- recent jobs section ------------- */
+.recent-jobs-section-container {
+  margin-top: 100px;
+}
+
+.recent-jobs-section-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
+.recent-jobs-section-cards {
+  margin-top: 30px;
+}
+
+.job-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+}
+
+.job-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* --------------- review section-------------- */
+.reviews-section-container {
+  margin-top: 100px;
+}
+
+.testimonial-card {
+  /* background: var(--color-secondary); */
+  padding: 60px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.testimonial-text {
+  margin-top: 15px;
+  font-style: italic;
+  max-width: 600px;
+}
+
+/* ---------------- pricing section -------------- */
+.pricing-section-container {
+  margin-top: 100px;
+}
+
+.pricing-section-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ------------------ footer section ---------------- */
+.footer-section-container {
+  margin-top: 100px;
 }

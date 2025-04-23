@@ -1,0 +1,118 @@
+/* -------------- create new account ------------ */
+.create-ac-form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center horizontally */
+  justify-content: center; /* center vertically */
+  min-height: 50vh; /* take full screen height */
+  padding: 20px;
+  background-color: #f5f5f5; /* optional background */
+}
+
+/* Form section rows */
+.create-ac-form-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+  gap: 40px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.create-ac-form-section-2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: flex-start;
+  margin-top: 20px;
+  gap: 40px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* Profile image container */
+.fs-profile-image-container {
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Profile image avatar */
+.fs-profile-image {
+  background: #f36d00;
+}
+
+/* Input containers */
+.fs-text-inputs-1,
+.fs-text-inputs-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+/* Text field base style */
+.text-input-1 {
+  border-radius: 8px;
+}
+
+/* Input border radius */
+.text-input-1 .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+/* Focused input outline */
+.text-input-1
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-primary);
+  border-width: 2px;
+}
+
+/* Label style */
+.text-input-1 label {
+  color: var(--color-secondary, #9c27b0);
+  font-size: 16px;
+}
+
+/* Upload button hover (optional override for button class) */
+.upload-btn:hover {
+  background-color: var(--color-primary-dark, #d53c00);
+}
+
+.form-area {
+  background: var(--color-secondary-light, #f3e5f5); /* fallback light purple */
+  border-radius: 12px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px;
+}
+
+.form-area-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* gap: 15px; */
+}
+
+.form-area-content h4 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.form-area-content svg {
+  font-size: 78px;
+  color: var(--color-primary, #f36d00);
+  margin-bottom: 20px;
+}
+
+.create-ac-form-button {
+  width: 30%;
+}
