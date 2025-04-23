@@ -1,0 +1,26 @@
+@import "./components/ComponentStyles.css";
+@import "./pages/PageStyles.css";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --color-primary: #f36d00;
+  --color-secondary: #555555;
+
+  --color-primary-light: #fff1e5;
+  --color-secondary-light: #c9c9c9;
+
+  --color-primary-dark: #d53c00;
+  --color-secondary-dark: #151515;
+
+  --color-text: #333333;
+  --color-text-light: #555555;
+  --color-text-white: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
