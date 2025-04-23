@@ -1,14 +1,22 @@
 import React, { useRef, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
-import { Box } from "@mui/material";
+import { Box, Typography, Grid } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import BackupIcon from "@mui/icons-material/Backup";
 import Autocomplete from "@mui/material/Autocomplete";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
+import Chip from "@mui/material/Chip";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { styled } from "@mui/material/styles";
 
 const options = ["Option 1", "Option 2", "Option 2"];
+
+const Input = styled("input")({
+  display: "none",
+});
 
 const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -16,6 +24,22 @@ const FormSection_1 = () => {
 
   const [value, setValue] = React.useState<string | null>(options[0]);
   const [inputValue, setInputValue] = React.useState("");
+
+  const [skills, setSkills] = useState<string[]>([]);
+
+  const [images, setImages] = useState<File[]>([]);
+
+  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setImages((prev) => [...prev, ...fileArray]);
+    }
+  };
+
+  const handleRemove = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -236,7 +260,10 @@ const FormSection_1 = () => {
       {/* section */}
       <div className="create-ac-form-section">
         <div className="fs-text-inputs-2">
-          <h3 style={{ marginBottom: "0" }}>Intro Video</h3>
+          <Typography mt={2} variant="h5" color="secondary.main">
+            Intro Video
+          </Typography>
+
           <Box className="form-area">
             <div className="form-area-content">
               <h4>Impress employers and Stand out !</h4>
@@ -256,20 +283,75 @@ const FormSection_1 = () => {
           </Box>
         </div>
         <div className="fs-text-inputs-2">
-          <h3 style={{ marginBottom: "0" }}>Images</h3>
-          <Box className="form-area">upload here</Box>
+          <Typography mt={2} variant="h5" color="secondary.main">
+            Images
+          </Typography>
+
+          <label htmlFor="upload-button">
+            <Input
+              accept="image/*"
+              id="upload-button"
+              multiple
+              type="file"
+              onChange={handleUpload}
+            />
+            <Button
+              sx={{ width: "100%" }}
+              variant="outlined"
+              component="span"
+              startIcon={<UploadFileIcon />}
+            >
+              Upload Images
+            </Button>
+          </label>
+
+          {/* Image preview grid */}
+          <Grid container spacing={2} mt={2}>
+            {images.map((file, index) => (
+              <Grid item xs={6} sm={4} md={3} key={index}>
+                <Box
+                  sx={{
+                    position: "relative",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`upload-${index}`}
+                    style={{ width: "100%", height: 100, objectFit: "cover" }}
+                  />
+                  <IconButton
+                    onClick={() => handleRemove(index)}
+                    sx={{
+                      position: "absolute",
+                      top: 4,
+                      right: 4,
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      color: "#fff",
+                      "&:hover": { backgroundColor: "rgba(0,0,0,0.8)" },
+                    }}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
         </div>
       </div>
 
       <div className="create-ac-form-section-2">
-        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Education</h3>
+        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Career History</h3>
       </div>
 
       {/* section */}
       <div className="create-ac-form-section">
         <div className="fs-text-inputs-1">
           <TextField
-            label="Your name"
+            label="Company name"
             variant="outlined"
             placeholder="Add your full name"
             className="text-input-1"
@@ -277,7 +359,7 @@ const FormSection_1 = () => {
           />
 
           <TextField
-            label="Home address"
+            label="From"
             variant="outlined"
             placeholder="Add your home address"
             className="text-input-1"
@@ -286,7 +368,7 @@ const FormSection_1 = () => {
         </div>
         <div className="fs-text-inputs-1">
           <TextField
-            label="Phone number"
+            label="Title"
             variant="outlined"
             placeholder="Add a valid phone number"
             className="text-input-1"
@@ -294,7 +376,7 @@ const FormSection_1 = () => {
           />
 
           <TextField
-            label="Email"
+            label="To"
             variant="outlined"
             placeholder="Add your email address"
             className="text-input-1"
@@ -304,9 +386,10 @@ const FormSection_1 = () => {
       </div>
 
       <div className="create-ac-form-section-2">
-        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Education</h3>
+        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Description</h3>
       </div>
 
+      {/* section */}
       <div className="create-ac-form-section">
         <div className="fs-text-inputs-2">
           <TextField
@@ -321,7 +404,111 @@ const FormSection_1 = () => {
         </div>
       </div>
 
+      <div className="create-ac-form-section-2">
+        <Button
+          variant="contained"
+          color="secondary"
+          className="create-ac-form-button-2"
+          sx={{
+            borderRadius: 2,
+            padding: "10px 80px",
+          }}
+        >
+          Add
+        </Button>
+      </div>
+
       {/* section */}
+      <div className="create-ac-form-section">
+        <div className="fs-text-inputs-2">
+          <Autocomplete
+            className="text-input-1"
+            multiple
+            freeSolo
+            options={[]} // No predefined options, user can type freely
+            value={skills}
+            onChange={(event, newValue) => {
+              setSkills(newValue);
+            }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip
+                  variant="outlined"
+                  label={option}
+                  {...getTagProps({ index })}
+                  key={option}
+                />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                label="Add Skills"
+                placeholder="e.g. React, Python, SQL"
+              />
+            )}
+          />
+        </div>
+      </div>
+
+      <div className="create-ac-form-section-2">
+        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Education</h3>
+      </div>
+
+      {/* section */}
+      <div className="create-ac-form-section">
+        <div className="fs-text-inputs-1">
+          <TextField
+            label="Institution name"
+            variant="outlined"
+            placeholder="Add your full name"
+            className="text-input-1"
+            size="small"
+          />
+
+          <TextField
+            label="From"
+            variant="outlined"
+            placeholder="Add your home address"
+            className="text-input-1"
+            size="small"
+          />
+        </div>
+        <div className="fs-text-inputs-1">
+          <TextField
+            label="Field of study"
+            variant="outlined"
+            placeholder="Add a valid phone number"
+            className="text-input-1"
+            size="small"
+          />
+
+          <TextField
+            label="To"
+            variant="outlined"
+            placeholder="Add your email address"
+            className="text-input-1"
+            size="small"
+          />
+        </div>
+      </div>
+
+      <div className="create-ac-form-section-2">
+        <Button
+          variant="contained"
+          color="secondary"
+          className="create-ac-form-button-2"
+          sx={{
+            borderRadius: 2,
+            padding: "10px 80px",
+          }}
+        >
+          Add
+        </Button>
+      </div>
+
+      {/* section bottom */}
       <div className="create-ac-form-section">
         <Button
           variant="contained"
