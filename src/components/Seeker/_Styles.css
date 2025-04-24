@@ -122,3 +122,32 @@
 }
 
 /* --------------- seeker profile tab -------------- */
+.seeker-profile-tab-image {
+  height: 120px;
+  border-radius: 10px;
+}
+
+.seeker-profile-section-1 {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.seeker-profile-section-2 {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.seeker-profile-text-area-container {
+  background-color: var(--color-bg-1);
+  border-radius: 10px;
+}
+
+.seeker-profile-text-area {
+  color: var(--color-secondary);
+  padding: 10px 20px 10px 20px;
+}
+
+/* ---------------- saved jobs tab -------------- */
