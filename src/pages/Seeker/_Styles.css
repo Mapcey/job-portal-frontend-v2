@@ -17,3 +17,24 @@
   width: 100%;
   padding: 10px;
 }
+
+/* -------------- browse jobs ------------- */
+
+.b-j-input-style-1 label {
+  color: var(--color-secondary) !important;
+}
+
+.b-j-input-style-1 .MuiInputBase-input {
+  color: var(--color-secondary) !important;
+}
+
+.b-j-input-style-1 .MuiOutlinedInput-notchedOutline {
+  border-color: var(--color-secondary);
+}
+
+.b-j-input-style-1 .MuiSvgIcon-root {
+  color: var(--color-secondary);
+}
+.b-j-input-style-1 .MuiOutlinedInput-root {
+  border-radius: 10px;
+}

@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import SeekerProfile from "./pages/Seeker/ProfilePage";
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import JobDetailsPage from "./pages/Seeker/JobDetailsPage";
+import BrowseJobs from "./pages/Seeker/BrowseJobs";
 
 import ProtectedRoute from "./routes/PrivatRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -15,6 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/jobs/details" element={<JobDetailsPage />} />
+        <Route path="/jobs" element={<BrowseJobs />} />
 
         {/* Protected routes */}
         <Route
@@ -31,15 +34,6 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateNewAcSeeker />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/jobs/details"
-          element={
-            <ProtectedRoute>
-              <JobDetailsPage />
             </ProtectedRoute>
           }
         />

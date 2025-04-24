@@ -161,6 +161,7 @@
 
 .breadcrumb-text {
   opacity: 1 priority;
+  width: 100%;
 }
 
 .breadcrumb-text h2 {
