@@ -7,6 +7,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import SeekerProfileTab from "../../components/Seeker/SeekerProfileTab";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
+import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -41,6 +42,12 @@ const SeekerProfilePage = () => {
           desc: "Check your updates and alerts here.",
         });
         break;
+      case 3:
+        setBreadcrumb({
+          title: "Manage Applications",
+          desc: "Check your applications here.",
+        });
+        break;
       default:
         break;
     }
@@ -53,7 +60,9 @@ const SeekerProfilePage = () => {
       case 1:
         return <SavedJobsTab />;
       case 2:
-        return <NotificationsTab />; // Replace with <NotificationsTab />
+        return <NotificationsTab />;
+      case 3:
+        return <ManageApplicationsTab />;
       default:
         return null;
     }
@@ -87,9 +96,28 @@ const SeekerProfilePage = () => {
             textColor="primary"
             indicatorColor="primary"
           >
-            <Tab label="My Profile" sx={{ color: "secondary.main" }} />
-            <Tab label="Saved Jobs" sx={{ color: "secondary.main" }} />
-            <Tab label="Notifications" sx={{ color: "secondary.main" }} />
+            <Tab
+              label="My Profile"
+              sx={{
+                color: "secondary.main",
+                alignItems: "flex-start",
+              }}
+            />
+            <Tab
+              label="Saved Jobs"
+              sx={{
+                color: "secondary.main",
+                alignItems: "flex-start",
+              }}
+            />
+            <Tab
+              label="Notifications"
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+            />
+            <Tab
+              label="Manage Applications"
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+            />
           </Tabs>
         </Box>
 
