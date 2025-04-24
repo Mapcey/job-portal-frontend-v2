@@ -1,3 +1,19 @@
+/* ----------- seeker profile ------------ */
 .seeker-profile-page-container {
   display: flex;
+}
+
+/* ------------- job details page ------------- */
+.job-details-page-container {
+}
+
+.job-details-page-content {
+  display: flex;
+  flex-direction: column;
+  padding: 5% 10% 0 10%;
+}
+
+.job-details-page-section-1 {
+  width: 100%;
+  padding: 10px;
 }

@@ -1,4 +1,3 @@
-import React from "react";
 import { useAuth } from "../context/AuthContext";
 
 import Header_1 from "../components/header/Header_1";
