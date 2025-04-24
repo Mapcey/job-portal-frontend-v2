@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,23 +13,28 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Avatar from "@mui/material/Avatar";
-import Badge from "@mui/material/Badge";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 
-const pages = ["Home", "Browse Jobs", "Contact", "About", "Pricing"];
 const settings = ["Profile", "Settings", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
+  const navigate = useNavigate();
+
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+
+  const pages = [
+    { label: "Home", path: "/" },
+    { label: "Browse Jobs", path: "/" },
+    { label: "Contact", path: "/" },
+    { label: "About", path: "/" },
+    { label: "Pricing", path: "/" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,10 +105,11 @@ const Header_2 = () => {
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
               {pages.map((page) => (
                 <Button
-                  key={page}
+                  onClick={() => navigate(page.path)}
+                  key={page.label}
                   sx={{ my: 2, color: "black", display: "block" }}
                 >
-                  {page}
+                  {page.label}
                 </Button>
               ))}
             </Box>
