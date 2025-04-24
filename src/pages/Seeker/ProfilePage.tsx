@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, Typography } from "@mui/material";
+import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
 
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
@@ -87,6 +87,7 @@ const SeekerProfilePage = () => {
             borderRadius: "10px",
             padding: 2,
             margin: "50px 10px 30px 90px",
+            height: "600px",
           }}
         >
           <Tabs
@@ -119,6 +120,20 @@ const SeekerProfilePage = () => {
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
           </Tabs>
+
+          <Box
+            className="seeker-video-container"
+            sx={{ marginTop: 2, marginBottom: 3 }}
+          >
+            <video controls width="100%" style={{ borderRadius: "8px" }}>
+              <source src="/videos/self-intro.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </Box>
+
+          <Button fullWidth variant="contained">
+            Browse Jobs
+          </Button>
         </Box>
 
         {/* Right Side - Tab Content */}
