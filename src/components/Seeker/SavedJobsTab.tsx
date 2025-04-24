@@ -82,24 +82,22 @@ const SavedJobsTab = () => {
               marginBottom: "20px",
             }}
           >
+            <IconButton
+              size="small"
+              onClick={() => handleRemove(job.id)}
+              sx={{
+                position: "absolute",
+                top: 5,
+                right: 5,
+                zIndex: 1,
+                backgroundColor: "white",
+                boxShadow: 1,
+                ":hover": { backgroundColor: "#f5f5f5" },
+              }}
+            >
+              <BookmarkRemoveIcon />
+            </IconButton>
             <CardActionArea>
-              {/* Remove icon */}
-              <IconButton
-                size="small"
-                onClick={() => handleRemove(job.id)}
-                sx={{
-                  position: "absolute",
-                  top: 5,
-                  right: 5,
-                  zIndex: 1,
-                  backgroundColor: "white",
-                  boxShadow: 1,
-                  ":hover": { backgroundColor: "#f5f5f5" },
-                }}
-              >
-                <BookmarkRemoveIcon />
-              </IconButton>
-
               <CardContent>
                 <Typography variant="h6">{job.title}</Typography>
                 <Typography mb={3} color="secondary">

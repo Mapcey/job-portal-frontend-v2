@@ -6,8 +6,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 
 import SeekerProfileTab from "../../components/Seeker/SeekerProfileTab";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
-// Import other tab components as needed
-// import NotificationsTab from "../../components/Seeker/NotificationsTab";
+import NotificationsTab from "../../components/Seeker/NotificationsTab";
 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -54,7 +53,7 @@ const SeekerProfilePage = () => {
       case 1:
         return <SavedJobsTab />;
       case 2:
-        return <Typography>Notifications Component Here</Typography>; // Replace with <NotificationsTab />
+        return <NotificationsTab />; // Replace with <NotificationsTab />
       default:
         return null;
     }
