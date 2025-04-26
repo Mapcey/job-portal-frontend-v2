@@ -7,12 +7,15 @@ import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import ProtectedRoute from "./routes/PrivatRoute";
 import { AuthProvider } from "./context/AuthContext";
 
+import SignupPage from "./pages/SignupPage"; // Import the SignupPage component
+
 function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} /> {/* Add this route */}
 
         {/* Protected routes */}
         <Route
@@ -23,7 +26,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/seeker/create-account"
           element={

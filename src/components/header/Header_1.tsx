@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,6 +13,7 @@ const pages = ["Home", "Browse Jobs", "Contact", "About"];
 
 const Header_1 = () => {
   const [elevated, setElevated] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,6 +23,14 @@ const Header_1 = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLoginClick = () => {
+    navigate("/login"); // Navigate to the login page
+  };
+
+  const handleSignUpClick = () => {
+    navigate("/signup"); // Navigate to the signup page
+  };
 
   return (
     <div style={{ marginBottom: 100 }}>
@@ -99,6 +109,7 @@ const Header_1 = () => {
                   marginRight: 2,
                   marginLeft: 2,
                 }}
+                onClick={handleLoginClick} // Add onClick for Login
               >
                 Login
               </Button>
@@ -106,6 +117,7 @@ const Header_1 = () => {
                 variant="contained"
                 color="primary"
                 sx={{ borderRadius: 2, padding: "5px 20px" }}
+                onClick={handleSignUpClick} // Add onClick for Sign Up
               >
                 Sign Up
               </Button>
