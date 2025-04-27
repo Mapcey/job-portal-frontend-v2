@@ -8,6 +8,7 @@ import BrowseJobs from "./pages/Seeker/BrowseJobs";
 import NotFoundPage from "./pages/NotFoundPage";
 import PricingPage from "./pages/PricingPage";
 import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import SeekerProfile from "./pages/Seeker/ProfilePage";
@@ -31,6 +32,7 @@ function App() {
         <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
 
         {/* Protected routes */}
         <Route
