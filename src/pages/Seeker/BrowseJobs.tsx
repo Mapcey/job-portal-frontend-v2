@@ -57,7 +57,7 @@ const BrowseJobs = () => {
       <Breadcrumb
         title="Browse Jobs"
         description="Find your dream job here"
-        backgroundImage="/imgs/backgrounds/bg-2.jpg"
+        backgroundImage="/imgs/backgrounds/bg-5.jpeg"
       />
 
       {/* Search and Filter Section */}

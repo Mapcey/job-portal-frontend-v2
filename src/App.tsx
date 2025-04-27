@@ -6,6 +6,7 @@ import SignupPage from "./pages/SignupPage";
 import JobDetailsPage from "./pages/Seeker/JobDetailsPage";
 import BrowseJobs from "./pages/Seeker/BrowseJobs";
 import NotFoundPage from "./pages/NotFoundPage";
+import PricingPage from "./pages/PricingPage";
 
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import SeekerProfile from "./pages/Seeker/ProfilePage";
@@ -27,10 +28,7 @@ function App() {
         <Route path="/jobs/details" element={<JobDetailsPage />} />
         <Route path="/jobs" element={<BrowseJobs />} />
         <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
-        <Route
-          path="/employee/create_account"
-          element={<CreateNewAcEmployer />}
-        />
+        <Route path="/pricing" element={<PricingPage />} />
 
         {/* Protected routes */}
         <Route
@@ -56,6 +54,15 @@ function App() {
           element={
             <ProtectedRoute>
               <PostJob />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/create_account"
+          element={
+            <ProtectedRoute>
+              <CreateNewAcEmployer />
             </ProtectedRoute>
           }
         />
