@@ -2,3 +2,16 @@
 .landingPage-container {
   height: 100px;
 }
+
+/* ---------------- Login page --------------- */
+.login-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5% 5% 5% 5%;
+  margin: auto;
+  width: 500px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+}

@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,6 +14,12 @@ const pages = ["Home", "Browse Jobs", "Contact", "About"];
 
 const Header_1 = () => {
   const [elevated, setElevated] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLoginButton = () => {
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,6 +101,7 @@ const Header_1 = () => {
               <Button
                 variant="outlined"
                 color="primary"
+                onClick={handleLoginButton}
                 sx={{
                   borderRadius: 2,
                   padding: "5px 20px",
