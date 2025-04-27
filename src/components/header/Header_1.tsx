@@ -21,6 +21,24 @@ const Header_1 = () => {
     navigate("/login");
   };
 
+  const handleSignupButton = () => {
+    navigate("/signup");
+  };
+
+  const handleMenuButtons = (page: string) => {
+    if (page == "Home") {
+      navigate(`/`);
+    } else if (page == "Browse Jobs") {
+      navigate(`/jobs`);
+    } else if (page == "Contact") {
+      navigate(`/contact`);
+    } else if (page == "About") {
+      navigate(`/about`);
+    } else {
+      navigate("/notFound");
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setElevated(window.scrollY > 50); // Shrink header when scrolled past 50px
@@ -83,6 +101,7 @@ const Header_1 = () => {
               {pages.map((page) => (
                 <Button
                   key={page}
+                  onClick={() => handleMenuButtons(page)}
                   sx={{ my: 2, color: "black", display: "block" }}
                 >
                   {page}
@@ -114,6 +133,7 @@ const Header_1 = () => {
               <Button
                 variant="contained"
                 color="primary"
+                onClick={handleSignupButton}
                 sx={{ borderRadius: 2, padding: "5px 20px" }}
               >
                 Sign Up
