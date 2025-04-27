@@ -1,5 +1,6 @@
 @import "./components/_Styles.css";
 @import "./components/Seeker/_Styles.css";
+@import "./components/Employee/_Styles.css";
 
 @import "./pages/_Styles.css";
 @import "./pages/Seeker/_Styles.css";

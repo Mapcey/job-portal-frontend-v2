@@ -1,0 +1,9 @@
+.form-area-1 {
+  background: var(--color-secondary-light, #f3e5f5); /* fallback light purple */
+  border-radius: 12px;
+  /* height: 300px; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px;
+}

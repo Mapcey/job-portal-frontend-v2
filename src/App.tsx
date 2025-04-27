@@ -3,11 +3,14 @@ import LandingPage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 
-import SeekerProfile from "./pages/Seeker/ProfilePage";
-import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import JobDetailsPage from "./pages/Seeker/JobDetailsPage";
 import BrowseJobs from "./pages/Seeker/BrowseJobs";
 import NotFoundPage from "./pages/NotFoundPage";
+
+import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
+import SeekerProfile from "./pages/Seeker/ProfilePage";
+
+import CreateNewAcEmployee from "./pages/Employee/ProfilePage";
 
 import ProtectedRoute from "./routes/PrivatRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -22,6 +25,10 @@ function App() {
         <Route path="/jobs/details" element={<JobDetailsPage />} />
         <Route path="/jobs" element={<BrowseJobs />} />
         <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
+        <Route
+          path="/employee/create_account"
+          element={<CreateNewAcEmployee />}
+        />
 
         {/* Protected routes */}
         <Route
@@ -32,6 +39,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         {/* Catch-all route */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
