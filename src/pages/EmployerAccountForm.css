@@ -1,0 +1,179 @@
+/* --- General Page Styles --- */
+.create-employer-account-page {
+    /* Optional: Add styles if needed for the overall page wrapper */
+  }
+  
+  .form-container-employer {
+    max-width: 500px; /* Adjust as needed */
+    margin: 2rem auto; /* Center the form container */
+    padding: 1rem; /* Add some padding around the form */
+  }
+  
+  /* --- Employer Account Form Styles --- */
+  .employer-account-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Spacing between form sections */
+  }
+  
+  .form-section {
+    /* Styles for general sections if needed, Grid handles spacing */
+     align-items: flex-start; /* Align items top for grid layout */
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500; /* Medium weight */
+    color: var(--color-text);
+    font-size: 0.9rem; /* Slightly smaller label */
+  }
+  
+  /* Style for TextFields using MUI's filled variant */
+  .form-input .MuiFilledInput-root {
+    background-color: var(--color-primary-light) !important; /* Use light primary background */
+    border-radius: 8px !important; /* Match design's rounded corners */
+    overflow: hidden; /* Ensures background color fills */
+  }
+  
+  .form-input .MuiFilledInput-input {
+    padding: 10px 12px; /* Adjust padding if needed */
+  }
+  
+  /* Style for Textarea */
+  .form-textarea {
+    background-color: var(--color-primary-light);
+    border: 1px solid var(--color-secondary-light); /* Subtle border */
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit; /* Use the root font */
+    font-size: 1rem;
+    color: var(--color-text);
+    min-height: 120px; /* Ensure minimum height */
+  }
+  
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary); /* Highlight focus */
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+  
+  /* Logo Upload Specifics */
+  .logo-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .company-logo-avatar {
+      border: 1px solid var(--color-secondary-light); /* Optional border */
+  }
+  
+  .upload-button.MuiButton-outlinedPrimary {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+      text-transform: none; /* Prevent uppercase */
+      border-radius: 6px;
+      padding: 4px 10px;
+  }
+  .upload-button.MuiButton-outlinedPrimary:hover {
+       background-color: var(--color-primary-light);
+  }
+  
+  
+  /* Video/Image Upload Boxes */
+  .upload-box {
+    background-color: var(--color-primary-light);
+    border-radius: 8px;
+    border: 2px dashed var(--color-secondary-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    min-height: 150px; /* Ensure decent height */
+  }
+  
+  .upload-box:hover {
+    border-color: var(--color-primary);
+    background-color: #fff7f0; /* Slightly lighter than primary-light */
+  }
+  
+  .video-upload-box {
+      /* Specific styles if needed */
+  }
+  
+  .image-upload-grid .upload-box {
+      min-height: 100px; /* Smaller height for grid items */
+      height: 100%; /* Fill grid item height */
+      padding: 0.5rem;
+  }
+  
+  /* Upgrade Box */
+  .upgrade-box {
+    background-color: var(--color-primary-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    height: 100%; /* Try to match height of editor section */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+  }
+  
+  /* General Button Styles */
+  .form-button {
+      border-radius: 8px !important;
+      padding: 10px 25px !important; /* Adjust padding */
+      text-transform: none !important; /* Keep text as is */
+      font-weight: 500 !important;
+  }
+  
+  /* Specific Button Colors/Styles */
+  .form-button.MuiButton-containedPrimary {
+      background-color: var(--color-primary) !important;
+      color: var(--color-text-white) !important;
+  }
+  .form-button.MuiButton-containedPrimary:hover {
+       background-color: var(--color-primary-dark) !important;
+  }
+  
+  .form-button.MuiButton-containedSecondary {
+      background-color: var(--color-secondary-dark) !important; /* Using secondary-dark for save/create */
+      color: var(--color-text-white) !important;
+  }
+  .form-button.MuiButton-containedSecondary:hover {
+       background-color: var(--color-secondary) !important; /* Lighter secondary on hover */
+  }
+  
+  /* Action Buttons Container */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 1rem; /* Space between buttons */
+    margin-top: 1rem; /* Space above buttons */
+  }
+  
+  .form-button-create {
+      padding: 10px 40px !important; /* Wider padding for create */
+  }
+  
+  /* Responsive adjustments if needed */
+  @media (max-width: 768px) {
+      .form-container-employer {
+          margin: 1rem auto;
+      }
+      .form-actions {
+          justify-content: center; /* Center buttons on smaller screens */
+      }
+      .logo-upload-container {
+          margin-bottom: 1rem; /* Add space below logo on mobile */
+      }
+      .upgrade-box {
+          margin-top: 1rem; /* Add space above upgrade box if stacking */
+      }
+  }

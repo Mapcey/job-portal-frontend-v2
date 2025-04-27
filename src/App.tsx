@@ -3,6 +3,7 @@ import LandingPage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SeekerProfile from "./pages/Seeker/Profile";
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
+import EmployerAccountForm from "./pages/employer/EmployerAccountForm";
 
 import ProtectedRoute from "./routes/PrivatRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -29,6 +30,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateNewAcSeeker />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employer/create-account"
+          element={
+            <ProtectedRoute>
+              <EmployerAccountForm />
             </ProtectedRoute>
           }
         />
