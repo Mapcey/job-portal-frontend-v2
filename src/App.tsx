@@ -18,6 +18,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/jobs/details" element={<JobDetailsPage />} />
         <Route path="/jobs" element={<BrowseJobs />} />
+        <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
 
         {/* Protected routes */}
         <Route
@@ -25,15 +26,6 @@ function App() {
           element={
             <ProtectedRoute>
               <SeekerProfile />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/seeker/create_account"
-          element={
-            <ProtectedRoute>
-              <CreateNewAcSeeker />
             </ProtectedRoute>
           }
         />
