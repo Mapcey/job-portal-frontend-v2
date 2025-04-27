@@ -10,7 +10,9 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CreateNewAcSeeker from "./pages/Seeker/CreateNewAccount";
 import SeekerProfile from "./pages/Seeker/ProfilePage";
 
-import CreateNewAcEmployee from "./pages/Employee/ProfilePage";
+import CreateNewAcEmployer from "./pages/Employer/CreateNewAccount";
+import EmployerProfilePage from "./pages/Employer/ProfilePage";
+import PostJob from "./pages/Employer/PostJob";
 
 import ProtectedRoute from "./routes/PrivatRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -27,7 +29,7 @@ function App() {
         <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
         <Route
           path="/employee/create_account"
-          element={<CreateNewAcEmployee />}
+          element={<CreateNewAcEmployer />}
         />
 
         {/* Protected routes */}
@@ -36,6 +38,24 @@ function App() {
           element={
             <ProtectedRoute>
               <SeekerProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/profile"
+          element={
+            <ProtectedRoute>
+              <EmployerProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/post"
+          element={
+            <ProtectedRoute>
+              <PostJob />
             </ProtectedRoute>
           }
         />
