@@ -30,10 +30,10 @@ const Header_2 = () => {
 
   const pages = [
     { label: "Home", path: "/" },
-    { label: "Browse Jobs", path: "/" },
-    { label: "Contact", path: "/" },
-    { label: "About", path: "/" },
-    { label: "Pricing", path: "/" },
+    { label: "Browse Jobs", path: "/jobs" },
+    { label: "Contact", path: "/contact" },
+    { label: "About", path: "/about" },
+    { label: "Pricing", path: "/pricing" },
   ];
 
   useEffect(() => {
