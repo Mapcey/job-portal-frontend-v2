@@ -3,6 +3,7 @@ import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
 
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
+import EmployerProfileTab from "../../components/Employer/EmployerProfileTab";
 
 const EmployerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -21,25 +22,25 @@ const EmployerProfilePage = () => {
     switch (selectedTab) {
       case 0:
         setBreadcrumb({
-          title: "My Profile",
+          title: "Employer > Profile",
           desc: "Manage your personal information and experience.",
         });
         break;
       case 1:
         setBreadcrumb({
-          title: "Saved Jobs",
+          title: "Manage Candidates",
           desc: "Jobs you saved for later viewing.",
         });
         break;
       case 2:
         setBreadcrumb({
-          title: "Notifications",
+          title: "Manage Posted Jobs",
           desc: "Check your updates and alerts here.",
         });
         break;
       case 3:
         setBreadcrumb({
-          title: "Manage Applications",
+          title: "Notifications",
           desc: "Check your applications here.",
         });
         break;
@@ -51,13 +52,15 @@ const EmployerProfilePage = () => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 0:
-      // return <SeekerProfileTab />;
+        return <EmployerProfileTab />;
       case 1:
       // return <SavedJobsTab />;
       case 2:
       // return <NotificationsTab />;
       case 3:
       // return <ManageApplicationsTab />;
+      case 4:
+      //tab
       default:
         return null;
     }
@@ -100,23 +103,28 @@ const EmployerProfilePage = () => {
               }}
             />
             <Tab
-              label="Saved Jobs"
+              label="Manage Candidates"
               sx={{
                 color: "secondary.main",
                 alignItems: "flex-start",
               }}
             />
             <Tab
-              label="Notifications"
+              label="Posted Jobs"
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
             <Tab
-              label="Manage Applications"
+              label="Notifications"
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+            />
+
+            <Tab
+              label="Pending Approvals"
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
           </Tabs>
 
-          <Box
+          {/* <Box
             className="seeker-video-container"
             sx={{ marginTop: 2, marginBottom: 3 }}
           >
@@ -124,11 +132,14 @@ const EmployerProfilePage = () => {
               <source src="/videos/self-intro.mp4" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-          </Box>
+          </Box> */}
 
           <Button fullWidth variant="contained">
-            Browse Jobs
+            Start Head Hunting
           </Button>
+          <button className="glow-on-hover" type="button">
+            Upgrade today !
+          </button>
         </Box>
 
         {/* Right Side - Tab Content */}
