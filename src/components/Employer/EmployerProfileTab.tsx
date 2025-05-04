@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Typography,
@@ -24,6 +25,13 @@ const EmployerProfileTab = () => {
   ];
 
   const [imageSrc, setImageSrc] = useState("/imgs/companies/c1.png");
+
+  const navigate = useNavigate();
+
+  const BrowsePostJob = () => {
+    navigate("/employer/post");
+  };
+
   return (
     <div className="employer-profile-tab-container">
       <div className="employer-profile-tab-content">
@@ -72,6 +80,7 @@ const EmployerProfileTab = () => {
               <Button
                 fullWidth
                 variant="contained"
+                onClick={BrowsePostJob}
                 sx={{
                   bgcolor: "secondary.main",
                   color: "white",

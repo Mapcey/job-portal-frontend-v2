@@ -4,6 +4,10 @@ import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import EmployerProfileTab from "../../components/Employer/EmployerProfileTab";
+import ManageCandidatesTab from "../../components/Employer/ManageCandidates";
+import NotificationsTab from "../../components/Seeker/NotificationsTab";
+import PostedJobs from "../../components/Employer/PostedJobs";
+import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 
 const EmployerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -16,6 +20,52 @@ const EmployerProfilePage = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
+
+  const jobs = [
+    {
+      id: 1,
+      title: "Frontend Developer",
+      company: "Suicul",
+      location: "Remote",
+      status: "Open",
+    },
+    {
+      id: 2,
+      title: "UI/UX Designer",
+      company: "Suicul",
+      location: "Colombo",
+      status: "Closed",
+    },
+    {
+      id: 3,
+      title: "UI/UX Designer",
+      company: "Suicul",
+      location: "Colombo",
+      status: "Closed",
+    },
+    {
+      id: 4,
+      title: "UI/UX Designer",
+      company: "Suicul",
+      location: "Colombo",
+      status: "Closed",
+    },
+  ];
+
+  const pendingJobs = [
+    {
+      id: 101,
+      title: "React Developer (Remote)",
+      editor: "Jane Doe",
+      submittedAt: "2025-05-03 10:15 AM",
+    },
+    {
+      id: 102,
+      title: "Marketing Executive",
+      editor: "John Smith",
+      submittedAt: "2025-05-04 08:42 AM",
+    },
+  ];
 
   // Update breadcrumb on tab change
   useEffect(() => {
@@ -44,6 +94,12 @@ const EmployerProfilePage = () => {
           desc: "Check your applications here.",
         });
         break;
+      case 4:
+        setBreadcrumb({
+          title: "Pending Approvals",
+          desc: "Check your applications here.",
+        });
+        break;
       default:
         break;
     }
@@ -54,13 +110,26 @@ const EmployerProfilePage = () => {
       case 0:
         return <EmployerProfileTab />;
       case 1:
-      // return <SavedJobsTab />;
+        return <ManageCandidatesTab />;
       case 2:
-      // return <NotificationsTab />;
+        return (
+          <PostedJobs
+            jobs={jobs}
+            onClose={(id) => console.log("Close job:", id)}
+            onDelete={(id) => console.log("Delete job:", id)}
+          />
+        );
       case 3:
-      // return <ManageApplicationsTab />;
+        return <NotificationsTab />;
       case 4:
-      //tab
+        return (
+          <PendingApprovalsTab
+            pendingJobs={pendingJobs}
+            onApprove={(id) => console.log("Approved:", id)}
+            onView={(id) => console.log("View job:", id)}
+            onDelete={(id) => console.log("Deleted:", id)}
+          />
+        );
       default:
         return null;
     }
@@ -134,7 +203,7 @@ const EmployerProfilePage = () => {
             </video>
           </Box> */}
 
-          <Button fullWidth variant="contained">
+          <Button sx={{ mt: 5 }} fullWidth variant="contained">
             Start Head Hunting
           </Button>
           <button className="glow-on-hover" type="button">
