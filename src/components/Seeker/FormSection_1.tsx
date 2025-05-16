@@ -508,6 +508,57 @@ const FormSection_1 = () => {
         </Button>
       </div>
 
+      {/* Social Media & Documents Section */}
+      <div className="create-ac-form-section">
+        <Typography variant="h6" color="secondary.main" gutterBottom>
+          Social Media & Documents
+        </Typography>
+
+        <div className="fs-text-inputs-1">
+          <TextField
+            label="Facebook URL"
+            variant="outlined"
+            placeholder="https://facebook.com/yourprofile"
+            className="text-input-1"
+            size="small"
+          />
+          <TextField
+            label="LinkedIn URL"
+            variant="outlined"
+            placeholder="https://linkedin.com/in/yourprofile"
+            className="text-input-1"
+            size="small"
+          />
+        </div>
+
+        <div className="fs-text-inputs-1">
+          <TextField
+            label="Portfolio / Personal Website"
+            variant="outlined"
+            placeholder="https://yourwebsite.com"
+            className="text-input-1"
+            size="small"
+            fullWidth
+          />
+        </div>
+
+        <div className="fs-text-inputs-1">
+          <Button
+            variant="contained"
+            component="label"
+            color="secondary"
+            sx={{ borderRadius: 2, textTransform: "none" }}
+          >
+            Upload Documents
+            <input type="file" hidden multiple />
+          </Button>
+          <Typography variant="caption" sx={{ ml: 2, mt: 1 }}>
+            (Upload your CV, certificates or any relevant documents. PDF, DOCX,
+            PNG)
+          </Typography>
+        </div>
+      </div>
+
       {/* section bottom */}
       <div className="create-ac-form-section">
         <Button
