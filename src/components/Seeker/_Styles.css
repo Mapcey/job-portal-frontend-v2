@@ -73,12 +73,6 @@
   border-width: 2px;
 }
 
-/* Label style */
-.text-input-1 label {
-  color: var(--color-secondary, #9c27b0);
-  font-size: 16px;
-}
-
 /* Upload button hover (optional override for button class) */
 .upload-btn:hover {
   background-color: var(--color-primary-dark, #d53c00);

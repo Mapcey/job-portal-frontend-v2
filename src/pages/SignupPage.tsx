@@ -1,20 +1,24 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import {
+  Box,
+  Button,
+  Container,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from "@mui/material";
+
+import { GoogleLogin } from "@react-oauth/google";
 
 import Header_1 from "../components/header/Header_1";
 
 const SignupPage = () => {
   const navigate = useNavigate();
+
+  const [tab, setTab] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -23,17 +27,12 @@ const SignupPage = () => {
   const [error] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
-    console.log(e);
+    e.preventDefault();
+    const role = tab === 0 ? "seeker" : "employer";
 
-    // handle signup
-  };
+    console.log({ email, password, confirmPassword, role });
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+    // TODO: Send signup request to backend with role
   };
 
   return (
@@ -43,11 +42,23 @@ const SignupPage = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
+
+        <Tabs
+          value={tab}
+          onChange={(e, newValue) => setTab(newValue)}
+          centered
+          sx={{ mb: 3 }}
+        >
+          <Tab label="Job Seeker" sx={{ color: "text.primary" }} />
+          <Tab label="Employer" sx={{ color: "text.primary" }} />
+        </Tabs>
+
         {error && (
-          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
+          <Typography variant="body2" color="error" sx={{ mb: 2 }}>
             {error}
           </Typography>
         )}
+
         <Box
           component="form"
           onSubmit={handleSignup}
@@ -66,8 +77,10 @@ const SignupPage = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="text-input-1"
           />
           <TextField
+            className="text-input-1"
             label="Password"
             type={showPassword ? "text" : "password"}
             variant="outlined"
@@ -75,17 +88,9 @@ const SignupPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={togglePasswordVisibility} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
           />
           <TextField
+            className="text-input-1"
             label="Confirm Password"
             type={showConfirmPassword ? "text" : "password"}
             variant="outlined"
@@ -93,42 +98,53 @@ const SignupPage = () => {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={toggleConfirmPasswordVisibility}
-                    edge="end"
-                  >
-                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
           />
+
+          {/* Optional: Role-specific fields */}
+          {/* {tab === 1 && (
+            <TextField
+              label="Company Name"
+              variant="outlined"
+              fullWidth
+              required
+            />
+          )} */}
+
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ padding: "10px 0", borderRadius: 2 }}
+            sx={{ py: 1.5, borderRadius: 2 }}
           >
-            Sign Up
+            Sign Up as {tab === 0 ? "Job Seeker" : "Employer"}
           </Button>
         </Box>
-        <Typography variant="body2" sx={{ margin: "10px 0" }}>
+
+        <Typography variant="body2" sx={{ my: 2, textAlign: "center" }}>
           Or
         </Typography>
-        <Button
+
+        {/* <Button
           variant="outlined"
           color="primary"
           fullWidth
-          sx={{ padding: "10px 0", borderRadius: 2 }}
-          //   onClick={handleGoogleSignUp}
+          sx={{ py: 1.5, borderRadius: 2 }}
         >
           Sign up with Google
-        </Button>
-        <Typography variant="body2" sx={{ marginTop: 2 }}>
+        </Button> */}
+
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            console.log("Google credential", credentialResponse);
+            // You can send credentialResponse.credential to your backend for verification
+          }}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+
+        <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
           Already have an account?{" "}
           <Button
             variant="text"

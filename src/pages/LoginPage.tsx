@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
+
+import { GoogleLogin } from "@react-oauth/google";
 
 import { useAuth } from "../context/AuthContext";
 import Header_1 from "../components/header/Header_1";
@@ -23,21 +17,29 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    const res = await fetch("/token.json");
+const handleLogin = async (e) => {
+  e.preventDefault(); // Prevent default form submission
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
     const data = await res.json();
-    login(data.token);
-    navigate("/seeker/profile");
 
-    // remove this
-    if (data === 1) {
-      setError("test");
+    if (res.ok && data.token) {
+      login(data.token); // Save JWT to context/localStorage
+      navigate("/seeker/profile");
+    } else {
+      setError(data.error || "Invalid email or password.");
     }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
   return (
     <Container>
@@ -62,6 +64,7 @@ const LoginPage = () => {
           }}
         >
           <TextField
+            className="text-input-1"
             label="Email"
             type="email"
             variant="outlined"
@@ -71,6 +74,7 @@ const LoginPage = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
+            className="text-input-1"
             label="Password"
             type={showPassword ? "text" : "password"}
             variant="outlined"
@@ -78,15 +82,6 @@ const LoginPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={togglePasswordVisibility} edge="end">
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
           />
           <Button
             type="submit"
@@ -101,15 +96,37 @@ const LoginPage = () => {
         <Typography variant="body2" sx={{ margin: "10px 0" }}>
           Or
         </Typography>
-        <Button
-          variant="outlined"
-          color="primary"
-          fullWidth
-          sx={{ padding: "10px 0", borderRadius: 2 }}
-          // onClick={handleGoogleSignIn}
-        >
-          Sign in with Google
-        </Button>
+
+       <GoogleLogin
+  onSuccess={async (credentialResponse) => {
+    const token = credentialResponse.credential;
+
+    try {
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        login(data.token); // Save your app's token using your AuthContext
+        navigate("/seeker/profile");
+      } else {
+        setError(data.error || "Authentication failed.");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Something went wrong during Google login.");
+    }
+  }}
+  onError={() => {
+    console.log("Login Failed");
+    setError("Google login failed.");
+  }}
+/>
+
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Don't have an account?{" "}
           <Button

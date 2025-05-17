@@ -4,3 +4,9 @@
   padding: 2rem;
   text-align: center;
 }
+
+/* ------------------- common ------------------ */
+.text-input-1 label {
+  color: var(--color-secondary, black);
+  font-size: 16px;
+}
