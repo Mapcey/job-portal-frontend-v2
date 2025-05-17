@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Box,
   Container,
@@ -49,7 +47,7 @@ const ContactPage = () => {
               sx={{ display: "flex", flexDirection: "column" }}
             >
               {/* Form */}
-              <Grid item xs={12} md={7}>
+              <Grid>
                 <Paper elevation={3} sx={{ p: 4, borderRadius: 4 }}>
                   <form>
                     <Grid container spacing={3}>
@@ -90,7 +88,7 @@ const ContactPage = () => {
                         color="secondary"
                       />
 
-                      <Grid item xs={12}>
+                      <Grid>
                         <Button
                           variant="contained"
                           color="secondary"
@@ -106,7 +104,7 @@ const ContactPage = () => {
               </Grid>
 
               {/* Contact Info */}
-              <Grid item xs={12} md={5}>
+              <Grid>
                 <Box sx={{ pl: { md: 4 }, pt: { xs: 4, md: 0 } }}>
                   <Typography
                     variant="h5"

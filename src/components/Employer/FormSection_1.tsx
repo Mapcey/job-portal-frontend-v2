@@ -184,7 +184,7 @@ const FormSection_1 = () => {
           {/* Image preview grid */}
           <Grid container spacing={2} mt={2}>
             {images.map((file, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
+              <Grid key={index}>
                 <Box
                   sx={{
                     position: "relative",

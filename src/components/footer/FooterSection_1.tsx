@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Typography,
@@ -26,7 +25,7 @@ const FooterSection_1 = () => {
     >
       <Grid container spacing={5}>
         {/* Logo & Description */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid>
           <Box>
             <img
               src="/logos/logo mono-01.svg"
@@ -44,7 +43,7 @@ const FooterSection_1 = () => {
         </Grid>
 
         {/* Quick Links */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
             Quick Links
           </Typography>
@@ -69,7 +68,7 @@ const FooterSection_1 = () => {
         </Grid>
 
         {/* Resources */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
             Resources
           </Typography>
@@ -94,7 +93,7 @@ const FooterSection_1 = () => {
         </Grid>
 
         {/* Contact Info */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
             Contact
           </Typography>

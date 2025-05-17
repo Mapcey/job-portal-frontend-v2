@@ -6,10 +6,7 @@ import {
   CardActions,
   Button,
   Pagination,
-  PaginationProps,
-  Box,
   Grid,
-  CardHeader,
 } from "@mui/material";
 
 import Chip from "@mui/material/Chip";
@@ -64,48 +61,50 @@ const RecentJobsSection = () => {
         <div className="recent-jobs-section-cards">
           <Grid container spacing={3} justifyContent="center">
             {displayedJobs.map((job) => (
-              <Card
-                sx={{ width: "500px", borderRadius: "10px" }}
-                variant="outlined"
-              >
-                <CardActions sx={{ justifyContent: "right" }}>
-                  <Button size="small">Details</Button>
-                  <Button variant="contained" sx={{ borderRadius: "10px" }}>
-                    Apply
-                  </Button>
-                </CardActions>
-                <CardContent>
-                  <Typography variant="h6">{job.title}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {job.company} — {job.location}
-                  </Typography>
-                  <Typography variant="body2" mt={1}>
-                    {job.description}
-                  </Typography>
-                </CardContent>
-                <Stack direction="row" m={2} spacing={1}>
-                  <Chip
-                    sx={{ bgcolor: "secondary.light" }}
-                    size="small"
-                    label="Rs. 50k - 75k"
-                  />
-                  <Chip
-                    sx={{ bgcolor: "secondary.light" }}
-                    size="small"
-                    label="Bachelor's"
-                  />
-                  <Chip
-                    sx={{ bgcolor: "secondary.light" }}
-                    size="small"
-                    label="Colombo"
-                  />
-                  <Chip
-                    sx={{ bgcolor: "secondary.light" }}
-                    size="small"
-                    label="Fulltime"
-                  />
-                </Stack>
-              </Card>
+              <Grid key={job.id || job.title}>
+                <Card
+                  sx={{ width: "500px", borderRadius: "10px" }}
+                  variant="outlined"
+                >
+                  <CardActions sx={{ justifyContent: "right" }}>
+                    <Button size="small">Details</Button>
+                    <Button variant="contained" sx={{ borderRadius: "10px" }}>
+                      Apply
+                    </Button>
+                  </CardActions>
+                  <CardContent>
+                    <Typography variant="h6">{job.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {job.company} — {job.location}
+                    </Typography>
+                    <Typography variant="body2" mt={1}>
+                      {job.description}
+                    </Typography>
+                  </CardContent>
+                  <Stack direction="row" m={2} spacing={1}>
+                    <Chip
+                      sx={{ bgcolor: "secondary.light" }}
+                      size="small"
+                      label="Rs. 50k - 75k"
+                    />
+                    <Chip
+                      sx={{ bgcolor: "secondary.light" }}
+                      size="small"
+                      label="Bachelor's"
+                    />
+                    <Chip
+                      sx={{ bgcolor: "secondary.light" }}
+                      size="small"
+                      label="Colombo"
+                    />
+                    <Chip
+                      sx={{ bgcolor: "secondary.light" }}
+                      size="small"
+                      label="Fulltime"
+                    />
+                  </Stack>
+                </Card>
+              </Grid>
             ))}
           </Grid>
 

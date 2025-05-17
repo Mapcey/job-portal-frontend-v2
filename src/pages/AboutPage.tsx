@@ -1,14 +1,4 @@
-import React from "react";
-
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Divider,
-} from "@mui/material";
+import { Box, Container, Typography, Divider } from "@mui/material";
 
 import Header_1 from "../components/header/Header_1";
 import Breadcrumb from "../components/common/Breadcrumb";

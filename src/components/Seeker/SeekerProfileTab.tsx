@@ -1,6 +1,12 @@
-import React, { useRef, useState } from "react";
-import { Typography, Box, Chip, TextField, Button } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
+import { useState } from "react";
+import {
+  Typography,
+  Box,
+  Chip,
+  TextField,
+  Button,
+  Autocomplete,
+} from "@mui/material";
 
 const SeekerProfileTab = () => {
   const [skills, setSkills] = useState<string[]>(["React", "Python", "SQL"]);
@@ -111,6 +117,7 @@ const SeekerProfileTab = () => {
             options={[]} // No predefined options, user can type freely
             value={skills}
             onChange={(event, newValue) => {
+              console.log(event);
               setSkills(newValue);
             }}
             renderTags={(value: readonly string[], getTagProps) =>

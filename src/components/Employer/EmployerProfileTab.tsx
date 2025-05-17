@@ -1,17 +1,16 @@
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
   Typography,
   Box,
-  Chip,
   TextField,
   Button,
   Grid,
   Card,
   CardMedia,
 } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
+
 import Avatar from "@mui/material/Avatar";
 
 const EmployerProfileTab = () => {
@@ -24,7 +23,7 @@ const EmployerProfileTab = () => {
     "/imgs/grid/legal.jpg",
   ];
 
-  const [imageSrc, setImageSrc] = useState("/imgs/companies/c1.png");
+  const [imageSrc] = useState("/imgs/companies/c1.png"); // add setImage later
 
   const navigate = useNavigate();
 
@@ -137,7 +136,7 @@ const EmployerProfileTab = () => {
 
             <Grid container spacing={2}>
               {photos.slice(0, 6).map((photo, index) => (
-                <Grid item xs={12} sm={6} md={6} key={index}>
+                <Grid key={index}>
                   <Card
                     sx={{ borderRadius: 2, overflow: "hidden", boxShadow: 3 }}
                   >

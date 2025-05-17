@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Button from "@mui/material/Button";
@@ -28,6 +28,11 @@ const LoginPage = () => {
     const data = await res.json();
     login(data.token);
     navigate("/seeker/profile");
+
+    // remove this
+    if (data === 1) {
+      setError("test");
+    }
   };
 
   const togglePasswordVisibility = () => {

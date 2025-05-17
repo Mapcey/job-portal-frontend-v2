@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Box,
   Typography,
@@ -8,7 +6,6 @@ import {
   CardContent,
   CardActions,
   Button,
-  IconButton,
   Stack,
 } from "@mui/material";
 import { Delete, Cancel } from "@mui/icons-material";
@@ -54,7 +51,7 @@ const PostedJobs = ({
       {/* Job Cards */}
       <Grid container spacing={3}>
         {jobs.map((job) => (
-          <Grid item xs={12} md={6} key={job.id}>
+          <Grid key={job.id}>
             <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
               <CardContent>
                 <Typography variant="subtitle1" fontWeight={600}>

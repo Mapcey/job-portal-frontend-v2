@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Box,
   Container,
@@ -58,7 +56,7 @@ const PricingPage = () => {
       <Container sx={{ py: 8 }} maxWidth="lg">
         <Grid container spacing={4}>
           {packages.map((pkg, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid  key={index}>
               <Card
                 sx={{
                   height: "100%",

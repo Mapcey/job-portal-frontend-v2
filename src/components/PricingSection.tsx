@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Typography,
   Box,
@@ -50,47 +49,49 @@ const PricingSection = () => {
         <Box sx={{ marginTop: 5 }}>
           <Grid container spacing={4} justifyContent="center">
             {pricingPlans.map((plan, index) => (
-              <Card
-                elevation={plan.highlighted ? 8 : 2}
-                sx={{
-                  padding: 7,
-                  borderRadius: 4,
-                  backgroundColor: plan.highlighted ? "primary.main" : "#fff",
-                  color: plan.highlighted ? "#fff" : "text.primary",
-                  transition: "transform 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: 6,
-                  },
-                }}
-              >
-                <CardContent>
-                  <Typography variant="h5" gutterBottom>
-                    {plan.title}
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
-                    {plan.price}
-                    <span style={{ fontSize: "16px" }}>/month</span>
-                  </Typography>
-                  {plan.features.map((feature, idx) => (
-                    <Typography
-                      key={idx}
-                      variant="body2"
-                      sx={{ marginBottom: 1 }}
-                    >
-                      • {feature}
+              <Grid key={plan.title || index}>
+                <Card
+                  elevation={plan.highlighted ? 8 : 2}
+                  sx={{
+                    padding: 7,
+                    borderRadius: 4,
+                    backgroundColor: plan.highlighted ? "primary.main" : "#fff",
+                    color: plan.highlighted ? "#fff" : "text.primary",
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-5px)",
+                      boxShadow: 6,
+                    },
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h5" gutterBottom>
+                      {plan.title}
                     </Typography>
-                  ))}
-                  <Button
-                    fullWidth
-                    variant={plan.highlighted ? "contained" : "outlined"}
-                    sx={{ marginTop: 3, borderRadius: 3 }}
-                    color={plan.highlighted ? "secondary" : "primary"}
-                  >
-                    {plan.highlighted ? "Get Started" : "Choose Plan"}
-                  </Button>
-                </CardContent>
-              </Card>
+                    <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2 }}>
+                      {plan.price}
+                      <span style={{ fontSize: "16px" }}>/month</span>
+                    </Typography>
+                    {plan.features.map((feature, idx) => (
+                      <Typography
+                        key={idx}
+                        variant="body2"
+                        sx={{ marginBottom: 1 }}
+                      >
+                        • {feature}
+                      </Typography>
+                    ))}
+                    <Button
+                      fullWidth
+                      variant={plan.highlighted ? "contained" : "outlined"}
+                      sx={{ marginTop: 3, borderRadius: 3 }}
+                      color={plan.highlighted ? "secondary" : "primary"}
+                    >
+                      {plan.highlighted ? "Get Started" : "Choose Plan"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
           </Grid>
         </Box>

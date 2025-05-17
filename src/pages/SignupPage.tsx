@@ -11,7 +11,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import { useAuth } from "../context/AuthContext";
 import Header_1 from "../components/header/Header_1";
 
 const SignupPage = () => {
@@ -21,9 +20,11 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
+    console.log(e);
+
     // handle signup
   };
 

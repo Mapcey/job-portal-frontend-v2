@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Grid,
@@ -41,6 +41,11 @@ const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+
+  const [category, setCategory] = useState("");
+  const [jobType, setJobType] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState("");
 
   const jobsPerPage = 8;
   const displayedJobs = jobList.slice(
@@ -85,6 +90,8 @@ const BrowseJobs = () => {
             label="Category"
             variant="outlined"
             size="small"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
           >
             {categories.map((cat) => (
               <MenuItem key={cat} value={cat}>
@@ -98,6 +105,8 @@ const BrowseJobs = () => {
             label="Job Type"
             variant="outlined"
             size="small"
+            value={jobType}
+            onChange={(e) => setJobType(e.target.value)}
           >
             {jobTypes.map((type) => (
               <MenuItem key={type} value={type}>
@@ -111,6 +120,8 @@ const BrowseJobs = () => {
             label="Education Level"
             variant="outlined"
             size="small"
+            value={educationLevel}
+            onChange={(e) => setEducationLevel(e.target.value)}
           >
             {educationLevels.map((edu) => (
               <MenuItem key={edu} value={edu}>
@@ -124,6 +135,8 @@ const BrowseJobs = () => {
             label="Experience Level"
             variant="outlined"
             size="small"
+            value={experienceLevel}
+            onChange={(e) => setExperienceLevel(e.target.value)}
           >
             {experienceLevels.map((exp) => (
               <MenuItem key={exp} value={exp}>
@@ -180,7 +193,7 @@ const BrowseJobs = () => {
 
           <Grid container spacing={3}>
             {displayedJobs.map((job) => (
-              <Grid item xs={12} sm={6} key={job.id}>
+              <Grid key={job.id}>
                 <Card variant="outlined" sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Typography variant="h6">{job.title}</Typography>

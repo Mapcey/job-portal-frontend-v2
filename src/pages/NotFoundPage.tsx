@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Container } from "@mui/material";
+import { Typography, Button, Container } from "@mui/material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 

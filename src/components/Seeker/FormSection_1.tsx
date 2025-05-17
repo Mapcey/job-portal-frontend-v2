@@ -138,10 +138,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -156,10 +158,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -174,10 +178,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -193,10 +199,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -211,10 +219,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -229,10 +239,12 @@ const FormSection_1 = () => {
             className="text-input-1"
             value={value}
             onChange={(event: any, newValue: string | null) => {
+              console.log(event);
               setValue(newValue);
             }}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
+              console.log(event);
               setInputValue(newInputValue);
             }}
             id="controllable-states-demo"
@@ -308,7 +320,7 @@ const FormSection_1 = () => {
           {/* Image preview grid */}
           <Grid container spacing={2} mt={2}>
             {images.map((file, index) => (
-              <Grid item xs={6} sm={4} md={3} key={index}>
+              <Grid key={index}>
                 <Box
                   sx={{
                     position: "relative",
@@ -428,6 +440,7 @@ const FormSection_1 = () => {
             options={[]} // No predefined options, user can type freely
             value={skills}
             onChange={(event, newValue) => {
+              console.log(event);
               setSkills(newValue);
             }}
             renderTags={(value: readonly string[], getTagProps) =>

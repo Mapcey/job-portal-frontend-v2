@@ -1,5 +1,5 @@
 import { useAuth } from "../../context/AuthContext";
-import { Box, Typography, Button, Chip, IconButton, Icon } from "@mui/material";
+import { Box, Typography, Button, Chip } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
