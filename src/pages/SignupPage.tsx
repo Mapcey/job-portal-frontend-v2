@@ -115,7 +115,7 @@ const SignupPage = () => {
           )} */}
 
           <Button
-            size="small"
+            // size="small"
             type="submit"
             variant="contained"
             color="primary"

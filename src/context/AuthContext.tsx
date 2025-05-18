@@ -26,13 +26,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
 
   useEffect(() => {
-    if (token) {
-      setIsAuthenticated(true);
-      localStorage.setItem("token", token);
-    } else {
-      setIsAuthenticated(false);
-      localStorage.removeItem("token");
-    }
+    const validateToken = async () => {
+      if (!token) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/validate", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.ok) {
+          setIsAuthenticated(true);
+        } else {
+          logout();
+        }
+      } catch (error) {
+        logout();
+      }
+    };
+
+    validateToken();
   }, [token]);
 
   const login = (token: string) => {

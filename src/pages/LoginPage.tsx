@@ -38,15 +38,15 @@ const LoginPage = () => {
         password
       );
 
-      const token = await userCredential.user.getIdToken();
-      login(token); // Store token in context/localStorage
+      const firebaseToken = await userCredential.user.getIdToken();
+      login(firebaseToken); // Store firebaseToken in context/localStorage
 
-      // Send token to backend
+      // Send firebaseToken to backend
       const res = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${firebaseToken}`,
         },
       });
 
@@ -146,7 +146,7 @@ const LoginPage = () => {
           />
           <Button
             type="submit"
-            size="small"
+            // size="small"
             variant="contained"
             color="primary"
             fullWidth
