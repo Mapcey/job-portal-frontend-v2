@@ -6,6 +6,9 @@ import React, {
   ReactNode,
 } from "react";
 
+import { auth } from "../config/firebaseConfig";
+import { onIdTokenChanged } from "firebase/auth";
+
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
@@ -25,6 +28,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
 
+  // Token Expiry Handling - Firebase ID tokens expire after 1 hour
+  useEffect(() => {
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      if (user) {
+        const newToken = await user.getIdToken();
+        setToken(newToken);
+      } else {
+        logout();
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Validate token before use
   useEffect(() => {
     const validateToken = async () => {
       if (!token) {
