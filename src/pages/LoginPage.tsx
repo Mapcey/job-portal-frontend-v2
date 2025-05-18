@@ -2,44 +2,103 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import GoogleIcon from "@mui/icons-material/Google";
 
-import { GoogleLogin } from "@react-oauth/google";
-
+// import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth } from "../config/firebaseConfig";
+
 import Header_1 from "../components/header/Header_1";
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-const handleLogin = async (e) => {
-  e.preventDefault(); // Prevent default form submission
-
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
+  const handleLogintemp = async () => {
+    const res = await fetch("/token.json"); // simulate your API
     const data = await res.json();
+    login(data.token); // store token and set authenticated
+    navigate("/seeker/profile");
+  };
 
-    if (res.ok && data.token) {
-      login(data.token); // Save JWT to context/localStorage
-      navigate("/seeker/profile");
-    } else {
-      setError(data.error || "Invalid email or password.");
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const token = await userCredential.user.getIdToken();
+      login(token); // Store token in context/localStorage
+
+      // Send token to backend
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Backend auth failed");
+
+      const data = await res.json(); // <-- You need to parse the response as JSON
+
+      // Route based on role
+      if (data.role === "seeker") {
+        navigate("/seeker/profile");
+      } else if (data.role === "employer") {
+        navigate("/employer/profile");
+      } else {
+        throw new Error("Unknown user role");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Login failed. Please check your credentials.");
     }
-  } catch (err) {
-    console.error("Login error:", err);
-    setError("Something went wrong. Please try again.");
-  }
-};
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      const firebaseToken = await result.user.getIdToken();
+      login(firebaseToken); // Save token in context/localStorage
+
+      // Call your backend to validate the Firebase token and get user role
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${firebaseToken}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.role === "seeker") {
+        navigate("/seeker/profile");
+      } else if (data.role === "employer") {
+        navigate("/employer/profile");
+      } else {
+        throw new Error("Unknown role");
+      }
+    } catch (err) {
+      console.error("Google Sign-In failed:", err);
+      setError("Google Sign-In failed.");
+    }
+  };
 
   return (
     <Container>
@@ -65,6 +124,7 @@ const handleLogin = async (e) => {
         >
           <TextField
             className="text-input-1"
+            size="small"
             label="Email"
             type="email"
             variant="outlined"
@@ -76,6 +136,7 @@ const handleLogin = async (e) => {
           <TextField
             className="text-input-1"
             label="Password"
+            size="small"
             type={showPassword ? "text" : "password"}
             variant="outlined"
             fullWidth
@@ -85,10 +146,11 @@ const handleLogin = async (e) => {
           />
           <Button
             type="submit"
+            size="small"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ padding: "10px 0", borderRadius: 2 }}
+            sx={{ borderRadius: 2 }}
           >
             Login
           </Button>
@@ -97,35 +159,15 @@ const handleLogin = async (e) => {
           Or
         </Typography>
 
-       <GoogleLogin
-  onSuccess={async (credentialResponse) => {
-    const token = credentialResponse.credential;
-
-    try {
-      const res = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.token) {
-        login(data.token); // Save your app's token using your AuthContext
-        navigate("/seeker/profile");
-      } else {
-        setError(data.error || "Authentication failed.");
-      }
-    } catch (err) {
-      console.error("Login failed:", err);
-      setError("Something went wrong during Google login.");
-    }
-  }}
-  onError={() => {
-    console.log("Login Failed");
-    setError("Google login failed.");
-  }}
-/>
+        <Button
+          variant="outlined"
+          color="secondary"
+          sx={{ padding: "5px 20px", borderRadius: 2 }}
+          onClick={handleGoogleSignIn}
+          startIcon={<GoogleIcon />}
+        >
+          Login in with Google
+        </Button>
 
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Don't have an account?{" "}
@@ -141,7 +183,7 @@ const handleLogin = async (e) => {
 
       {/* ************* login with dummy token (temp) ************ */}
       <h2>Login</h2>
-      <button onClick={handleLogin}>Login (Dev)</button>
+      <button onClick={handleLogintemp}>Login (Dev)</button>
       {/* ******************************************************** */}
     </Container>
   );

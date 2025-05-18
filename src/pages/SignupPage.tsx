@@ -10,6 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import GoogleIcon from "@mui/icons-material/Google";
 
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -70,6 +71,7 @@ const SignupPage = () => {
           }}
         >
           <TextField
+            size="small"
             label="Email"
             type="email"
             variant="outlined"
@@ -80,6 +82,7 @@ const SignupPage = () => {
             className="text-input-1"
           />
           <TextField
+            size="small"
             className="text-input-1"
             label="Password"
             type={showPassword ? "text" : "password"}
@@ -90,6 +93,7 @@ const SignupPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <TextField
+            size="small"
             className="text-input-1"
             label="Confirm Password"
             type={showConfirmPassword ? "text" : "password"}
@@ -111,11 +115,12 @@ const SignupPage = () => {
           )} */}
 
           <Button
+            size="small"
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            sx={{ py: 1.5, borderRadius: 2 }}
+            sx={{ borderRadius: 2 }}
           >
             Sign Up as {tab === 0 ? "Job Seeker" : "Employer"}
           </Button>
@@ -125,16 +130,17 @@ const SignupPage = () => {
           Or
         </Typography>
 
-        {/* <Button
+        <Button
+          size="small"
           variant="outlined"
-          color="primary"
-          fullWidth
-          sx={{ py: 1.5, borderRadius: 2 }}
+          color="secondary"
+          sx={{ padding: "5px 20px", borderRadius: 2 }}
+          startIcon={<GoogleIcon />}
         >
           Sign up with Google
-        </Button> */}
+        </Button>
 
-        <GoogleLogin
+        {/* <GoogleLogin
           onSuccess={(credentialResponse) => {
             console.log("Google credential", credentialResponse);
             // You can send credentialResponse.credential to your backend for verification
@@ -142,7 +148,7 @@ const SignupPage = () => {
           onError={() => {
             console.log("Login Failed");
           }}
-        />
+        /> */}
 
         <Typography variant="body2" sx={{ mt: 2, textAlign: "center" }}>
           Already have an account?{" "}
