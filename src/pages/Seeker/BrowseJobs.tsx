@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Box,
   Grid,
@@ -46,6 +48,8 @@ const BrowseJobs = () => {
   const [jobType, setJobType] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
+
+  const navigate = useNavigate();
 
   const jobsPerPage = 8;
   const displayedJobs = jobList.slice(
@@ -210,7 +214,14 @@ const BrowseJobs = () => {
                     </Box>
                   </CardContent>
                   <CardActions>
-                    <Button size="small">View</Button>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        navigate("/jobs/details");
+                      }}
+                    >
+                      View
+                    </Button>
                     <Button size="small">Apply</Button>
                   </CardActions>
                 </Card>

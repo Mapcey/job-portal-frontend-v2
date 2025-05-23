@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -17,7 +18,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 
-const settings = ["Profile", "Settings", "Logout"];
+import { useAuth } from "../../context/AuthContext";
+
+const settings = ["Employer Profile", "Seeker Profile", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
@@ -35,6 +38,8 @@ const Header_2 = () => {
     { label: "About", path: "/about" },
     { label: "Pricing", path: "/pricing" },
   ];
+
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,12 +77,17 @@ const Header_2 = () => {
           >
             {/* logo */}
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <img
-                src="/logos/logo_header.svg"
-                alt="Logo"
-                className="header-logo"
-                style={{ height: 50 }}
-              />
+              <Link
+                to="/"
+                style={{ display: "inline-flex", alignItems: "center" }}
+              >
+                <img
+                  src="/logos/logo_header.svg"
+                  alt="Logo"
+                  className="header-logo"
+                  style={{ height: 50, cursor: "pointer" }}
+                />
+              </Link>
             </Box>
 
             {/* space */}
@@ -154,7 +164,19 @@ const Header_2 = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <MenuItem
+                    key={setting}
+                    onClick={() => {
+                      handleCloseUserMenu();
+                      if (setting === "Logout") {
+                        logout(); // ✅ Call your logout function here
+                      } else if (setting === "Seeker Profile") {
+                        navigate("/seeker/profile");
+                      } else if (setting === "Employer Profile") {
+                        navigate("/employer/profile");
+                      }
+                    }}
+                  >
                     <Typography sx={{ textAlign: "center" }}>
                       {setting}
                     </Typography>

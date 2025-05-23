@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -66,12 +67,17 @@ const Header_1 = () => {
           >
             {/* logo */}
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <img
-                src="/logos/logo_header.svg"
-                alt="Logo"
-                className="header-logo"
-                style={{ height: 50 }}
-              />
+              <Link
+                to="/"
+                style={{ display: "inline-flex", alignItems: "center" }}
+              >
+                <img
+                  src="/logos/logo_header.svg"
+                  alt="Logo"
+                  className="header-logo"
+                  style={{ height: 50, cursor: "pointer" }}
+                />
+              </Link>
             </Box>
 
             {/* space */}

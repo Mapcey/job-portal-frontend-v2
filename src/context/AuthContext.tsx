@@ -33,6 +33,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Token Expiry Handling - Firebase ID tokens expire after 1 hour
   useEffect(() => {
+    if (!token || token === "dev-token-12345") return; // TODO: Remove | temp token
+
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
         const newToken = await user.getIdToken();
@@ -54,18 +56,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        const res = await fetch("/api/validate", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // const res = await fetch("/api/validate", {
+        //   method: "POST",
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
 
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-          setIsAuthenticated(true);
-        } else {
-          logout();
-        }
+        // if (res.ok) {
+        //   const data = await res.json();
+        //   setUser(data.user);
+        //   setIsAuthenticated(true);
+        // } else {
+        //   logout();
+        // }
+        console.log("checking");
+
+        setIsAuthenticated(true);
       } catch (error) {
         logout();
       }
@@ -76,10 +81,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = (token: string) => {
     setToken(token);
+    localStorage.setItem("token", token);
   };
 
   const logout = () => {
     setToken(null);
+    localStorage.removeItem("token");
   };
 
   return (

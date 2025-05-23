@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Box, Tabs, Tab, Button } from "@mui/material";
 
 import Header_2 from "../../components/header/Header_2";
@@ -11,6 +13,8 @@ import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab
 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+
+  const navigate = useNavigate();
 
   const [breadcrumb, setBreadcrumb] = useState({
     title: "My Profile",
@@ -131,7 +135,13 @@ const SeekerProfilePage = () => {
             </video>
           </Box>
 
-          <Button fullWidth variant="contained">
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              navigate("/jobs");
+            }}
+          >
             Browse Jobs
           </Button>
         </Box>
