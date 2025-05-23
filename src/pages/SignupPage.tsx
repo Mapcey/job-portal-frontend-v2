@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
 
-import { GoogleLogin } from "@react-oauth/google";
-
 import Header_1 from "../components/header/Header_1";
 
 const SignupPage = () => {
