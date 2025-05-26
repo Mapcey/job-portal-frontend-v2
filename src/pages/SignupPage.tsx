@@ -21,8 +21,14 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [
+    showPassword,
+    // setShowPassword
+  ] = useState(false);
+  const [
+    showConfirmPassword,
+    // setShowConfirmPassword
+  ] = useState(false);
   const [error] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -44,7 +50,7 @@ const SignupPage = () => {
 
         <Tabs
           value={tab}
-          onChange={(e, newValue) => setTab(newValue)}
+          onChange={(_e, newValue) => setTab(newValue)}
           centered
           sx={{ mb: 3 }}
         >

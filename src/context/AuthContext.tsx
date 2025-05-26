@@ -9,7 +9,7 @@ import React, {
 import { auth } from "../config/firebaseConfig";
 import { onIdTokenChanged } from "firebase/auth";
 
-import { USER } from "../types/user";
+// import { USER } from "../types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -29,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.getItem("token")
   );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
-  const [user, setUser] = useState<USER | null>(null);
+  // const [user, setUser] = useState<USER | null>(null);
 
   // Token Expiry Handling - Firebase ID tokens expire after 1 hour
   useEffect(() => {
