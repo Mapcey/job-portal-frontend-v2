@@ -1,9 +1,13 @@
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const keywords = ["Software Engineer", "Product Manager", "UX Designer"];
+
+  const navigate = useNavigate();
+
   return (
     <div className="hero-section-container">
       <div className="hero-section-right">
@@ -20,6 +24,7 @@ const HeroSection = () => {
           <Button
             variant="contained"
             sx={{ borderRadius: 2, padding: "15px 10%", marginRight: "3%" }}
+            onClick={() => navigate("/employer/post")}
           >
             Post a Job
           </Button>
@@ -33,6 +38,7 @@ const HeroSection = () => {
                 bgcolor: "secondary.dark",
               },
             }}
+            onClick={() => navigate("/jobs")}
           >
             See Our Jobs
           </Button>

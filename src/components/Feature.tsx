@@ -1,7 +1,9 @@
 // import React from "react";
 import { Typography, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Feature = () => {
+  const navigate = useNavigate();
   return (
     <div className="feature-container">
       <div className="feature-content">
@@ -104,8 +106,14 @@ const Feature = () => {
           blanditiis tenetur unde suscipit, quam beatae rerum inventore
           consectetur, neque doloribus,
         </div>
-        <Button sx={{ margin: "20" }} variant="contained">
-          Contained
+        <Button
+          sx={{ margin: "20" }}
+          variant="contained"
+          onClick={() => {
+            navigate("/seeker/create_account");
+          }}
+        >
+          Complete Profile
         </Button>
       </div>
     </div>
