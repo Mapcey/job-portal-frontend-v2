@@ -8,9 +8,14 @@ import SeekerProfileTab from "../../components/Seeker/SeekerProfileTab";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
+import { signOut } from "firebase/auth";
+import { auth } from "../../Config/firebaseConfig";
+import { useNavigate } from "react-router-dom";
+
 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const navigate = useNavigate();
 
   const [breadcrumb, setBreadcrumb] = useState({
     title: "My Profile",
@@ -20,7 +25,11 @@ const SeekerProfilePage = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
-
+  const handleLogout = async () => {
+  await signOut(auth);
+  localStorage.removeItem("token"); // Remove token
+  navigate("/login");
+};
   // Update breadcrumb on tab change
   useEffect(() => {
     switch (selectedTab) {

@@ -10,22 +10,45 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../Config/firebaseConfig";
 import Header_1 from "../components/header/Header_1";
+import { useAuth } from "../context/AuthContext";
+
 
 const SignupPage = () => {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
-    console.log(e);
+    e.preventDefault();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      login(token); // store token in context
+      navigate("/seeker/profile"); // navigate after signup
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred during signup");
+    }
+  };
 
-    // handle signup
+  const handleGoogleSignUp = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Google Sign-Up successful:", user);
+      navigate("/seeker/profile");
+    } catch (err: any) {
+      console.error("Error during Google Sign-Up:", err);
+      setError(err.message || "An unexpected error occurred during Google Sign-Up");
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -124,7 +147,7 @@ const SignupPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-          //   onClick={handleGoogleSignUp}
+            onClick={handleGoogleSignUp}
         >
           Sign up with Google
         </Button>

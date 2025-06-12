@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -10,28 +9,44 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
-import { useAuth } from "../context/AuthContext";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../Config/firebaseConfig";
 import Header_1 from "../components/header/Header_1";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 const LoginPage = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    const res = await fetch("/token.json");
-    const data = await res.json();
-    login(data.token);
-    navigate("/seeker/profile");
+  const { login } = useAuth();
+  // ...state...
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      login(token); // store token in context
+      navigate("/seeker/profile"); // navigate after login
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred during login");
+    }
+  };
 
-    // remove this
-    if (data === 1) {
-      setError("test");
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("Google Sign-In successful:", user);
+       navigate("/seeker/profile");
+    } catch (err: any) {
+      console.error("Error during Google Sign-In:", err);
+      setError(err.message || "An unexpected error occurred during Google Sign-In");
     }
   };
 
@@ -106,7 +121,7 @@ const LoginPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-          // onClick={handleGoogleSignIn}
+           onClick={handleGoogleSignIn}
         >
           Sign in with Google
         </Button>
@@ -121,11 +136,6 @@ const LoginPage = () => {
           </Button>
         </Typography>
       </div>
-
-      {/* ************* login with dummy token (temp) ************ */}
-      <h2>Login</h2>
-      <button onClick={handleLogin}>Login (Dev)</button>
-      {/* ******************************************************** */}
     </Container>
   );
 };

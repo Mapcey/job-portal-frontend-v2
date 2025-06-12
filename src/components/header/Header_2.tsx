@@ -16,12 +16,13 @@ import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
+import { useAuth } from "../../context/AuthContext";
 
 const settings = ["Profile", "Settings", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -51,6 +52,23 @@ const Header_2 = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  const handleMenuItemClick = (setting: string) => {
+    handleCloseUserMenu();
+    if (setting === "Logout") {
+      logout();
+      navigate("/login");
+    }
+    // Add navigation for other settings if needed
+  };
+
+  // Helper to get first letter of email (uppercase)
+  const getInitial = () => {
+    if (user && user.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return "";
   };
 
   return (
@@ -114,7 +132,7 @@ const Header_2 = () => {
               ))}
             </Box>
 
-            {/* login */}
+            {/* login/user section */}
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
@@ -134,7 +152,9 @@ const Header_2 = () => {
               </IconButton>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar>
+                    {getInitial()}
+                  </Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -154,7 +174,7 @@ const Header_2 = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)}>
                     <Typography sx={{ textAlign: "center" }}>
                       {setting}
                     </Typography>
@@ -162,8 +182,6 @@ const Header_2 = () => {
                 ))}
               </Menu>
             </Box>
-
-            {/* login buttons */}
           </Toolbar>
         </Container>
       </AppBar>
