@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
+import { getEmployer_test } from "../../services/APIs/employerApi";
+
+import { EMPLOYER } from "../../types/employer";
 
 import {
   Typography,
@@ -14,6 +18,8 @@ import {
 import Avatar from "@mui/material/Avatar";
 
 const EmployerProfileTab = () => {
+  const [employer, setEmployer] = useState<EMPLOYER | null>(null);
+
   const photos = [
     "/imgs/grid/design.jpg",
     "/imgs/grid/developing.jpg",
@@ -30,6 +36,13 @@ const EmployerProfileTab = () => {
   const BrowsePostJob = () => {
     navigate("/employer/post");
   };
+
+  useEffect(() => {
+    getEmployer_test("1").then((res) => {
+      setEmployer(res);
+      console.log("Single employer:", res); // ✅ just res, not res.data
+    });
+  }, []);
 
   return (
     <div className="employer-profile-tab-container">
@@ -50,7 +63,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Company name"
               disabled
-              value={"John Keells Holdings"}
+              value={employer?.CompanyName || ""}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -59,7 +72,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Head Office Location"
               disabled
-              value={"Colombo"}
+              value={employer?.Location || ""}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -69,7 +82,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Phone number"
               disabled
-              value={"045 22 111 2222"}
+              value={employer?.ContactNo || ""}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -103,7 +116,7 @@ const EmployerProfileTab = () => {
             <TextField
               id="outlined-multiline-static"
               label="Company Overview"
-              value={"add about company."}
+              value={employer?.Overview || ""}
               disabled
               multiline
               rows={4}
