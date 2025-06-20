@@ -30,7 +30,10 @@ const LoginPage = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
-      login(token); // store token in context
+      const uid = userCredential.user.uid;
+      login(token);
+      console.log("User id:", uid);
+      console.log("Token:", token); // store token in context
       navigate("/seeker/profile"); // navigate after login
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during login");
@@ -42,6 +45,10 @@ const LoginPage = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      const uid = result.user.uid; 
+      const token = await result.user.getIdToken();
+      console.log("User id:", uid);
+      console.log("Token:", token);
       console.log("Google Sign-In successful:", user);
        navigate("/seeker/profile");
     } catch (err: any) {

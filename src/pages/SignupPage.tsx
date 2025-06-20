@@ -26,11 +26,15 @@ const SignupPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
+      const uid = userCredential.user.uid;
+      console.log("User id:", uid);
+      console.log("Token:", token);
       login(token); // store token in context
       navigate("/seeker/profile"); // navigate after signup
     } catch (err: any) {
@@ -43,6 +47,10 @@ const SignupPage = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      const token = await result.user.getIdToken();
+      const uid = result.user.uid; 
+      console.log("User id:", uid);
+      console.log("Token:", token);
       console.log("Google Sign-Up successful:", user);
       navigate("/seeker/profile");
     } catch (err: any) {
