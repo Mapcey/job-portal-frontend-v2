@@ -1,38 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
 import {
   Box,
-  Grid,
-  TextField,
-  MenuItem,
-  Typography,
   Button,
   Card,
-  CardContent,
   CardActions,
+  CardContent,
   Chip,
+  Grid,
+  MenuItem,
   Pagination,
+  TextField,
+  Typography,
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-
-import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 import Header_1 from "../../components/header/Header_1";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 
-// Mock job data
-const jobList = new Array(20).fill(null).map((_, i) => ({
-  id: i,
-  title: `Frontend Developer ${i + 1}`,
-  company: "Tech Corp",
-  location: "Colombo",
-  salary: "50K - 70K",
-  education: "Bachelor's",
-  experience: "2+ years",
-}));
+import { useAuth } from "../../context/AuthContext";
+import { getAllJobs } from "../../services/APIs/seekerApis";
+import { Job } from "../../types/job";
 
 const categories = ["IT", "Finance", "Marketing"];
 const jobTypes = ["Full-Time", "Part-Time", "Internship"];
@@ -41,6 +31,11 @@ const experienceLevels = ["0-1 years", "2+ years", "5+ years"];
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
 
@@ -49,10 +44,36 @@ const BrowseJobs = () => {
   const [educationLevel, setEducationLevel] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
 
-  const navigate = useNavigate();
-
   const jobsPerPage = 8;
-  const displayedJobs = jobList.slice(
+
+  // Load jobs from backend
+  useEffect(() => {
+    getAllJobs().then((data) => {
+      setJobs(data);
+      setFilteredJobs(data); // initially show all
+    });
+  }, []);
+
+  // Filter logic (optional if you wire it to the Filter button)
+  const handleFilter = () => {
+    let result = [...jobs];
+    if (category) result = result.filter((job) => job.JobCategory === category);
+    if (jobType) result = result.filter((job) => job.JobType === jobType);
+    if (educationLevel)
+      result = result.filter((job) => job.EducationLevel === educationLevel);
+    if (experienceLevel)
+      result = result.filter((job) => job.ProfExperience === experienceLevel);
+
+    if (searchQuery)
+      result = result.filter((job) =>
+        job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+    setFilteredJobs(result);
+    setPage(1); // Reset to first page
+  };
+
+  const displayedJobs = filteredJobs.slice(
     (page - 1) * jobsPerPage,
     page * jobsPerPage
   );
@@ -197,28 +218,84 @@ const BrowseJobs = () => {
 
           <Grid container spacing={3}>
             {displayedJobs.map((job) => (
-              <Grid key={job.id}>
-                <Card variant="outlined" sx={{ borderRadius: 2 }}>
+              <Grid item key={job.JobId} xs={12} sm={6} md={4}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    borderRadius: 2,
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    minWidth: 300, // optional fixed min width
+                  }}
+                >
                   <CardContent>
-                    <Typography variant="h6">{job.title}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {job.company}
+                    <Typography variant="h6" gutterBottom>
+                      {job.JobTitle}
                     </Typography>
-                    <Box
-                      sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      gutterBottom
                     >
-                      <Chip variant="outlined" label={job.salary} />
-                      <Chip variant="outlined" label={job.education} />
-                      <Chip variant="outlined" label={job.location} />
-                      <Chip variant="outlined" label={job.experience} />
+                      {job.Location}
+                    </Typography>
+
+                    {/* Chips container: max two lines */}
+                    <Box
+                      sx={{
+                        mt: 1,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 1,
+                        maxHeight: "3.6em", // roughly 2 lines height (depends on line-height)
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Chip
+                        label={
+                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                            {job.SalaryRange}
+                          </Typography>
+                        }
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={
+                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                            {job.EducationLevel}
+                          </Typography>
+                        }
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={
+                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                            {job.JobCategory}
+                          </Typography>
+                        }
+                        variant="outlined"
+                      />
+
+                      <Chip
+                        label={
+                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                            {job.JobType}
+                          </Typography>
+                        }
+                        variant="outlined"
+                      />
+                      {/* <Chip label={job.EducationLevel} variant="outlined" />
+                      <Chip label={job.JobCategory} variant="outlined" />
+                      <Chip label={job.JobType} variant="outlined" /> */}
                     </Box>
                   </CardContent>
+
                   <CardActions>
                     <Button
                       size="small"
-                      onClick={() => {
-                        navigate("/jobs/details");
-                      }}
+                      onClick={() => navigate(`/jobs/details/${job.JobId}`)}
                     >
                       View
                     </Button>
@@ -232,7 +309,7 @@ const BrowseJobs = () => {
           {/* Pagination */}
           <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Pagination
-              count={Math.ceil(jobList.length / jobsPerPage)}
+              count={Math.ceil(filteredJobs.length / jobsPerPage)}
               page={page}
               onChange={handlePageChange}
               color="primary"
