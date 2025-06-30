@@ -9,12 +9,15 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "../Config/firebaseConfig";
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -28,7 +31,11 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const token = await userCredential.user.getIdToken();
       const uid = userCredential.user.uid;
       login(token);
@@ -45,15 +52,17 @@ const LoginPage = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const uid = result.user.uid; 
+      const uid = result.user.uid;
       const token = await result.user.getIdToken();
       console.log("User id:", uid);
       console.log("Token:", token);
       console.log("Google Sign-In successful:", user);
-       navigate("/seeker/profile");
+      navigate("/seeker/profile");
     } catch (err: any) {
       console.error("Error during Google Sign-In:", err);
-      setError(err.message || "An unexpected error occurred during Google Sign-In");
+      setError(
+        err.message || "An unexpected error occurred during Google Sign-In"
+      );
     }
   };
 
@@ -91,6 +100,9 @@ const LoginPage = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
           />
           <TextField
             label="Password"
@@ -100,6 +112,9 @@ const LoginPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -128,7 +143,7 @@ const LoginPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-           onClick={handleGoogleSignIn}
+          onClick={handleGoogleSignIn}
         >
           Sign in with Google
         </Button>

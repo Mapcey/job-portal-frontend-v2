@@ -11,7 +11,6 @@ import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
 
-
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const navigate = useNavigate();

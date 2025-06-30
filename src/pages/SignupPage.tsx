@@ -10,11 +10,14 @@ import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth } from "../Config/firebaseConfig";
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
-
 
 const SignupPage = () => {
   const [email, setEmail] = useState("");
@@ -26,11 +29,14 @@ const SignupPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const token = await userCredential.user.getIdToken();
       const uid = userCredential.user.uid;
       console.log("User id:", uid);
@@ -48,14 +54,16 @@ const SignupPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const token = await result.user.getIdToken();
-      const uid = result.user.uid; 
+      const uid = result.user.uid;
       console.log("User id:", uid);
       console.log("Token:", token);
       console.log("Google Sign-Up successful:", user);
       navigate("/seeker/profile");
     } catch (err: any) {
       console.error("Error during Google Sign-Up:", err);
-      setError(err.message || "An unexpected error occurred during Google Sign-Up");
+      setError(
+        err.message || "An unexpected error occurred during Google Sign-Up"
+      );
     }
   };
 
@@ -97,6 +105,9 @@ const SignupPage = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
           />
           <TextField
             label="Password"
@@ -106,6 +117,9 @@ const SignupPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -124,6 +138,9 @@ const SignupPage = () => {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -155,7 +172,7 @@ const SignupPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-            onClick={handleGoogleSignUp}
+          onClick={handleGoogleSignUp}
         >
           Sign up with Google
         </Button>
