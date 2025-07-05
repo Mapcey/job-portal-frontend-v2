@@ -1,6 +1,8 @@
 export interface Job {
   JobId: number;
   CompanyId: number;
+  CompanyName: string;
+  DatePublished: string;
   JobTitle: string;
   Location: string;
   JobCategory: string;
@@ -10,8 +12,8 @@ export interface Job {
   ProfExperience: string;
   Languages: string;
   SalaryRange: string;
-  ExpiryDate: string; // You can also use `Date` if parsing manually
-  PostedDate: string; // Same as above
+  ExpiryDate: string;
+  PostedDate: string;
   Description: string;
   Status: string;
 }

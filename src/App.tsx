@@ -27,7 +27,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/jobs/details" element={<JobDetailsPage />} />
+        <Route path="/jobs/details/:id" element={<JobDetailsPage />} />
         <Route path="/jobs" element={<BrowseJobs />} />
         <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
         <Route path="/pricing" element={<PricingPage />} />

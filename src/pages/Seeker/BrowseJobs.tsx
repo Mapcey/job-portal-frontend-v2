@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+// MUI
 import {
   Box,
   Button,
   Card,
   CardActions,
   CardContent,
+  CardActionArea,
   Chip,
-  Grid,
   MenuItem,
   Pagination,
   TextField,
@@ -14,15 +17,14 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useNavigate } from "react-router-dom";
-
+// FIELS
 import Header_1 from "../../components/header/Header_1";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
-
 import { useAuth } from "../../context/AuthContext";
 import { getAllJobs } from "../../services/APIs/seekerApis";
 import { Job } from "../../types/job";
+import Loading from "../../components/Loading";
 
 const categories = ["IT", "Finance", "Marketing"];
 const jobTypes = ["Full-Time", "Part-Time", "Internship"];
@@ -35,6 +37,7 @@ const BrowseJobs = () => {
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -51,6 +54,7 @@ const BrowseJobs = () => {
     getAllJobs().then((data) => {
       setJobs(data);
       setFilteredJobs(data); // initially show all
+      setLoading(false);
     });
   }, []);
 
@@ -79,6 +83,8 @@ const BrowseJobs = () => {
   );
 
   const handlePageChange = (_: any, value: number) => setPage(value);
+
+  if (loading) return <Loading text="Loading All the Jobs..." />;
 
   return (
     <Box className="browse-jobs-container">
@@ -170,13 +176,16 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          <Button variant="contained">Filter</Button>
+          <Button variant="contained" sx={{ borderRadius: 2 }}>
+            Filter
+          </Button>
         </Box>
 
         {/* Results */}
         <Box sx={{ width: "75%" }}>
           <Box display={"flex"} flexDirection={"row"}>
             <TextField
+              size="small"
               fullWidth
               variant="outlined"
               placeholder="Search jobs..."
@@ -203,7 +212,7 @@ const BrowseJobs = () => {
               variant="contained"
               color="primary"
               sx={{
-                height: "55px",
+                height: "38px",
                 alignSelf: "flex-start",
 
                 borderRadius: "30px",
@@ -216,19 +225,25 @@ const BrowseJobs = () => {
             </Button>
           </Box>
 
-          <Grid container spacing={3}>
+          <Box
+            display="grid"
+            gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
+            gap={3}
+          >
             {displayedJobs.map((job) => (
-              <Grid item key={job.JobId} xs={12} sm={6} md={4}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 2,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    minWidth: 300, // optional fixed min width
-                  }}
+              <Card
+                key={job.JobId}
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <CardActionArea
+                  onClick={() => navigate(`/jobs/details/${job.JobId}`)}
                 >
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -242,69 +257,85 @@ const BrowseJobs = () => {
                       {job.Location}
                     </Typography>
 
-                    {/* Chips container: max two lines */}
+                    {/* Chips container (max 2 lines) */}
                     <Box
                       sx={{
                         mt: 1,
                         display: "flex",
                         flexWrap: "wrap",
                         gap: 1,
-                        maxHeight: "3.6em", // roughly 2 lines height (depends on line-height)
+                        maxHeight: "3.6em",
                         overflow: "hidden",
                       }}
                     >
                       <Chip
                         label={
-                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                          <Typography
+                            fontSize={12}
+                            noWrap
+                            sx={{ maxWidth: 100 }}
+                          >
                             {job.SalaryRange}
                           </Typography>
                         }
                         variant="outlined"
+                        size="small"
                       />
                       <Chip
                         label={
-                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                          <Typography
+                            noWrap
+                            sx={{ maxWidth: 100 }}
+                            fontSize={12}
+                          >
                             {job.EducationLevel}
                           </Typography>
                         }
                         variant="outlined"
+                        size="small"
                       />
                       <Chip
                         label={
-                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                          <Typography
+                            noWrap
+                            sx={{ maxWidth: 100 }}
+                            fontSize={12}
+                          >
                             {job.JobCategory}
                           </Typography>
                         }
                         variant="outlined"
+                        size="small"
                       />
-
                       <Chip
                         label={
-                          <Typography noWrap sx={{ maxWidth: 100 }}>
+                          <Typography
+                            noWrap
+                            sx={{ maxWidth: 100 }}
+                            fontSize={12}
+                          >
                             {job.JobType}
                           </Typography>
                         }
                         variant="outlined"
+                        size="small"
                       />
-                      {/* <Chip label={job.EducationLevel} variant="outlined" />
-                      <Chip label={job.JobCategory} variant="outlined" />
-                      <Chip label={job.JobType} variant="outlined" /> */}
                     </Box>
                   </CardContent>
-
-                  <CardActions>
-                    <Button
-                      size="small"
-                      onClick={() => navigate(`/jobs/details/${job.JobId}`)}
-                    >
-                      View
-                    </Button>
-                    <Button size="small">Apply</Button>
-                  </CardActions>
-                </Card>
-              </Grid>
+                </CardActionArea>
+                <CardActions>
+                  <Button
+                    size="small"
+                    component={Link}
+                    to={`/jobs/details/${job.JobId}`}
+                  >
+                    View
+                  </Button>
+                  <Button size="small">Apply</Button>
+                </CardActions>
+              </Card>
             ))}
-          </Grid>
+          </Box>
 
           {/* Pagination */}
           <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>

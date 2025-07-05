@@ -14,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
   user: User | null;
-  login: (token: string) => void;
+  login: (token: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
 }
@@ -27,13 +27,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Called when user logs in
-  const login = (newToken: string) => {
+  const login = async (newToken: string): Promise<boolean> => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
-    validateToken(newToken);
+    const result = await validateToken(newToken);
+    return result; // true or false
   };
 
   const logout = () => {
@@ -45,26 +45,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Validate token with backend securely
-  const validateToken = async (incomingToken: string) => {
+  const validateToken = async (incomingToken: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const res = await fetch("/api/validate", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${incomingToken}`,
-        },
-      });
+      const res = await fetch(
+        "http://qvf.93e.mytemp.website/api2/api/auth/validate",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${incomingToken}`,
+          },
+        }
+      );
 
       if (res.ok) {
         const data = await res.json();
         setIsAuthenticated(true);
-        // optionally: setUser(data.user); if returned from backend
+        console.log(data);
+
+        // setUser(data); // if backend returns user info
+        return true;
       } else {
         logout();
+        return false;
       }
     } catch (err) {
       console.error("Token validation failed:", err);
       logout();
+      return false;
     } finally {
       setLoading(false);
     }
@@ -75,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
-      validateToken(storedToken);
+      validateToken(storedToken); // ✅ this handles refresh
     } else {
       setLoading(false);
     }

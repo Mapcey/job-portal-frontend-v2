@@ -37,11 +37,13 @@ const LoginPage = () => {
         password
       );
       const token = await userCredential.user.getIdToken();
-      const uid = userCredential.user.uid;
-      login(token);
-      console.log("User id:", uid);
-      console.log("Token:", token); // store token in context
-      navigate("/seeker/profile"); // navigate after login
+      const success = await login(token); // Wait for backend validation
+      if (success) {
+        // navigate("/seeker/profile");
+        navigate("/employer/profile");
+      } else {
+        setError("Authentication failed. Please try again.");
+      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during login");
     }
