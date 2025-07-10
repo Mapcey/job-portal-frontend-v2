@@ -1,10 +1,5 @@
 // src/components/common/Loading.tsx
-import {
-  CircularProgress,
-  Box,
-  Typography,
-  LinearProgress,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 const Loading = ({ text = "Loading..." }: { text?: string }) => {
   return (
@@ -15,11 +10,6 @@ const Loading = ({ text = "Loading..." }: { text?: string }) => {
       justifyContent="center"
       height="100vh"
     >
-      {/* <CircularProgress size={48} color="primary" />
-      <LinearProgress sx={{ width: "100%" }} />
-      <Typography mt={2} variant="body1" color="grey">
-        {text}
-      </Typography> */}
       <div className="loader"></div>
       <Typography mt={2} variant="body1" color="grey">
         {text}

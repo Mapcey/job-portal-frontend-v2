@@ -11,6 +11,8 @@ import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
 
+import Loading from "../../components/Loading";
+
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const navigate = useNavigate();
@@ -118,7 +120,7 @@ const SeekerProfilePage = () => {
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
             <Tab
-              label="Manage Applications"
+              label="My Applications"
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
           </Tabs>

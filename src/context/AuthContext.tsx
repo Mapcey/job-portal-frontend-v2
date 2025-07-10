@@ -4,7 +4,6 @@ import React, {
   useState,
   useEffect,
   ReactNode,
-  useRef,
 } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../Config/firebaseConfig";
@@ -21,6 +20,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const DEV_MODE_BYPASS_AUTH = true; // ! validation by pass
+
 // --- Provider ---
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
@@ -32,8 +33,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (newToken: string): Promise<boolean> => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
+
+    // ! validation by pass
+    if (DEV_MODE_BYPASS_AUTH) {
+      setIsAuthenticated(true);
+      return true;
+    }
+
     const result = await validateToken(newToken);
-    return result; // true or false
+    return result;
   };
 
   const logout = () => {
