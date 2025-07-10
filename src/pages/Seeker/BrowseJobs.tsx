@@ -26,11 +26,6 @@ import { getAllJobs } from "../../services/APIs/seekerApis";
 import { Job } from "../../types/job";
 import Loading from "../../components/Loading";
 
-const categories = ["IT", "Finance", "Marketing"];
-const jobTypes = ["Full-Time", "Part-Time", "Internship"];
-const educationLevels = ["High School", "Bachelor's", "Master's"];
-const experienceLevels = ["0-1 years", "2+ years", "5+ years"];
-
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -47,7 +42,32 @@ const BrowseJobs = () => {
   const [educationLevel, setEducationLevel] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("");
 
+  const [categories, setCategories] = useState<string[]>([]);
+  const [jobTypes, setJobTypes] = useState<string[]>([]);
+  const [educationLevels, setEducationLevels] = useState<string[]>([]);
+  const [experienceLevels, setExperienceLevels] = useState<string[]>([]);
+
   const jobsPerPage = 8;
+
+  useEffect(() => {
+    getAllJobs().then((data) => {
+      setJobs(data);
+      setFilteredJobs(data);
+      setLoading(false);
+
+      // Dynamically extract unique values
+      setCategories([...new Set(data.map((job) => job.JobCategory))]);
+      setJobTypes([...new Set(data.map((job) => job.JobType))]);
+      setEducationLevels([...new Set(data.map((job) => job.EducationLevel))]);
+
+      // Optional: if experience level is a separate field
+      setExperienceLevels([
+        ...new Set(
+          data.map((job) => job.ProfExperience?.toString() + "+ years")
+        ),
+      ]);
+    });
+  }, []);
 
   // Load jobs from backend
   useEffect(() => {
@@ -61,12 +81,27 @@ const BrowseJobs = () => {
   // Filter logic (optional if you wire it to the Filter button)
   const handleFilter = () => {
     let result = [...jobs];
+
     if (category) result = result.filter((job) => job.JobCategory === category);
     if (jobType) result = result.filter((job) => job.JobType === jobType);
     if (educationLevel)
       result = result.filter((job) => job.EducationLevel === educationLevel);
-    if (experienceLevel)
-      result = result.filter((job) => job.ProfExperience === experienceLevel);
+
+    if (experienceLevel) {
+      // Extract numeric part from string like "2+ years"
+      const match = experienceLevel.match(/^(\d+)/);
+      const experienceNumber = match ? parseInt(match[1], 10) : NaN;
+
+      if (!isNaN(experienceNumber)) {
+        result = result.filter((job) =>
+          typeof job.ProfExperience === "number"
+            ? job.ProfExperience <= experienceNumber
+            : false
+        );
+      }
+
+      console.log("Filtering for experience >= ", experienceNumber);
+    }
 
     if (searchQuery)
       result = result.filter((job) =>
@@ -109,27 +144,32 @@ const BrowseJobs = () => {
         >
           <Typography variant="h6">Filters</Typography>
 
+          {/* Location */}
           <TextField
             className="b-j-input-style-1"
             label="Location"
             variant="outlined"
             size="small"
           />
+
+          {/* categories */}
           <TextField
             className="b-j-input-style-1"
             select
             label="Category"
+            value={category}
             variant="outlined"
             size="small"
-            value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            {categories.map((cat) => (
+            {[...categories].sort().map((cat) => (
               <MenuItem key={cat} value={cat}>
                 {cat}
               </MenuItem>
             ))}
           </TextField>
+
+          {/* job type */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -145,6 +185,8 @@ const BrowseJobs = () => {
               </MenuItem>
             ))}
           </TextField>
+
+          {/* education level */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -160,6 +202,8 @@ const BrowseJobs = () => {
               </MenuItem>
             ))}
           </TextField>
+
+          {/* experience level */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -169,14 +213,18 @@ const BrowseJobs = () => {
             value={experienceLevel}
             onChange={(e) => setExperienceLevel(e.target.value)}
           >
-            {experienceLevels.map((exp) => (
+            {[...experienceLevels].sort().map((exp) => (
               <MenuItem key={exp} value={exp}>
                 {exp}
               </MenuItem>
             ))}
           </TextField>
 
-          <Button variant="contained" sx={{ borderRadius: 2 }}>
+          <Button
+            variant="contained"
+            sx={{ borderRadius: 2 }}
+            onClick={handleFilter}
+          >
             Filter
           </Button>
         </Box>

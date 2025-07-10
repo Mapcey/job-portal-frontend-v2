@@ -9,7 +9,7 @@ export interface Job {
   JobType: string;
   WorkType: string;
   EducationLevel: string;
-  ProfExperience: string;
+  ProfExperience: number;
   Languages: string;
   SalaryRange: string;
   ExpiryDate: string;
