@@ -112,6 +112,24 @@ const BrowseJobs = () => {
     setPage(1); // Reset to first page
   };
 
+  const handleResetFilters = () => {
+    setCategory("");
+    setJobType("");
+    setEducationLevel("");
+    setExperienceLevel("");
+    setSearchQuery("");
+    setFilteredJobs(jobs); // show all jobs again
+    setPage(1); // reset to first page
+  };
+
+  const handleSearch = () => {
+    const result = jobs.filter((job) =>
+      job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredJobs(result);
+    setPage(1); // Reset to first page
+  };
+
   const displayedJobs = filteredJobs.slice(
     (page - 1) * jobsPerPage,
     page * jobsPerPage
@@ -227,6 +245,18 @@ const BrowseJobs = () => {
           >
             Filter
           </Button>
+
+          <Button
+            variant="contained"
+            sx={{
+              borderRadius: 2,
+              bgcolor: "secondary.light",
+              color: "secondary.main",
+            }}
+            onClick={handleResetFilters}
+          >
+            Clear Filter
+          </Button>
         </Box>
 
         {/* Results */}
@@ -267,7 +297,7 @@ const BrowseJobs = () => {
                 textTransform: "none",
                 px: 3,
               }}
-              // onClick={handleSearch}
+              onClick={handleSearch}
             >
               Search
             </Button>
