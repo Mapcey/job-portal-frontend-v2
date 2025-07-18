@@ -18,13 +18,13 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 // FIELS
-import Header_1 from "../../components/header/Header_1";
-import Header_2 from "../../components/header/Header_2";
-import Breadcrumb from "../../components/common/Breadcrumb";
-import { useAuth } from "../../context/AuthContext";
-import { getAllJobs } from "../../services/APIs/seekerApis";
-import { Job } from "../../types/job";
-import Loading from "../../components/Loading";
+import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
+import Breadcrumb from "../components/common/Breadcrumb";
+import { useAuth } from "../context/AuthContext";
+import { Job } from "../types/job";
+import Loading from "../components/Loading";
+import { getAllJobs } from "../services/APIs";
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
@@ -50,22 +50,30 @@ const BrowseJobs = () => {
   const jobsPerPage = 8;
 
   useEffect(() => {
-    getAllJobs().then((data) => {
+    getAllJobs().then((data: Job[]) => {
       setJobs(data);
       setFilteredJobs(data);
       setLoading(false);
 
-      // Dynamically extract unique values
-      setCategories([...new Set(data.map((job) => job.JobCategory))]);
-      setJobTypes([...new Set(data.map((job) => job.JobType))]);
-      setEducationLevels([...new Set(data.map((job) => job.EducationLevel))]);
+      setCategories([
+        ...new Set(data.map((job: Job) => job.JobCategory)),
+      ] as string[]);
 
-      // Optional: if experience level is a separate field
+      setJobTypes([
+        ...new Set(data.map((job: Job) => job.JobType)),
+      ] as string[]);
+
+      setEducationLevels([
+        ...new Set(data.map((job: Job) => job.EducationLevel)),
+      ] as string[]);
+
       setExperienceLevels([
         ...new Set(
-          data.map((job) => job.ProfExperience?.toString() + "+ years")
+          data.map((job: Job) =>
+            job.ProfExperience ? job.ProfExperience.toString() + "+ years" : ""
+          )
         ),
-      ]);
+      ] as string[]);
     });
   }, []);
 

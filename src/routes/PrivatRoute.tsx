@@ -5,26 +5,29 @@ import Loading from "../components/Loading";
 
 interface ProtectedRouteProps {
   children: ReactNode;
+  allowedRoles?: string[];
 }
 
-const DEV_MODE_BYPASS_AUTH = true; //! dev bypass
+const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+  const { isAuthenticated, loading, userRole } = useAuth();
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  //! dev bypass
-  if (DEV_MODE_BYPASS_AUTH) {
-    if (loading) {
-      return <Loading />; // or your custom loading spinner
-    }
-    return <>{children}</>;
-  }
-
+  // 1. While Firebase checks the user, show a loader
   if (loading) {
-    return <Loading />; // or your custom loading spinner
+    return <Loading />;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  // 2. If not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 3. (Optional) Check role-based access
+  if (allowedRoles && !allowedRoles.includes(userRole || "")) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // 4. Render the protected content
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

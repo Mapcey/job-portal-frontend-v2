@@ -5,22 +5,33 @@ import { Box, Typography, Button, Chip } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 // FILES
-import Header_1 from "../../components/header/Header_1";
-import Header_2 from "../../components/header/Header_2";
-import Breadcrumb from "../../components/common/Breadcrumb";
-import { useAuth } from "../../context/AuthContext";
-import { getJobById } from "../../services/APIs/seekerApis";
-import { Job } from "../../types/job";
-import Loading from "../../components/Loading";
+import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
+import Breadcrumb from "../components/common/Breadcrumb";
+import { useAuth } from "../context/AuthContext";
+import { Job } from "../types/job";
+import Loading from "../components/Loading";
+
+import { getJobById } from "../services/APIs/seekerApis";
+import { getJobDetails } from "../services/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<Job | null>(null);
   const { isAuthenticated } = useAuth();
 
+  // useEffect(() => {
+  //   if (id) {
+  //     getJobById(id).then((data) => {
+  //       if (data) setJob(data);
+  //       else setJob(null);
+  //     });
+  //   }
+  // }, [id]);
+
   useEffect(() => {
     if (id) {
-      getJobById(id).then((data) => {
+      getJobDetails(id).then((data) => {
         if (data) setJob(data);
         else setJob(null);
       });
@@ -69,10 +80,10 @@ const JobDetailsPage = () => {
               flexDirection={"column"}
             >
               <Typography variant="h4">{job.JobTitle}</Typography>
-              <Typography variant="h5">{job.CompanyName}</Typography>
+              {/* <Typography variant="h5">{job.CompanyName}</Typography> */}
               <Typography mb={2} variant="subtitle1">
                 Data published:{" "}
-                {new Date(job.DatePublished).toLocaleDateString("en-GB")}
+                {/* {new Date(job.DatePublished).toLocaleDateString("en-GB")} */}
               </Typography>
               <Chip
                 label={job.JobType}

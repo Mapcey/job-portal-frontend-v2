@@ -13,8 +13,10 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  setPersistence,
+  browserLocalPersistence,
 } from "firebase/auth";
-import { auth } from "../Config/firebaseConfig";
+import { auth } from "../firebase/config";
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -27,20 +29,29 @@ const LoginPage = () => {
   const [error, setError] = useState("");
 
   const { login } = useAuth();
-  // ...state...
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      await setPersistence(auth, browserLocalPersistence);
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
       const token = await userCredential.user.getIdToken();
+      const uid = await userCredential.user.getIdToken();
+      console.log(token);
+
       const success = await login(token); // Wait for backend validation
+
+      console.log("token stored");
+
       if (success) {
         // navigate("/seeker/profile");
         navigate("/employer/profile");
+        console.log("go to page");
       } else {
         setError("Authentication failed. Please try again.");
       }
