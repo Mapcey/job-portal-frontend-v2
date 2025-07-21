@@ -56,11 +56,13 @@ const Header_2 = () => {
 
   const handleMenuItemClick = (setting: string) => {
     handleCloseUserMenu();
+
     if (setting === "Logout") {
       logout();
       navigate("/login");
+    } else if (setting === "Profile") {
+      navigate("/employer/profile"); // Or whatever your profile route is
     }
-    // Add navigation for other settings if needed
   };
 
   // Helper to get first letter of email (uppercase)
@@ -152,9 +154,7 @@ const Header_2 = () => {
               </IconButton>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>
-                    {getInitial()}
-                  </Avatar>
+                  <Avatar>{getInitial()}</Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -174,7 +174,10 @@ const Header_2 = () => {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={() => handleMenuItemClick(setting)}>
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleMenuItemClick(setting)}
+                  >
                     <Typography sx={{ textAlign: "center" }}>
                       {setting}
                     </Typography>

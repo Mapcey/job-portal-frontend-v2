@@ -1,23 +1,54 @@
-import { useAuth } from "../../context/AuthContext";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+// MUI
 import { Box, Typography, Button, Chip } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+// FILES
+import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
+import Breadcrumb from "../components/common/Breadcrumb";
+import { useAuth } from "../context/AuthContext";
+import { Job } from "../types/job";
+import Loading from "../components/Loading";
 
-import Header_1 from "../../components/header/Header_1";
-import Header_2 from "../../components/header/Header_2";
-import Breadcrumb from "../../components/common/Breadcrumb";
-
-const tags = {
-  salary: "50K - 70K",
-  education: "Bachelor's",
-  location: "Colombo",
-  langulage: "Emglish",
-  experince: "3 - 5 yrs",
-  ctegory: "Engineering",
-};
+import { getJobById } from "../services/APIs/seekerApis";
+import { getJobDetails } from "../services/APIs";
 
 const JobDetailsPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [job, setJob] = useState<Job | null>(null);
   const { isAuthenticated } = useAuth();
+
+  // useEffect(() => {
+  //   if (id) {
+  //     getJobById(id).then((data) => {
+  //       if (data) setJob(data);
+  //       else setJob(null);
+  //     });
+  //   }
+  // }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      getJobDetails(id).then((data) => {
+        if (data) setJob(data);
+        else setJob(null);
+      });
+    }
+  }, [id]);
+
+  const tags = {
+    salary: job?.SalaryRange,
+    education: job?.EducationLevel,
+    location: job?.Location,
+    langulage: job?.Languages,
+    experince: `${job?.ProfExperience} Years`,
+    category: job?.JobCategory,
+  };
+
+  if (!job) return <Loading text="Loading Job Data..." />;
+
   return (
     <div className="job-details-page-container">
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
@@ -48,12 +79,16 @@ const JobDetailsPage = () => {
               mr={10}
               flexDirection={"column"}
             >
-              <Typography variant="h4">Software Engineer</Typography>
-              <Typography variant="h5">ABC company</Typography>
+              <Typography variant="h4">{job.JobTitle}</Typography>
+              {/* <Typography variant="h5">{job.CompanyName}</Typography> */}
               <Typography mb={2} variant="subtitle1">
-                Data published: dd/mm/yy
+                Data published:{" "}
+                {/* {new Date(job.DatePublished).toLocaleDateString("en-GB")} */}
               </Typography>
-              <Chip label="Full time" sx={{ width: "100px", color: "white" }} />
+              <Chip
+                label={job.JobType}
+                sx={{ width: "100px", color: "white" }}
+              />
             </Box>
             <Box width={"40%"}>
               {Object.entries(tags).map(([key, value]) => (
@@ -82,23 +117,8 @@ const JobDetailsPage = () => {
             <Typography mb={2} variant="h5">
               Job Description
             </Typography>
-            <Box bgcolor={"secondary.light"} borderRadius={3}>
-              <Typography p={2}>
-                Text between angle brackets is an HTML tag and is not displayed.
-                Most tags, such as the HTML and /HTML tags that surround the
-                contents of a page, come in pairs; some tags, like HR, for a
-                horizontal rule, stand alone. Comments, such as the text you're
-                reading, are not displayed when the Web page is shown. The
-                information between the HEAD and /HEAD tags is not displayed.
-                The information between the BODY and /BODY tags is displayed.
-                Text between angle brackets is an HTML tag and is not displayed.
-                Most tags, such as the HTML and /HTML tags that surround the
-                contents of a page, come in pairs; some tags, like HR, for a
-                horizontal rule, stand alone. Comments, such as the text you're
-                reading, are not displayed when the Web page is shown. The
-                information between the HEAD and /HEAD tags is not displayed.
-                The information between the BODY and /BODY tags is displayed.
-              </Typography>
+            <Box bgcolor={"#ebebeb"} borderRadius={3}>
+              <Typography p={2}>{job.Description}</Typography>
             </Box>
           </Box>
           <Box flex={1}>
@@ -118,24 +138,24 @@ const JobDetailsPage = () => {
               <Typography mb={2} variant="h4">
                 Job Overview
               </Typography>
-              <Box p={2} borderRadius={2} bgcolor={"secondary.light"}>
+              <Box p={2} borderRadius={2} bgcolor={"#ebebeb"}>
                 <Typography mb={1}>
-                  <strong> Job Overview:</strong> Full-time
+                  <strong> Job Overview:</strong> {job.JobType}
                 </Typography>
                 <Typography mb={1}>
-                  <strong> Job Category:</strong> Engineering
+                  <strong> Job Category:</strong> {tags.category}
                 </Typography>
                 <Typography mb={1}>
-                  <strong> Job Experience:</strong> 3 - 5 Years
+                  <strong> Job Experience:</strong> {tags.experince}
                 </Typography>
                 <Typography mb={1}>
-                  <strong> Education Level:</strong> Bachelor's
+                  <strong> Education Level:</strong> {tags.education}
                 </Typography>
                 <Typography mb={1}>
-                  <strong> Location:</strong> Colombo
+                  <strong> Location:</strong> {tags.location}
                 </Typography>
                 <Typography mb={1}>
-                  <strong> Salery:</strong> $50k - $75K
+                  <strong> Salery:</strong> {tags.salary}
                 </Typography>
               </Box>
             </Box>

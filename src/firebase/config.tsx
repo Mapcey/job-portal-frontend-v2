@@ -8,7 +8,7 @@ const firebaseConfig = {
   storageBucket: "suicul-job-portal.firebasestorage.app",
   messagingSenderId: "116976838431",
   appId: "1:116976838431:web:eda7d2a393bc302758f22a",
-  measurementId: "G-WB7N753Q0P"
+  measurementId: "G-WB7N753Q0P",
 };
 
 // Initialize Firebase

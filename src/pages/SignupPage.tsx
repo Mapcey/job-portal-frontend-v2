@@ -1,61 +1,141 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../Config/firebaseConfig";
+import {
+  Button,
+  TextField,
+  Box,
+  Typography,
+  Container,
+  IconButton,
+  InputAdornment,
+  Tab,
+  Tabs,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
+import { auth } from "../firebase/config";
+
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 
+import { signinSeeker } from "../services/APIs";
+import { signinEmployer } from "../services/APIs";
 
 const SignupPage = () => {
+  const [selectedTab, setSelectedTab] = useState(0);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
+    await setPersistence(auth, browserLocalPersistence);
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
-      const uid = userCredential.user.uid;
-      console.log("User id:", uid);
-      console.log("Token:", token);
-      login(token); // store token in context
-      navigate("/seeker/profile"); // navigate after signup
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+      const uid = user.uid;
+      const firebaseEmail = user.email;
+
+      if (!firebaseEmail) {
+        throw new Error("Email not found in Firebase user object.");
+      }
+
+      console.log({
+        token: token,
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        phoneNumber: user.phoneNumber,
+        photoURL: user.photoURL,
+        emailVerified: user.emailVerified,
+        providerId: user.providerId,
+        metadata: user.metadata,
+      });
+
+      await login(token); // Store token in context or localStorage
+
+      // 👇 Call your backend API with the new user info
+      const userPayload = {
+        uid,
+        email: firebaseEmail,
+      };
+
+      if (selectedTab === 0) {
+        // Seeker
+        await signinSeeker(userPayload);
+        navigate("/seeker/profile");
+        console.log("seeker api", userPayload);
+      } else {
+        // Employer
+        await signinEmployer(userPayload);
+        navigate("/employer/profile");
+        console.log("employer api", userPayload);
+      }
     } catch (err: any) {
+      console.error("Signup failed:", err);
       setError(err.message || "An unexpected error occurred during signup");
     }
   };
 
   const handleGoogleSignUp = async () => {
+    await setPersistence(auth, browserLocalPersistence);
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const token = await result.user.getIdToken();
-      const uid = result.user.uid; 
-      console.log("User id:", uid);
-      console.log("Token:", token);
-      console.log("Google Sign-Up successful:", user);
-      navigate("/seeker/profile");
+      const token = await user.getIdToken();
+      const uid = user.uid;
+      const firebaseEmail = user.email;
+
+      if (!firebaseEmail) {
+        throw new Error("Email not found in Firebase user object.");
+      }
+
+      const userPayload = {
+        uid,
+        email: firebaseEmail,
+      };
+
+      login(token);
+
+      if (selectedTab === 0) {
+        await signinSeeker(userPayload);
+        navigate("/seeker/profile");
+        console.log("seeker api - gmail", userPayload);
+      } else {
+        await signinEmployer(userPayload);
+        navigate("/employer/profile");
+        console.log("employer api - gmail", userPayload);
+      }
     } catch (err: any) {
-      console.error("Error during Google Sign-Up:", err);
-      setError(err.message || "An unexpected error occurred during Google Sign-Up");
+      setError(
+        err.message || "An unexpected error occurred during Google Sign-Up"
+      );
     }
   };
 
@@ -74,11 +154,30 @@ const SignupPage = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Sign Up
         </Typography>
+
+        <Tabs value={selectedTab} onChange={handleTabChange} sx={{ mb: 2 }}>
+          <Tab
+            label="As a Seeker"
+            sx={{
+              color: selectedTab === 0 ? "black" : "gray", // black when active, gray when inactive
+              fontWeight: selectedTab === 0 ? "bold" : "normal",
+            }}
+          />
+          <Tab
+            label="As an Employer"
+            sx={{
+              color: selectedTab === 1 ? "black" : "gray", // black when active, gray when inactive
+              fontWeight: selectedTab === 1 ? "bold" : "normal",
+            }}
+          />
+        </Tabs>
+
         {error && (
           <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
             {error}
           </Typography>
         )}
+
         <Box
           component="form"
           onSubmit={handleSignup}
@@ -97,6 +196,9 @@ const SignupPage = () => {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
           />
           <TextField
             label="Password"
@@ -106,6 +208,9 @@ const SignupPage = () => {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -114,6 +219,7 @@ const SignupPage = () => {
                   </IconButton>
                 </InputAdornment>
               ),
+              style: { color: "black" },
             }}
           />
           <TextField
@@ -124,6 +230,9 @@ const SignupPage = () => {
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            InputLabelProps={{
+              style: { color: "black" },
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -137,6 +246,7 @@ const SignupPage = () => {
               ),
             }}
           />
+
           <Button
             type="submit"
             variant="contained"
@@ -147,18 +257,21 @@ const SignupPage = () => {
             Sign Up
           </Button>
         </Box>
+
         <Typography variant="body2" sx={{ margin: "10px 0" }}>
           Or
         </Typography>
+
         <Button
           variant="outlined"
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-            onClick={handleGoogleSignUp}
+          onClick={handleGoogleSignUp}
         >
           Sign up with Google
         </Button>
+
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Already have an account?{" "}
           <Button

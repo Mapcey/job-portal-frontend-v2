@@ -1,82 +1,100 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { auth } from "../Config/firebaseConfig";
-import { useRef } from "react";
+import { auth } from "../firebase/config";
+import { getUserInfo } from "../services/APIs";
 
+// --- Types ---
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
-  user: User | null;
-  login: (token: string) => void;
+  firebaseUser: User | null;
+  userRole: string | null;
+  login: (token: string) => Promise<boolean>;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// --- Provider ---
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const TIMEOUT_DURATION = 60 * 1000;
+  const [token, setToken] = useState<string | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const startTimeout = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      logout();
-      alert("Session expired. Please log in again.");
-    }, TIMEOUT_DURATION);
-  };
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setIsAuthenticated(!!firebaseUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      setIsAuthenticated(true);
-      localStorage.setItem("token", token);
-    } else {
-      setIsAuthenticated(false);
-      localStorage.removeItem("token");
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      startTimeout();
-      // Optionally, reset timer on user activity:
-      const resetOnActivity = () => startTimeout();
-      window.addEventListener("mousemove", resetOnActivity);
-      window.addEventListener("keydown", resetOnActivity);
-      return () => {
-        window.removeEventListener("mousemove", resetOnActivity);
-        window.removeEventListener("keydown", resetOnActivity);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      };
-    }
-  }, [isAuthenticated]);
-
-  const login = (token: string) => {
+  const login = async (token: string): Promise<boolean> => {
     setToken(token);
+    try {
+      const userData = await getUserInfo(); // Token sent via axios interceptor
+      setIsAuthenticated(true);
+      if (userData.role) setUserRole(userData.role);
+      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      logout();
+      return false;
+    }
   };
 
   const logout = () => {
     setToken(null);
+    setFirebaseUser(null);
+    setUserRole(null);
+    setIsAuthenticated(false);
     signOut(auth);
-    setUser(null);
   };
 
+  // Persist session and fetch backend user info on refresh
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdToken();
+        setFirebaseUser(user);
+        setToken(token);
+
+        try {
+          const userData = await getUserInfo();
+          setUserRole(userData.role);
+          setIsAuthenticated(true);
+        } catch (err) {
+          console.error("Failed to fetch user info on auth state change:", err);
+          logout();
+        }
+      } else {
+        logout();
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        token,
+        firebaseUser,
+        userRole,
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+// --- Hook ---
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
