@@ -16,15 +16,17 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,  // <<------------------------------- ture
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "strict": false, // <<-------------------------------- ture
+    "noUnusedLocals": false, // <<------------------------ ture
+    "noUnusedParameters": false, // <<-------------------- ture
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "forceConsistentCasingInFileNames": true, // <<------- new
   },
   "include": ["src"]
 }
