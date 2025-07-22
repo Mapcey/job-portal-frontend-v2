@@ -17,12 +17,11 @@ import ProtectedRoute from "./PrivatRoute";
 
 const AppRoutes = () => (
   <Routes>
+    <Route path="*" element={<NotFoundPage />} />
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
-    {/* <Route path="/jobs/details/:id" element={<JobDetailsPage />} /> */}
     <Route path="/jobs" element={<BrowseJobs />} />
-    <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/contact" element={<ContactPage />} />
@@ -36,7 +35,6 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/seeker/profile"
       element={
@@ -61,15 +59,23 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+
     <Route
-      path="/employer/create_account"
+      path="/employer/register"
       element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <CreateNewAcEmployer />
-        </ProtectedRoute>
+        // <ProtectedRoute allowedRoles={["employer"]}>
+        <CreateNewAcEmployer />
+        // </ProtectedRoute>
       }
     />
-    <Route path="*" element={<NotFoundPage />} />
+    <Route
+      path="/seeker/register"
+      element={
+        // <ProtectedRoute allowedRoles={["seeker"]}>
+        <CreateNewAcSeeker />
+        // </ProtectedRoute>
+      }
+    />
   </Routes>
 );
 

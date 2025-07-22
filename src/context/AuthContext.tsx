@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { getUserInfo } from "../services/APIs";
+import { getUserInfo } from "../services/APIs/APIs";
 
 // --- Types ---
 interface AuthContextType {
@@ -18,6 +18,7 @@ interface AuthContextType {
   login: (token: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
+  userInfo: any;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<string | null>(null);
 
   const login = async (token: string): Promise<boolean> => {
     setToken(token);
@@ -87,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         loading,
+        userInfo,
       }}
     >
       {children}

@@ -1,6 +1,5 @@
 import axios from "axios";
-import { auth } from "../../firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase/config";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -9,17 +8,15 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add interceptor to attach Firebase token
+// Interceptor to attach token
 axiosInstance.interceptors.request.use(
   async (config) => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-      }
-    });
     const user = auth.currentUser;
     if (user) {
       const token = await user.getIdToken();
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      delete config.headers.Authorization; // Clear header if user not logged in
     }
     return config;
   },

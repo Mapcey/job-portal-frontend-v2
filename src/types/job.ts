@@ -1,8 +1,7 @@
 export interface Job {
   JobId: number;
   CompanyId: number;
-  // CompanyName: string; << NEW
-  // DatePublished: string; << NEW
+  CompanyName: string;
   JobTitle: string;
   Location: string;
   JobCategory: string;

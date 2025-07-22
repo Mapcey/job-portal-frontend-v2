@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -13,6 +13,7 @@ import {
   Tabs,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {
   createUserWithEmailAndPassword,
@@ -26,8 +27,8 @@ import { auth } from "../firebase/config";
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 
-import { signinSeeker } from "../services/APIs";
-import { signinEmployer } from "../services/APIs";
+import { signinSeeker } from "../services/APIs/APIs";
+import { signinEmployer } from "../services/APIs/APIs";
 
 const SignupPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -37,18 +38,32 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error("Failed to set Firebase persistence:", error);
+    });
+  }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
+    setSubmitting(true);
     await setPersistence(auth, browserLocalPersistence);
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -79,10 +94,9 @@ const SignupPage = () => {
 
       await login(token); // Store token in context or localStorage
 
-      // 👇 Call your backend API with the new user info
       const userPayload = {
-        uid,
         email: firebaseEmail,
+        role: selectedTab === 0 ? "seeker" : "employer",
       };
 
       if (selectedTab === 0) {
@@ -99,6 +113,8 @@ const SignupPage = () => {
     } catch (err: any) {
       console.error("Signup failed:", err);
       setError(err.message || "An unexpected error occurred during signup");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -117,19 +133,19 @@ const SignupPage = () => {
       }
 
       const userPayload = {
-        uid,
         email: firebaseEmail,
+        role: selectedTab === 0 ? "seeker" : "employer",
       };
 
       login(token);
 
       if (selectedTab === 0) {
         await signinSeeker(userPayload);
-        navigate("/seeker/profile");
+        navigate("/seeker/register");
         console.log("seeker api - gmail", userPayload);
       } else {
         await signinEmployer(userPayload);
-        navigate("/employer/profile");
+        navigate("/employer/register");
         console.log("employer api - gmail", userPayload);
       }
     } catch (err: any) {
@@ -173,9 +189,24 @@ const SignupPage = () => {
         </Tabs>
 
         {error && (
-          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              px: 2,
+              py: 1,
+              backgroundColor: "#fdecea",
+              border: "1px solid #f5c6cb",
+              borderRadius: 2,
+              color: "error.main",
+            }}
+          >
+            <ErrorOutlineIcon sx={{ mr: 1 }} />
+            <Typography variant="body2" fontWeight={500}>
+              {error}
+            </Typography>
+          </Box>
         )}
 
         <Box

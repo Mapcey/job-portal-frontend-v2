@@ -4,16 +4,21 @@
  */
 
 import React, { useRef, useState } from "react";
-import TextField from "@mui/material/TextField";
-import Avatar from "@mui/material/Avatar";
-import { Box, Typography, Grid } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import BackupIcon from "@mui/icons-material/Backup";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DeleteIcon from "@mui/icons-material/Delete";
+
+import {
+  Box,
+  Typography,
+  Grid,
+  TextField,
+  Avatar,
+  Button,
+  IconButton,
+} from "@mui/material";
+import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
+
 import { styled } from "@mui/material/styles";
+import { CREATE_EMPLOYER } from "../../types/createUser";
+import { employerRegister } from "../../services/APIs/APIs";
 
 const Input = styled("input")({
   display: "none",
@@ -22,8 +27,27 @@ const Input = styled("input")({
 const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
-
   const [images, setImages] = useState<File[]>([]);
+
+  const [formData, setFormData] = useState<CREATE_EMPLOYER>({
+    companyName: "",
+    location: "",
+    phone: "",
+    description: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await employerRegister(formData);
+      console.log("Success:", response);
+      // redirect or show success message
+    } catch (err) {
+      console.error("Registration failed:", err);
+    }
+
+    console.log("submit");
+  };
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -50,7 +74,7 @@ const FormSection_1 = () => {
   };
 
   return (
-    <div className="create-ac-form-container">
+    <form className="create-ac-form-container" onSubmit={handleSubmit}>
       {/* section */}
       <div className="create-ac-form-section">
         <div className="fs-profile-image-container">
@@ -77,7 +101,7 @@ const FormSection_1 = () => {
                 },
               }}
             >
-              <BackupIcon />
+              <Backup />
             </IconButton>
           </Box>
 
@@ -97,6 +121,10 @@ const FormSection_1 = () => {
             placeholder="Add a business name"
             className="text-input-1"
             size="small"
+            required
+            onChange={(e) =>
+              setFormData({ ...formData, companyName: e.target.value })
+            }
           />
 
           <TextField
@@ -105,6 +133,9 @@ const FormSection_1 = () => {
             placeholder="Add office address"
             className="text-input-1"
             size="small"
+            onChange={(e) =>
+              setFormData({ ...formData, location: e.target.value })
+            }
           />
         </div>
         <div className="fs-text-inputs-1">
@@ -114,6 +145,9 @@ const FormSection_1 = () => {
             placeholder="Add a valid phone number"
             className="text-input-1"
             size="small"
+            onChange={(e) =>
+              setFormData({ ...formData, phone: e.target.value })
+            }
           />
         </div>
       </div>
@@ -129,6 +163,9 @@ const FormSection_1 = () => {
             rows={4}
             className="text-input-1"
             size="small"
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
           />
         </div>
       </div>
@@ -143,7 +180,7 @@ const FormSection_1 = () => {
           <Box className="form-area">
             <div className="form-area-content">
               <h4>Impress employers and Stand out !</h4>
-              <PlayCircleIcon />
+              <PlayCircle />
               <Button
                 variant="contained"
                 color="primary"
@@ -175,7 +212,7 @@ const FormSection_1 = () => {
               sx={{ width: "100%" }}
               variant="outlined"
               component="span"
-              startIcon={<UploadFileIcon />}
+              startIcon={<UploadFile />}
             >
               Upload Images
             </Button>
@@ -210,7 +247,7 @@ const FormSection_1 = () => {
                     }}
                     size="small"
                   >
-                    <DeleteIcon fontSize="small" />
+                    <Delete fontSize="small" />
                   </IconButton>
                 </Box>
               </Grid>
@@ -342,17 +379,17 @@ const FormSection_1 = () => {
 
       {/* section bottom */}
       <div className="create-ac-form-section">
-        <Button
+        {/* <Button
           variant="contained"
           color="secondary"
           className="search-button"
           sx={{
             borderRadius: 2,
             padding: "10px 50px",
-          }}
+          }}-
         >
           Save
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           color="secondary"
@@ -361,11 +398,12 @@ const FormSection_1 = () => {
             borderRadius: 2,
             padding: "10px 80px",
           }}
+          type="submit"
         >
           Create Account
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

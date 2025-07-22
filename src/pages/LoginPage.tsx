@@ -43,6 +43,7 @@ const LoginPage = () => {
       const token = await userCredential.user.getIdToken();
       const uid = await userCredential.user.getIdToken();
       console.log(token);
+      console.log(uid);
 
       const success = await login(token); // Wait for backend validation
 

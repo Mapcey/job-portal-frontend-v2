@@ -24,7 +24,7 @@ import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
 import { Job } from "../types/job";
 import Loading from "../components/Loading";
-import { getAllJobs } from "../services/APIs";
+import { getAllJobs } from "../services/APIs/APIs";
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();

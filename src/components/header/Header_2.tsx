@@ -22,7 +22,7 @@ const settings = ["Profile", "Settings", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, user } = useAuth();
+  const { logout, userInfo } = useAuth();
   const navigate = useNavigate();
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -67,8 +67,8 @@ const Header_2 = () => {
 
   // Helper to get first letter of email (uppercase)
   const getInitial = () => {
-    if (user && user.email) {
-      return user.email.charAt(0).toUpperCase();
+    if (userInfo && userInfo.email) {
+      return userInfo.email.charAt(0).toUpperCase();
     }
     return "";
   };
