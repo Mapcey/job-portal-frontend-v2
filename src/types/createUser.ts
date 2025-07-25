@@ -1,8 +1,13 @@
-export interface CREATE_EMPLOYER {
-  companyName: string;
-  location: string;
-  phone: string;
-  description?: string;
+export interface EMPLOYER_DATA {
+  EmployerId: number;
+  FirebaseUID: string;
+  CompanyName: string;
+  ContactNo: string;
+  WebSite: string;
+  Location: string;
+  LinkedIn: string;
+  Overview: string;
+  IsSub: boolean;
 }
 
 export interface CREATE_SEEKER {

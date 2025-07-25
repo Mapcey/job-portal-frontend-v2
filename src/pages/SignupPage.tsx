@@ -21,17 +21,18 @@ import {
   signInWithPopup,
   setPersistence,
   browserLocalPersistence,
+  deleteUser,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 
-import { signinSeeker } from "../services/APIs/APIs";
-import { signinEmployer } from "../services/APIs/APIs";
+import { signupSeeker } from "../services/APIs/APIs";
+import { signupEmployer } from "../services/APIs/APIs";
 
 const SignupPage = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useState(1);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +42,7 @@ const SignupPage = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { setUserRoleAndInfo } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,11 +57,13 @@ const SignupPage = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     setSubmitting(true);
+    setError("");
     await setPersistence(auth, browserLocalPersistence);
     e.preventDefault();
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setSubmitting(false);
       return;
     }
 
@@ -80,80 +83,82 @@ const SignupPage = () => {
         throw new Error("Email not found in Firebase user object.");
       }
 
-      console.log({
-        token: token,
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        phoneNumber: user.phoneNumber,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-        providerId: user.providerId,
-        metadata: user.metadata,
-      });
-
-      await login(token); // Store token in context or localStorage
-
       const userPayload = {
-        email: firebaseEmail,
-        role: selectedTab === 0 ? "seeker" : "employer",
+        ContactNo: firebaseEmail,
       };
 
       if (selectedTab === 0) {
-        // Seeker
-        await signinSeeker(userPayload);
-        navigate("/seeker/profile");
-        console.log("seeker api", userPayload);
+        await signupSeeker(userPayload);
       } else {
-        // Employer
-        await signinEmployer(userPayload);
-        navigate("/employer/profile");
-        console.log("employer api", userPayload);
+        const response = await signupEmployer(userPayload);
+        console.log(response);
+        if (response.FirebaseUID == uid) {
+          console.log("Signup success");
+          setUserRoleAndInfo("employer", response);
+          navigate("/employer/register");
+
+          // signup();
+        } else {
+          throw new Error(response.message || "Signup failed");
+        }
       }
     } catch (err: any) {
       console.error("Signup failed:", err);
+      const user = auth.currentUser;
+      if (user) {
+        await deleteUser(user).catch((deleteErr) =>
+          console.warn("Failed to delete Firebase user:", deleteErr)
+        );
+      }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    await setPersistence(auth, browserLocalPersistence);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const token = await user.getIdToken();
-      const uid = user.uid;
-      const firebaseEmail = user.email;
+  // const handleGoogleSignUp = async () => {
+  //   await setPersistence(auth, browserLocalPersistence);
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     const token = await user.getIdToken();
+  //     const uid = user.uid;
+  //     const firebaseEmail = user.email;
 
-      if (!firebaseEmail) {
-        throw new Error("Email not found in Firebase user object.");
-      }
+  //     if (!firebaseEmail) {
+  //       throw new Error("Email not found in Firebase user object.");
+  //     }
 
-      const userPayload = {
-        email: firebaseEmail,
-        role: selectedTab === 0 ? "seeker" : "employer",
-      };
+  //     const userPayload = {
+  //       IsSub: false,
+  //     };
 
-      login(token);
+  //     login(token);
 
-      if (selectedTab === 0) {
-        await signinSeeker(userPayload);
-        navigate("/seeker/register");
-        console.log("seeker api - gmail", userPayload);
-      } else {
-        await signinEmployer(userPayload);
-        navigate("/employer/register");
-        console.log("employer api - gmail", userPayload);
-      }
-    } catch (err: any) {
-      setError(
-        err.message || "An unexpected error occurred during Google Sign-Up"
-      );
-    }
-  };
+  //     if (selectedTab === 0) {
+  //       await signupSeeker(userPayload);
+  //       navigate("/seeker/register");
+  //       console.log("seeker api - gmail", userPayload);
+  //     } else {
+  //       console.log("employer");
+
+  //       const response = await signupEmployer(userPayload);
+  //       console.log(response);
+
+  //       if (response.success) {
+  //         console.log("Signup confirmed:", response.data);
+  //         navigate("/seeker/register");
+  //       } else {
+  //         throw new Error(response.message || "Signup failed");
+  //       }
+  //     }
+  //   } catch (err: any) {
+  //     setError(
+  //       err.message || "An unexpected error occurred during Google Sign-Up"
+  //     );
+  //   }
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -298,7 +303,7 @@ const SignupPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-          onClick={handleGoogleSignUp}
+          // onClick={handleGoogleSignUp}
         >
           Sign up with Google
         </Button>

@@ -1,5 +1,5 @@
 // import React from "react";
-import Header_1 from "../../components/header/Header_1";
+import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import FormSection_1 from "../../components/Employer/FormSection_1";
 
@@ -7,10 +7,10 @@ const CreateNewAcEmployer = () => {
   return (
     <div className="create-new-ac-seeker-container">
       <div>
-        <Header_1 />
+        <Header_2 />
         <Breadcrumb
           title="Complete Your New Employer Profile"
-          description="Create a new account to access all features and services. Create a new account to access all features and services."
+          description="Create a new account to access all features and services. "
           backgroundImage="/imgs/backgrounds/bg-1.jpg"
         />
         <FormSection_1 />

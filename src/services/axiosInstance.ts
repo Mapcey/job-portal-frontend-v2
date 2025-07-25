@@ -18,6 +18,11 @@ axiosInstance.interceptors.request.use(
     } else {
       delete config.headers.Authorization; // Clear header if user not logged in
     }
+    // Log the request details
+    console.log("Request URL:", config.url);
+    console.log("Request Method:", config.method);
+    console.log("Request Headers:", config.headers);
+    console.log("Payload:", config.data);
     return config;
   },
   (error) => Promise.reject(error)

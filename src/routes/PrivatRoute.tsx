@@ -9,7 +9,9 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { isAuthenticated, loading, userRole } = useAuth();
+  const { isAuthenticated, loading, userRole, logout } = useAuth();
+
+  console.log("privetroute: ", isAuthenticated, userRole);
 
   // 1. While Firebase checks the user, show a loader
   if (loading) {
@@ -18,6 +20,8 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
 
   // 2. If not authenticated, redirect to login
   if (!isAuthenticated) {
+    logout();
+    console.log("privetroute: log out");
     return <Navigate to="/login" replace />;
   }
 

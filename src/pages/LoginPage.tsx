@@ -20,6 +20,7 @@ import { auth } from "../firebase/config";
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -28,10 +29,11 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const { login } = useAuth();
+  const { login, userRole } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     try {
       await setPersistence(auth, browserLocalPersistence);
 
@@ -41,18 +43,21 @@ const LoginPage = () => {
         password
       );
       const token = await userCredential.user.getIdToken();
-      const uid = await userCredential.user.getIdToken();
       console.log(token);
-      console.log(uid);
 
       const success = await login(token); // Wait for backend validation
 
-      console.log("token stored");
+      console.log("login function - OK");
 
       if (success) {
-        // navigate("/seeker/profile");
-        navigate("/employer/profile");
-        console.log("go to page");
+        console.log(success);
+        if (success == "employer") {
+          navigate("/employer/profile/");
+        } else if (success == "seeker") {
+          navigate("/seeker/profile/");
+        } else {
+          console.log("user role not found");
+        }
       } else {
         setError("Authentication failed. Please try again.");
       }
@@ -92,9 +97,24 @@ const LoginPage = () => {
           Login
         </Typography>
         {error && (
-          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              px: 2,
+              py: 1,
+              backgroundColor: "#fdecea",
+              border: "1px solid #f5c6cb",
+              borderRadius: 2,
+              color: "error.main",
+            }}
+          >
+            <ErrorOutlineIcon sx={{ mr: 1 }} />
+            <Typography variant="body2" fontWeight={500}>
+              {error}
+            </Typography>
+          </Box>
         )}
         <Box
           component="form"

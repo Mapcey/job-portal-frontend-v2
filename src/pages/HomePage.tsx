@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { useAuth } from "../context/AuthContext";
 
 import Header_1 from "../components/header/Header_1";
@@ -13,6 +15,10 @@ import FooterSection_1 from "../components/footer/FooterSection_1";
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("Home", isAuthenticated);
+  });
 
   return (
     <div className="landingPage-container">

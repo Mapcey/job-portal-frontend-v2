@@ -18,11 +18,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useAuth } from "../../context/AuthContext";
 
-const settings = ["Profile", "Settings", "Logout"];
+const settings = ["Profile", "Edite", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, userInfo } = useAuth();
+  const { logout, userInfo, userRole } = useAuth();
   const navigate = useNavigate();
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -61,7 +61,23 @@ const Header_2 = () => {
       logout();
       navigate("/login");
     } else if (setting === "Profile") {
-      navigate("/employer/profile"); // Or whatever your profile route is
+      if (userRole == "seeker") {
+        navigate("/seeker/profile");
+        console.log(userRole);
+      } else if (userRole == "employer") {
+        navigate("/employer/profile");
+        console.log(userRole);
+      } else {
+        console.log("no user role");
+      }
+    } else if (setting === "Edite") {
+      if (userRole == "seeker") {
+        navigate("/seeker/register");
+      } else if (userRole == "employer") {
+        navigate("/employer/register");
+      } else {
+        console.log("no user role");
+      }
     }
   };
 
@@ -71,6 +87,11 @@ const Header_2 = () => {
       return userInfo.email.charAt(0).toUpperCase();
     }
     return "";
+  };
+
+  const handleTest = () => {
+    console.log("info: ", userInfo);
+    console.log("role: ", userRole);
   };
 
   return (
@@ -149,6 +170,7 @@ const Header_2 = () => {
                 size="large"
                 aria-label="show 17 new notifications"
                 sx={{ marginRight: 2 }}
+                onClick={handleTest}
               >
                 <NotificationsIcon />
               </IconButton>

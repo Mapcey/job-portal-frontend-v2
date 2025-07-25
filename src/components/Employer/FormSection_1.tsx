@@ -1,9 +1,4 @@
-/**
- * CSS -> Components > Employee >
- * CSS (copy) -> Components > Seeker >
- */
-
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -17,8 +12,9 @@ import {
 import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
 
 import { styled } from "@mui/material/styles";
-import { CREATE_EMPLOYER } from "../../types/createUser";
-import { employerRegister } from "../../services/APIs/APIs";
+import { EMPLOYER_DATA } from "../../types/createUser";
+import { putEmployerData } from "../../services/APIs/APIs";
+import { useAuth } from "../../context/AuthContext";
 
 const Input = styled("input")({
   display: "none",
@@ -28,25 +24,38 @@ const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
   const [images, setImages] = useState<File[]>([]);
+  const { userInfo } = useAuth();
+  const [employerID, setEmployerID] = useState(0);
 
-  const [formData, setFormData] = useState<CREATE_EMPLOYER>({
-    companyName: "",
-    location: "",
-    phone: "",
-    description: "",
+  useEffect(() => {
+    if (userInfo && "EmployerId" in userInfo) {
+      setEmployerID(userInfo.EmployerId);
+      console.log(userInfo.EmployerId);
+    }
+  }, [userInfo]);
+
+  const [formData, setFormData] = useState<EMPLOYER_DATA>({
+    EmployerId: 0,
+    FirebaseUID: "",
+    CompanyName: "",
+    ContactNo: "",
+    WebSite: "",
+    Location: "",
+    LinkedIn: "",
+    Overview: "",
+    IsSub: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log(userInfo.EmployerId);
+
     e.preventDefault();
     try {
-      const response = await employerRegister(formData);
+      const response = await putEmployerData(employerID, formData);
       console.log("Success:", response);
-      // redirect or show success message
     } catch (err) {
-      console.error("Registration failed:", err);
+      console.error("Update failed:", err);
     }
-
-    console.log("submit");
   };
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +132,7 @@ const FormSection_1 = () => {
             size="small"
             required
             onChange={(e) =>
-              setFormData({ ...formData, companyName: e.target.value })
+              setFormData({ ...formData, CompanyName: e.target.value })
             }
           />
 
@@ -134,7 +143,7 @@ const FormSection_1 = () => {
             className="text-input-1"
             size="small"
             onChange={(e) =>
-              setFormData({ ...formData, location: e.target.value })
+              setFormData({ ...formData, Location: e.target.value })
             }
           />
         </div>
@@ -146,7 +155,7 @@ const FormSection_1 = () => {
             className="text-input-1"
             size="small"
             onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
+              setFormData({ ...formData, ContactNo: e.target.value })
             }
           />
         </div>
@@ -164,7 +173,7 @@ const FormSection_1 = () => {
             className="text-input-1"
             size="small"
             onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
+              setFormData({ ...formData, Overview: e.target.value })
             }
           />
         </div>

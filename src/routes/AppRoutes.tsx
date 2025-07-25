@@ -63,17 +63,17 @@ const AppRoutes = () => (
     <Route
       path="/employer/register"
       element={
-        // <ProtectedRoute allowedRoles={["employer"]}>
-        <CreateNewAcEmployer />
-        // </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <CreateNewAcEmployer />
+        </ProtectedRoute>
       }
     />
     <Route
       path="/seeker/register"
       element={
-        // <ProtectedRoute allowedRoles={["seeker"]}>
-        <CreateNewAcSeeker />
-        // </ProtectedRoute>
+        <ProtectedRoute allowedRoles={["seeker"]}>
+          <CreateNewAcSeeker />
+        </ProtectedRoute>
       }
     />
   </Routes>
