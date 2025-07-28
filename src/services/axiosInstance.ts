@@ -28,4 +28,27 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// --- Response Interceptor with Retry Logic ---
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+
+    // Only retry on 500 and if retry count is less than 2
+    if (error.response?.status === 500) {
+      config._retryCount = config._retryCount || 0;
+
+      if (config._retryCount < 2) {
+        config._retryCount += 1;
+        console.warn(`Retrying request... attempt ${config._retryCount + 1}`);
+        return axiosInstance(config); // Retry the request
+      }
+
+      console.error("Max retry attempts reached for:", config.url);
+    }
+
+    return Promise.reject(error); // Final rejection
+  }
+);
+
 export default axiosInstance;

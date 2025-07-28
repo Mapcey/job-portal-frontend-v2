@@ -1,7 +1,7 @@
 import axiosInstance from "../axiosInstance";
 
 import { Job } from "../../types/job";
-import { EMPLOYER_DATA } from "../../types/createUser";
+import { EMPLOYER_DATA } from "../../types/users";
 
 export const getUserInfo = async () => {
   const response = await axiosInstance.get(`/user/me`);

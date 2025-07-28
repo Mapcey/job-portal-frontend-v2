@@ -83,9 +83,16 @@ const Header_2 = () => {
 
   // Helper to get first letter of email (uppercase)
   const getInitial = () => {
-    if (userInfo && userInfo.email) {
-      return userInfo.email.charAt(0).toUpperCase();
+    if (userRole == "employer") {
+      if (userInfo && userInfo.CompanyName) {
+        return userInfo.CompanyName.charAt(0).toUpperCase();
+      }
+    } else if (userRole == "seeker") {
+      if (userInfo && userInfo.Name) {
+        return userInfo.Name.charAt(0).toUpperCase();
+      }
     }
+
     return "";
   };
 

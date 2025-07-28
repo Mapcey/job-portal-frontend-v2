@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -10,8 +10,11 @@ import {
   Card,
   CardMedia,
 } from "@mui/material";
-
 import Avatar from "@mui/material/Avatar";
+
+import { EMPLOYER_DATA } from "../../types/users";
+import { useAuth } from "../../context/AuthContext";
+import { getEmployerData } from "../../services/APIs/APIs";
 
 const EmployerProfileTab = () => {
   const photos = [
@@ -26,6 +29,32 @@ const EmployerProfileTab = () => {
   const [imageSrc] = useState("/imgs/companies/c1.png"); // add setImage later
 
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
+  const [employerID, setEmployerID] = useState(0);
+  const [user, setUser] = useState<EMPLOYER_DATA | null>(null);
+
+  useEffect(() => {
+    if (userInfo && "EmployerId" in userInfo) {
+      setEmployerID(userInfo.EmployerId);
+      console.log(userInfo.EmployerId);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (employerID !== 0) {
+        try {
+          const data = await getEmployerData(employerID.toString());
+          setUser(data);
+          console.log("Employer data fetched:", data);
+        } catch (error) {
+          console.error("Failed to fetch employer data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [employerID]);
 
   const BrowsePostJob = () => {
     navigate("/employer/post");
@@ -50,7 +79,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Company name"
               disabled
-              value={"John Keells Holdings"}
+              value={user?.CompanyName || ""}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -59,7 +88,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Head Office Location"
               disabled
-              value={"Colombo"}
+              value={user?.Location}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -69,7 +98,7 @@ const EmployerProfileTab = () => {
             <TextField
               label="Phone number"
               disabled
-              value={"045 22 111 2222"}
+              value={user?.ContactNo || ""}
               variant="outlined"
               className="text-input-1"
               size="small"
@@ -103,7 +132,7 @@ const EmployerProfileTab = () => {
             <TextField
               id="outlined-multiline-static"
               label="Company Overview"
-              value={"add about company."}
+              value={user?.Overview || ""}
               disabled
               multiline
               rows={4}

@@ -12,7 +12,7 @@ import {
 import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
 
 import { styled } from "@mui/material/styles";
-import { EMPLOYER_DATA } from "../../types/createUser";
+import { EMPLOYER_DATA } from "../../types/users";
 import { putEmployerData } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 
@@ -24,7 +24,7 @@ const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
   const [images, setImages] = useState<File[]>([]);
-  const { userInfo } = useAuth();
+  const { userInfo, login, token } = useAuth();
   const [employerID, setEmployerID] = useState(0);
 
   useEffect(() => {
@@ -409,7 +409,7 @@ const FormSection_1 = () => {
           }}
           type="submit"
         >
-          Create Account
+          Save
         </Button>
       </div>
     </form>

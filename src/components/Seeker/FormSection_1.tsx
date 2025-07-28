@@ -14,7 +14,7 @@ import {
 import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-import { CREATE_SEEKER } from "../../types/createUser";
+import { CREATE_SEEKER } from "../../types/users";
 
 const options = ["Option 1", "Option 2", "Option 2"];
 
