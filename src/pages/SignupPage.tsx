@@ -12,7 +12,7 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {
@@ -32,7 +32,7 @@ import { signupSeeker } from "../services/APIs/APIs";
 import { signupEmployer } from "../services/APIs/APIs";
 
 const SignupPage = () => {
-  const [selectedTab, setSelectedTab] = useState(1);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,14 +85,16 @@ const SignupPage = () => {
 
       const userPayload = {
         ContactNo: "12345",
+        Email: firebaseEmail,
       };
 
       if (selectedTab === 0) {
         const response = await signupSeeker(userPayload);
         console.log(response);
-        if (response.FirebaseUID == uid) {
+        if (response) {
           console.log("Signup success");
           setUserRoleAndInfo("seeker", response);
+          navigate("/seeker/register");
         }
       } else {
         const response = await signupEmployer(userPayload);
