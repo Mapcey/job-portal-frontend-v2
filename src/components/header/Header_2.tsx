@@ -2,21 +2,25 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Container,
+  Button,
+  Tooltip,
+  Avatar,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Typography from "@mui/material/Typography";
 import { useAuth } from "../../context/AuthContext";
+
+import NotificationPopover from "./NotificationPop";
 
 const settings = ["Profile", "Edite", "Logout"];
 
@@ -28,6 +32,17 @@ const Header_2 = () => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+
+  const [anchorElNotification, setAnchorElNotification] =
+    useState<null | HTMLElement>(null);
+
+  const handleOpenNotification = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNotification(event.currentTarget);
+  };
+
+  const handleCloseNotification = () => {
+    setAnchorElNotification(null);
+  };
 
   const pages = [
     { label: "Home", path: "/" },
@@ -105,7 +120,7 @@ const Header_2 = () => {
     <div style={{ marginBottom: 90 }}>
       <AppBar
         position="fixed"
-        sx={{ backgroundColor: "primary.light", transition: "all 0.3s ease" }}
+        sx={{ backgroundColor: "primary.light" }}
         elevation={elevated ? 4 : 0}
       >
         <Container maxWidth="xl">
@@ -170,17 +185,29 @@ const Header_2 = () => {
                 marginLeft: 4,
               }}
             >
-              <IconButton size="large" aria-label="show 4 new mails">
+              <IconButton
+                size="large"
+                aria-label="show 4 new mails"
+                onClick={handleTest}
+              >
                 <MailIcon />
               </IconButton>
+
               <IconButton
                 size="large"
                 aria-label="show 17 new notifications"
                 sx={{ marginRight: 2 }}
-                onClick={handleTest}
+                onClick={handleOpenNotification}
               >
                 <NotificationsIcon />
               </IconButton>
+
+              <NotificationPopover
+                anchorEl={anchorElNotification}
+                open={Boolean(anchorElNotification)}
+                onClose={handleCloseNotification}
+              />
+
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar>{getInitial()}</Avatar>

@@ -84,11 +84,16 @@ const SignupPage = () => {
       }
 
       const userPayload = {
-        ContactNo: firebaseEmail,
+        ContactNo: "12345",
       };
 
       if (selectedTab === 0) {
-        await signupSeeker(userPayload);
+        const response = await signupSeeker(userPayload);
+        console.log(response);
+        if (response.FirebaseUID == uid) {
+          console.log("Signup success");
+          setUserRoleAndInfo("seeker", response);
+        }
       } else {
         const response = await signupEmployer(userPayload);
         console.log(response);
@@ -96,8 +101,6 @@ const SignupPage = () => {
           console.log("Signup success");
           setUserRoleAndInfo("employer", response);
           navigate("/employer/register");
-
-          // signup();
         } else {
           throw new Error(response.message || "Signup failed");
         }

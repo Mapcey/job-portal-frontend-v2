@@ -14,6 +14,7 @@ import CreateNewAcEmployer from "../pages/Employer/CreateNewAccount";
 import EmployerProfilePage from "../pages/Employer/ProfilePage";
 import PostJob from "../pages/Employer/PostJob";
 import ProtectedRoute from "./PrivatRoute";
+import SeekerEditPage from "../pages/Seeker/EditProfile";
 
 const AppRoutes = () => (
   <Routes>
@@ -25,6 +26,7 @@ const AppRoutes = () => (
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/contact" element={<ContactPage />} />
+    <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
 
     {/* Protected routes */}
     <Route
@@ -38,9 +40,9 @@ const AppRoutes = () => (
     <Route
       path="/seeker/profile"
       element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
-          <SeekerProfile />
-        </ProtectedRoute>
+        // <ProtectedRoute allowedRoles={["seeker"]}>
+        <SeekerProfile />
+        // </ProtectedRoute>
       }
     />
     <Route
