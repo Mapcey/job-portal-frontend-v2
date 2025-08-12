@@ -89,7 +89,7 @@ const Header_2 = () => {
       if (userRole == "seeker") {
         navigate("/seeker/register");
       } else if (userRole == "employer") {
-        navigate("/employer/register");
+        navigate("/employer/edit_profile");
       } else {
         console.log("no user role");
       }

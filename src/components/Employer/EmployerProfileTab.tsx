@@ -15,6 +15,7 @@ import Avatar from "@mui/material/Avatar";
 import { EMPLOYER_DATA } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 import { getEmployerData } from "../../services/APIs/APIs";
+import EditIcon from "@mui/icons-material/Edit";
 
 const EmployerProfileTab = () => {
   const photos = [
@@ -60,6 +61,10 @@ const EmployerProfileTab = () => {
     navigate("/employer/post");
   };
 
+  const BrowseEditProfile = () => {
+    navigate("/employer/edit_profile");
+  };
+
   return (
     <div className="employer-profile-tab-container">
       <div className="employer-profile-tab-content">
@@ -81,16 +86,16 @@ const EmployerProfileTab = () => {
               disabled
               value={user?.CompanyName || ""}
               variant="outlined"
-              className="text-input-1"
+              className="text-field-dis"
               size="small"
             />
 
             <TextField
               label="Head Office Location"
               disabled
-              value={user?.Location}
+              value={user?.Location || ""}
               variant="outlined"
-              className="text-input-1"
+              className="text-field-dis"
               size="small"
             />
           </div>
@@ -100,7 +105,7 @@ const EmployerProfileTab = () => {
               disabled
               value={user?.ContactNo || ""}
               variant="outlined"
-              className="text-input-1"
+              className="text-field-dis"
               size="small"
             />
 
@@ -136,7 +141,7 @@ const EmployerProfileTab = () => {
               disabled
               multiline
               rows={4}
-              className="text-input-1"
+              className="text-field-dis"
               size="small"
             />
           </div>
@@ -180,6 +185,21 @@ const EmployerProfileTab = () => {
               ))}
             </Grid>
           </Box>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            fullWidth={false}
+            variant="contained"
+            onClick={BrowseEditProfile}
+            startIcon={<EditIcon />} // icon on the left of text
+            sx={{
+              bgcolor: "secondary.main",
+              color: "white",
+              width: "150px",
+            }}
+          >
+            Edit profile
+          </Button>
         </div>
       </div>
     </div>

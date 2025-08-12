@@ -15,6 +15,7 @@ import EmployerProfilePage from "../pages/Employer/ProfilePage";
 import PostJob from "../pages/Employer/PostJob";
 import ProtectedRoute from "./PrivatRoute";
 import SeekerEditPage from "../pages/Seeker/EditProfile";
+import EditProfileEmployer from "../pages/Employer/EditProfileEmployer";
 
 const AppRoutes = () => (
   <Routes>
@@ -75,6 +76,15 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["seeker"]}>
           <CreateNewAcSeeker />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/employer/edit_profile"
+      element={
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <EditProfileEmployer />
         </ProtectedRoute>
       }
     />

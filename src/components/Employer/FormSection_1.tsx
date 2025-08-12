@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Box,
@@ -27,6 +28,8 @@ const FormSection_1 = () => {
   const { userInfo, login, token } = useAuth();
   const [employerID, setEmployerID] = useState(0);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (userInfo && "EmployerId" in userInfo) {
       setEmployerID(userInfo.EmployerId);
@@ -53,6 +56,7 @@ const FormSection_1 = () => {
     try {
       const response = await putEmployerData(employerID, formData);
       console.log("Success:", response);
+      navigate("/employer/profile/");
     } catch (err) {
       console.error("Update failed:", err);
     }
