@@ -31,3 +31,26 @@ export interface CREATE_JOB {
   Description: string;
   Status: string;
 }
+
+export interface EMP_DATA {
+  CompanyName: string;
+  WebSite: string;
+}
+
+export interface EMP_POSTED_JOBS {
+  JobId: number;
+  employer: EMP_DATA;
+  JobTitle: string;
+  Location: string;
+  JobCategory: string;
+  JobType: string;
+  WorkType: string;
+  EducationLevel: string;
+  ProfExperience: string;
+  Languages: string;
+  SalaryRange: string;
+  ExpiryDate: string; // ISO date string from API
+  PostedDate: string; // ISO date string from API
+  Description: string;
+  Status: string;
+}
