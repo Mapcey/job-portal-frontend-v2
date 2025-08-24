@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -8,83 +8,79 @@ import {
   Chip,
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
-
+import { useNavigate } from "react-router-dom";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
-
-const dummyJobs = [
-  {
-    id: 1,
-    name: "Saman Kumara",
-    company: "Engineer",
-    test: "ss",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "50K - 70K",
-      education: "Bachelor's",
-      location: "Remote",
-    },
-  },
-  {
-    id: 2,
-    name: "Saman Kumara",
-    company: "Developer",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "70K - 90K",
-      education: "Bachelor's",
-      location: "Colombo",
-    },
-  },
-  {
-    id: 3,
-    name: "Saman Kumara",
-    company: "Analyst",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "60K - 80K",
-      education: "Master's",
-      location: "Kandy",
-    },
-  },
-];
+import { getSeekerApplications, deleteSeekerApplications } from "../../services/APIs/APIs";
+import { useAuth } from "../../context/AuthContext";
+import { ApplicationsSeeker } from "../../types//applicationsSeeker";
 
 const ManageApplicationsTab = () => {
-  const [appliedCandidates, setAppliedCandidates] = useState(dummyJobs);
+  const { userInfo } = useAuth();
+  const navigate = useNavigate();
+  const [seekerID, setSeekerID] = useState<number>(0);
+  const [application, setApplication] = useState<ApplicationsSeeker[]>([]);
 
-  const handleRemove = (id: number) => {
-    const updatedJobs = appliedCandidates.filter((job) => job.id !== id);
-    setAppliedCandidates(updatedJobs);
+  // Get seeker ID from context
+    useEffect(() => {
+      if (userInfo && "UserId" in userInfo) {
+        setSeekerID(userInfo.UserId);
+        console.log("SeekerID from context:", userInfo.UserId);
+      }
+    }, [userInfo]);
+  
+  // Fetch applications
+  useEffect(() => {
+      const fetchData = async () => {
+        if (seekerID !== 0) {
+          try {
+            const data = await getSeekerApplications(seekerID.toString());
+            setApplication(data);
+          } catch (error) {
+            console.error("Failed to fetch notifications:", error);
+          }
+        }
+      };
+      fetchData();
+    }, [seekerID]);
+
+
+  const handleOpenApplication = (jobId: number) => {
+    navigate(`/jobs/details/${jobId}`);
   };
-
+  const handleRemove = async (applicationId: number) => {
+    if (!userInfo || !userInfo.UserId) return;
+    try {
+      //await deleteSeekerApplications(userInfo.UserId.toString(), applicationId); // pass both IDs
+      //setApplications((prev) =>
+        //prev.filter((app) => app.ApplicationId !== applicationId)
+      //);
+    } catch (err) {
+      console.error("Failed to remove application:", err);
+    }
+  };
   return (
-    <Box className="saved-jobs-tab-container" sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
-        Applied Candidates ({appliedCandidates.length})
+        Applied Candidates ({application.length})
       </Typography>
 
       <Box
-        className="saved-jobs-tab-content"
         sx={{
           maxHeight: "600px",
           overflowY: "auto",
-          // display: "flex",
           flexDirection: "column",
           gap: 2,
         }}
       >
-        {appliedCandidates.map((job) => (
+        {application.map((app) => (
           <Card
-            key={job.id}
+            key={app.ApplicationId}
             variant="outlined"
-            sx={{
-              position: "relative",
-              paddingTop: "20px",
-              marginBottom: "20px",
-            }}
+            sx={{ position: "relative", paddingTop: "20px", marginBottom: "20px" }}
           >
             <IconButton
               size="small"
-              onClick={() => handleRemove(job.id)}
+              onClick={(e) => { e.stopPropagation(); handleRemove(app.ApplicationId); }}
               sx={{
                 position: "absolute",
                 top: 5,
@@ -97,42 +93,35 @@ const ManageApplicationsTab = () => {
             >
               <PersonRemoveAlt1Icon />
             </IconButton>
-            <CardActionArea>
+
+            <CardActionArea onClick={() => handleOpenApplication(app.JobId)}>
               <CardContent>
-                <Typography variant="h6">{job.name}</Typography>
-                <Typography mb={3} color="secondary">
-                  {job.company}
+                <Typography variant="h6">{app.ApplicantName}</Typography>
+                <Typography mb={1} color="secondary">
+                  {app.JobTitle} - {app.JobCategory}
+                </Typography>
+                <Typography variant="body1" mb={1}>
+                  {app.Description}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Status: {app.Status}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Applied on: {new Date(app.AppliedDateTime).toLocaleString()}
                 </Typography>
 
-                <Typography variant="body1">{job.desc}</Typography>
-
-                {/* Chips */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    marginTop: 2,
-                  }}
-                >
-                  {Object.entries(job.chips).map(([key, value]) => (
-                    <Chip
-                      key={key}
-                      label={`${value}`}
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                    />
-                  ))}
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
+                  <Chip label={app.Status} variant="outlined" color="primary" size="small" />
+                  <Chip label={app.JobCategory} variant="outlined" color="secondary" size="small" />
                 </Box>
               </CardContent>
             </CardActionArea>
           </Card>
         ))}
 
-        {appliedCandidates.length === 0 && (
-          <Typography variant="h3" color="secondary.light">
-            No Applications yet.
+        {application.length === 0 && (
+          <Typography variant="h5" color="secondary.light">
+            No applications yet.
           </Typography>
         )}
       </Box>

@@ -3,6 +3,7 @@ import axiosInstance from "../axiosInstance";
 import { Job } from "../../types/job";
 import { EMPLOYER_DATA, SEEKER_DATA } from "../../types/users";
 import { saved_jobs } from "../../types/job";
+import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 
 export const getUserInfo = async () => {
   const response = await axiosInstance.get(`/user/me`);
@@ -43,6 +44,22 @@ export const getSeekerSavedJobs = async (id: string): Promise<saved_jobs[]> => {
   const response = await axiosInstance.get(`/seekers/${id}/saved_jobs`);
   return response.data;
   
+};
+export const deleteSavedJobs = async (
+  seekerId: string,
+  jobId: string,
+): Promise<void> => {
+  await axiosInstance.delete(`/seekers/${seekerId}/saved_jobs/${jobId}`);
+};
+export const getSeekerApplications = async (id: string): Promise<ApplicationsSeeker[]> => {
+  const response = await axiosInstance.get(`/seekers/${id}/applications`);
+  return response.data;
+  
+};
+export const deleteSeekerApplications = async (
+  applicationid: string,
+): Promise<void> => {
+  await axiosInstance.delete(`/jobs/applications/${applicationid}`);
 };
 /*export const updateSeeker = async (data: { "FirstName": "string",
   LastName: string,
@@ -113,12 +130,12 @@ export const getSeekerNotifications = async (seekerId: string) => {
   const response = await axiosInstance.get(`/seekers/${seekerId}/notifications`);
   return response.data;
 }
-/*export const markNotificationAsRead = async (
+export const markNotificationAsRead = async (
   seekerId: string,
   notificationId: number
 ) => {
-  await axiosInstance.put(`/seekers/${seekerId}/notifications/${notificationId}/read`);
-};*/
+  await axiosInstance.put(`/seekers/${seekerId}/notifications/${notificationId}`);
+};
 
 /*export const deleteNotifications = async (
   seekerId: string,

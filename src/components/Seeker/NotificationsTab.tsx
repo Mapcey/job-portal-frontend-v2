@@ -19,7 +19,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import { notification } from "../../types/notification";
 import { useAuth } from "../../context/AuthContext";
-import { getSeekerNotifications } from "../../services/APIs/APIs";
+import { getSeekerNotifications, markNotificationAsRead } from "../../services/APIs/APIs";
 
 const NotificationsTab = () => {
   const { userInfo } = useAuth();
@@ -51,19 +51,38 @@ const NotificationsTab = () => {
   }, [seekerID]);
 
   // 🔹 Mark as read + open dialog
-  const handleClick = (note: notification) => {
-    setSelectedNote(note);
+  const handleClick = async (note: notification) => {
+  setSelectedNote(note);
 
-    if (note.Status === "Unread") {
+  if (note.Status === "Unread") {
+    // Optimistically update UI
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.NotificationId === note.NotificationId
+          ? { ...n, Status: "Read" }
+          : n
+      )
+    );
+
+    try {
+      // Call API to mark as read
+      if (userInfo && "UserId" in userInfo) {
+        await markNotificationAsRead(userInfo.UserId.toString(), note.NotificationId);
+        console.log(`Notification ${note.NotificationId} marked as read`);
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+      // Optionally, revert UI change if API fails
       setNotifications((prev) =>
         prev.map((n) =>
           n.NotificationId === note.NotificationId
-            ? { ...n, Status: "Read" }
+            ? { ...n, Status: "Unread" }
             : n
         )
       );
     }
-  };
+  }
+};
 
   return (
     <Box sx={{ p: 2 }}>

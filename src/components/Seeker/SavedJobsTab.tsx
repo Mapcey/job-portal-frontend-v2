@@ -8,81 +8,71 @@ import {
   Chip,
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
-
-import { saved_jobs } from "../../types/job";
+import { useNavigate } from "react-router-dom";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
-import { getSeekerSavedJobs, deleteSeekerSavedJob  } from "../../services/APIs/APIs";
+import { getSeekerSavedJobs, deleteSeekerSavedJob } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
+import { saved_jobs } from "../../types/job";
 
-  const SavedJobsTab = () => {
+const SavedJobsTab = () => {
   const { userInfo } = useAuth();
   const [seekerID, setSeekerID] = useState<number>(0);
   const [savedJobs, setSavedJobs] = useState<saved_jobs[]>([]);
+  const navigate = useNavigate();
 
+  // Get seeker ID
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) {
       setSeekerID(userInfo.UserId);
-      console.log(" SeekerID from context:", userInfo.UserId);
     }
   }, [userInfo]);
 
-  const handleRemove = async (jobId: number) => {
-    if (!seekerID) return;
-    try {
-      console.log(`🗑 Removing job with ID: ${jobId}`);
-      await deleteSeekerSavedJob(seekerID.toString(), jobId); 
-      setSavedJobs((prev) => prev.filter((job) => job.JobId !== jobId)); 
-      console.log("Job removed successfully");
-    } catch (error) {
-      console.error("Failed to remove job:", error);
-    }
-  };
-
+  // Fetch saved jobs
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchSavedJobs = async () => {
       if (seekerID !== 0) {
-        console.log("Fetching saved jobs for seekerID:", seekerID);
         try {
-          const data = await getSeekerSavedJobs(seekerID.toString());
-          console.log("Raw API response:", data);
+          const data: saved_jobs[] = await getSeekerSavedJobs(seekerID.toString());
           setSavedJobs(data);
-        } catch (error) {
-          console.error("Failed to fetch saved jobs:", error);
+        } catch (err) {
+          console.error("Failed to fetch saved jobs:", err);
         }
       }
     };
-
-    fetchData();
+    fetchSavedJobs();
   }, [seekerID]);
 
+  // Remove saved job
+  const handleRemove = async (jobId: number) => {
+    if (!seekerID) return;
+    try {
+      await deleteSeekerSavedJob(seekerID.toString(), jobId);
+      setSavedJobs((prev) => prev.filter((job) => job.JobId !== jobId));
+    } catch (err) {
+      console.error("Failed to remove job:", err);
+    }
+  };
+
+  // Navigate to job details
+  const handleOpenJob = (jobId: number) => {
+    navigate(`/jobs/details/${jobId}`);
+  };
+
   return (
-    <Box className="saved-jobs-tab-container" sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
         Saved Jobs ({savedJobs.length})
       </Typography>
 
-      <Box
-        className="saved-jobs-tab-content"
-        sx={{
-          maxHeight: "600px",
-          overflowY: "auto",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
+      <Box sx={{ maxHeight: 600, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
         {savedJobs.map((job) => (
-          <Card
-            key={job.JobId}
-            variant="outlined"
-            sx={{
-              position: "relative",
-              paddingTop: "20px",
-              marginBottom: "20px",
-            }}
-          >
+          <Card key={job.JobId} variant="outlined" sx={{ position: "relative", paddingTop: 2 }}>
             <IconButton
               size="small"
-              onClick={() => handleRemove(job.JobId)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemove(job.JobId);
+              }}
               sx={{
                 position: "absolute",
                 top: 5,
@@ -95,49 +85,20 @@ import { useAuth } from "../../context/AuthContext";
             >
               <BookmarkRemoveIcon />
             </IconButton>
-            <CardActionArea>
+
+            <CardActionArea onClick={() => handleOpenJob(job.JobId)}>
               <CardContent>
-                <Typography variant="h6">
-                  {job.JobTitle || "Untitled Job"}
-                </Typography>
-                <Typography mb={3} color="secondary">
+                <Typography variant="h6">{job.JobTitle || "Untitled Job"}</Typography>
+                <Typography mb={1} color="text.secondary">
                   {job.employer?.CompanyName || "Unknown Company"}
                 </Typography>
-                <Typography variant="body1">
-                  {job.Description || ""}
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    marginTop: 2,
-                  }}
-                >
-                  <Chip
-                    label={job.SalaryRange || "-"}
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  />
-                  <Chip
-                    label={job.EducationLevel || "-"}
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  />
-                  <Chip
-                    label={job.Location || "-"}
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  />
-                  <Chip
-                    label={job.JobType || "-"}
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  />
+                <Typography variant="body2" mb={1}>{job.Description || ""}</Typography>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                  <Chip label={job.SalaryRange || "-"} variant="outlined" color="primary" size="small" />
+                  <Chip label={job.EducationLevel || "-"} variant="outlined" color="primary" size="small" />
+                  <Chip label={job.Location || "-"} variant="outlined" color="primary" size="small" />
+                  <Chip label={job.JobType || "-"} variant="outlined" color="primary" size="small" />
                 </Box>
               </CardContent>
             </CardActionArea>
@@ -145,7 +106,7 @@ import { useAuth } from "../../context/AuthContext";
         ))}
 
         {savedJobs.length === 0 && (
-          <Typography variant="h3" color="secondary.light">
+          <Typography variant="h5" color="text.secondary">
             No saved jobs yet.
           </Typography>
         )}

@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
-import { Box, TextField, Button, Typography, Divider } from "@mui/material";
+import { Box, TextField, Button, Typography, Divider, LinearProgress } from "@mui/material";
 import { SEEKER_DATA } from "../../types/users";
 import { getSeekerData } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { storage } from "../../firebase/config";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const EditSeekerProfile = () => {
   const { userInfo } = useAuth();
   const [seekerID, setSeekerID] = useState<number>(0);
   const [form, setForm] = useState<Partial<SEEKER_DATA>>({});
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userInfo && "UserId" in userInfo) {
-      setSeekerID(userInfo.UserId);
-    }
+    if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
   }, [userInfo]);
 
   useEffect(() => {
@@ -35,7 +40,98 @@ const EditSeekerProfile = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Type-safe helper function
+  // ----------------- FILE VALIDATIONS -----------------
+
+  const validateProfileImage = (file: File) => {
+    const validFormats = ["image/jpeg", "image/png"];
+    if (!validFormats.includes(file.type)) return "Profile image must be JPG or PNG";
+    if (file.size > 1 * 1024 * 1024) return "Profile image must be ≤ 1 MB";
+    return null;
+  };
+
+  const validateCV = (file: File) => {
+    const validFormats = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    if (!validFormats.includes(file.type)) return "CV must be PDF or DOCX";
+    if (file.size > 5 * 1024 * 1024) return "CV must be ≤ 5 MB";
+    return null;
+  };
+
+  const validateVideo = (file: File) => {
+    if (file.type !== "video/mp4") return "Video must be MP4";
+    if (file.size > 50 * 1024 * 1024) return "Video must be ≤ 50 MB";
+    return null;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "image" | "cv" | "video") => {
+    const file = e.target.files?.[0] || null;
+    if (!file) return;
+
+    let error: string | null = null;
+    switch (type) {
+      case "image":
+        error = validateProfileImage(file);
+        if (!error) setProfileImage(file);
+        break;
+      case "cv":
+        error = validateCV(file);
+        if (!error) setCvFile(file);
+        break;
+      case "video":
+        error = validateVideo(file);
+        if (!error) setVideoFile(file);
+        break;
+    }
+
+    if (error) {
+      alert(error);
+      e.target.value = ""; // Reset file input
+    }
+  };
+
+  const uploadFile = async (file: File, path: string) => {
+    return new Promise<string>((resolve, reject) => {
+      const storageRef = ref(storage, path);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const prog = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setProgress(prog);
+        },
+        (error) => reject(error),
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          resolve(url);
+        }
+      );
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploading(true);
+    try {
+      const updatedData: Partial<SEEKER_DATA> = { ...form };
+
+      //if (profileImage) updatedData.ProfileImage = await uploadFile(profileImage, `seekers/${seekerID}/profile.jpg`);
+      //if (cvFile) updatedData.CV = await uploadFile(cvFile, `seekers/${seekerID}/cv.pdf`);
+      //if (videoFile) updatedData.IntroVideo = await uploadFile(videoFile, `seekers/${seekerID}/intro.mp4`);
+
+      // Save updatedData to your backend
+      // await updateSeekerData(seekerID.toString(), updatedData);
+
+      navigate(-1);
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  };
+
+  // ----------------- RENDER ARRAY SECTIONS -----------------
+
   const getArray = (type: "careers" | "educations" | "skills") => {
     switch (type) {
       case "careers":
@@ -47,45 +143,20 @@ const EditSeekerProfile = () => {
     }
   };
 
-  const handleArrayChange = (
-    type: "careers" | "educations" | "skills",
-    idx: number,
-    field: string,
-    value: string
-  ) => {
+  const handleArrayChange = (type: "careers" | "educations" | "skills", idx: number, field: string, value: string) => {
     const updated = [...getArray(type)];
     updated[idx] = { ...updated[idx], [field]: value };
-
     setForm({ ...form, [type]: updated } as Partial<SEEKER_DATA>);
   };
 
   const addArrayItem = (type: "careers" | "educations" | "skills") => {
     const item =
       type === "careers"
-        ? {
-            id: Date.now(),
-            Designation: "",
-            CompanyName: "",
-            StartDate: "",
-            EndDate: "",
-            Description: "",
-          }
+        ? { id: Date.now(), Designation: "", CompanyName: "", StartDate: "", EndDate: "", Description: "" }
         : type === "educations"
-        ? {
-            id: Date.now(),
-            InstituteName: "",
-            FieldOfStudy: "",
-            StartDate: "",
-            EndDate: "",
-            LevelOfStudy: "",
-            Status: "",
-          }
+        ? { id: Date.now(), InstituteName: "", FieldOfStudy: "", StartDate: "", EndDate: "", LevelOfStudy: "", Status: "" }
         : { id: Date.now(), Skill: "", ExpertLevel: "" };
-
-    setForm({
-      ...form,
-      [type]: [...getArray(type), item],
-    } as Partial<SEEKER_DATA>);
+    setForm({ ...form, [type]: [...getArray(type), item] } as Partial<SEEKER_DATA>);
   };
 
   const removeArrayItem = (type: "careers" | "educations" | "skills", idx: number) => {
@@ -94,21 +165,7 @@ const EditSeekerProfile = () => {
     setForm({ ...form, [type]: updated } as Partial<SEEKER_DATA>);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      //await updateSeekerData(seekerID.toString(), form);
-      navigate(-1);
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-    }
-  };
-
-  const renderArraySection = (
-    type: "careers" | "educations" | "skills",
-    title: string,
-    fields: string[]
-  ) => (
+  const renderArraySection = (type: "careers" | "educations" | "skills", title: string, fields: string[]) => (
     <Box sx={{ mt: 3 }}>
       <Typography variant="h6">{title}</Typography>
       <Button variant="outlined" size="small" sx={{ mb: 1 }} onClick={() => addArrayItem(type)}>
@@ -116,17 +173,7 @@ const EditSeekerProfile = () => {
       </Button>
       {getArray(type).length > 0 ? (
         getArray(type).map((item, idx) => (
-          <Box
-            key={(item as any).id || idx}
-            sx={{
-              mb: 2,
-              p: 2,
-              border: "1px solid #ddd",
-              borderRadius: 2,
-              boxShadow: 1,
-              backgroundColor: "#fafafa",
-            }}
-          >
+          <Box key={(item as any).id || idx} sx={{ mb: 2, p: 2, border: "1px solid #ddd", borderRadius: 2, boxShadow: 1, backgroundColor: "#fafafa" }}>
             {fields.map((field) => (
               <TextField
                 key={field}
@@ -137,13 +184,7 @@ const EditSeekerProfile = () => {
                 margin="dense"
               />
             ))}
-            <Button
-              variant="text"
-              color="error"
-              size="small"
-              onClick={() => removeArrayItem(type, idx)}
-              sx={{ mt: 1 }}
-            >
+            <Button variant="text" color="error" size="small" onClick={() => removeArrayItem(type, idx)} sx={{ mt: 1 }}>
               Remove
             </Button>
           </Box>
@@ -159,101 +200,40 @@ const EditSeekerProfile = () => {
       <Typography variant="h4" mb={3} textAlign="center">
         Edit Profile
       </Typography>
+
       <form onSubmit={handleSubmit}>
         <Box sx={{ display: "grid", gap: 2 }}>
-          <TextField
-            label="First Name"
-            name="FirstName"
-            value={form.FirstName || ""}
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-          <TextField
-            label="Last Name"
-            name="LastName"
-            value={form.LastName || ""}
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-          <TextField
-            label="Email"
-            name="Email"
-            value={form.Email || ""}
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-          <TextField
-            label="Contact No"
-            name="ContactNo"
-            value={form.ContactNo || ""}
-            InputProps={{ readOnly: true }}
-            fullWidth
-          />
-          <TextField
-            label="Address"
-            name="Address"
-            value={form.Address || ""}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Professional Experience (years)"
-            name="ProfessionalExperience"
-            type="number"
-            value={form.ProfessionalExperience || ""}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Salary"
-            name="Salary"
-            type="number"
-            value={form.Salary || ""}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Job Type"
-            name="JobType"
-            value={form.JobType || ""}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Summary"
-            name="Summary"
-            value={form.Summary || ""}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            rows={3}
-          />
+          <TextField label="First Name" name="FirstName" value={form.FirstName || ""} InputProps={{ readOnly: true }} fullWidth />
+          <TextField label="Last Name" name="LastName" value={form.LastName || ""} InputProps={{ readOnly: true }} fullWidth />
+          <TextField label="Email" name="Email" value={form.Email || ""} InputProps={{ readOnly: true }} fullWidth />
+          <TextField label="Contact No" name="ContactNo" value={form.ContactNo || ""} InputProps={{ readOnly: true }} fullWidth />
+          <TextField label="Address" name="Address" value={form.Address || ""} onChange={handleChange} fullWidth />
+          <TextField label="Professional Experience (years)" name="ProfessionalExperience" type="number" value={form.ProfessionalExperience || ""} onChange={handleChange} fullWidth />
+          <TextField label="Salary" name="Salary" type="number" value={form.Salary || ""} onChange={handleChange} fullWidth />
+          <TextField label="Job Type" name="JobType" value={form.JobType || ""} onChange={handleChange} fullWidth />
+          <TextField label="Summary" name="Summary" value={form.Summary || ""} onChange={handleChange} fullWidth multiline rows={3} />
         </Box>
 
         <Divider sx={{ my: 3 }} />
 
-        {renderArraySection("careers", "Career History", [
-          "Designation",
-          "CompanyName",
-          "StartDate",
-          "EndDate",
-          "Description",
-        ])}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Typography>Profile Image (.jpg / .png, ≤1 MB)</Typography>
+          <input type="file" accept="image/png, image/jpeg" onChange={(e) => handleFileChange(e, "image")} />
+          <Typography>CV (.pdf / .docx, ≤5 MB)</Typography>
+          <input type="file" accept=".pdf,.docx" onChange={(e) => handleFileChange(e, "cv")} />
+          <Typography>Intro Video (.mp4, ≤50 MB)</Typography>
+          <input type="file" accept="video/mp4" onChange={(e) => handleFileChange(e, "video")} />
+        </Box>
 
-        {renderArraySection("educations", "Education", [
-          "InstituteName",
-          "FieldOfStudy",
-          "StartDate",
-          "EndDate",
-          "LevelOfStudy",
-          "Status",
-        ])}
+        {uploading && <LinearProgress variant="determinate" value={progress} sx={{ my: 2 }} />}
 
+        {renderArraySection("careers", "Career History", ["Designation", "CompanyName", "StartDate", "EndDate", "Description"])}
+        {renderArraySection("educations", "Education", ["InstituteName", "FieldOfStudy", "StartDate", "EndDate", "LevelOfStudy", "Status"])}
         {renderArraySection("skills", "Skills", ["Skill", "ExpertLevel"])}
 
         <Box sx={{ mt: 4, display: "flex", gap: 2, justifyContent: "center" }}>
-          <Button type="submit" variant="contained" size="large">
-            Save
+          <Button type="submit" variant="contained" size="large" disabled={uploading}>
+            {uploading ? "Uploading..." : "Save"}
           </Button>
           <Button variant="outlined" size="large" onClick={() => navigate(-1)}>
             Cancel
