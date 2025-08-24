@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,52 +9,51 @@ import {
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 
+import { saved_jobs } from "../../types/job";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
+import { getSeekerSavedJobs, deleteSeekerSavedJob  } from "../../services/APIs/APIs";
+import { useAuth } from "../../context/AuthContext";
 
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "TechCorp",
-    test: "ss",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "50K - 70K",
-      education: "Bachelor's",
-      location: "Remote",
-    },
-  },
-  {
-    id: 2,
-    title: "Backend Engineer",
-    company: "DataSoft",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "70K - 90K",
-      education: "Bachelor's",
-      location: "Colombo",
-    },
-  },
-  {
-    id: 3,
-    title: "GIS Analyst",
-    company: "GeoMapping Ltd",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "60K - 80K",
-      education: "Master's",
-      location: "Kandy",
-    },
-  },
-];
+  const SavedJobsTab = () => {
+  const { userInfo } = useAuth();
+  const [seekerID, setSeekerID] = useState<number>(0);
+  const [savedJobs, setSavedJobs] = useState<saved_jobs[]>([]);
 
-const SavedJobsTab = () => {
-  const [savedJobs, setSavedJobs] = useState(dummyJobs);
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) {
+      setSeekerID(userInfo.UserId);
+      console.log(" SeekerID from context:", userInfo.UserId);
+    }
+  }, [userInfo]);
 
-  const handleRemove = (id: number) => {
-    const updatedJobs = savedJobs.filter((job) => job.id !== id);
-    setSavedJobs(updatedJobs);
+  const handleRemove = async (jobId: number) => {
+    if (!seekerID) return;
+    try {
+      console.log(`🗑 Removing job with ID: ${jobId}`);
+      await deleteSeekerSavedJob(seekerID.toString(), jobId); 
+      setSavedJobs((prev) => prev.filter((job) => job.JobId !== jobId)); 
+      console.log("Job removed successfully");
+    } catch (error) {
+      console.error("Failed to remove job:", error);
+    }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (seekerID !== 0) {
+        console.log("Fetching saved jobs for seekerID:", seekerID);
+        try {
+          const data = await getSeekerSavedJobs(seekerID.toString());
+          console.log("Raw API response:", data);
+          setSavedJobs(data);
+        } catch (error) {
+          console.error("Failed to fetch saved jobs:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [seekerID]);
 
   return (
     <Box className="saved-jobs-tab-container" sx={{ p: 2 }}>
@@ -67,14 +66,13 @@ const SavedJobsTab = () => {
         sx={{
           maxHeight: "600px",
           overflowY: "auto",
-          // display: "flex",
           flexDirection: "column",
           gap: 2,
         }}
       >
         {savedJobs.map((job) => (
           <Card
-            key={job.id}
+            key={job.JobId}
             variant="outlined"
             sx={{
               position: "relative",
@@ -84,7 +82,7 @@ const SavedJobsTab = () => {
           >
             <IconButton
               size="small"
-              onClick={() => handleRemove(job.id)}
+              onClick={() => handleRemove(job.JobId)}
               sx={{
                 position: "absolute",
                 top: 5,
@@ -99,14 +97,15 @@ const SavedJobsTab = () => {
             </IconButton>
             <CardActionArea>
               <CardContent>
-                <Typography variant="h6">{job.title}</Typography>
-                <Typography mb={3} color="secondary">
-                  {job.company}
+                <Typography variant="h6">
+                  {job.JobTitle || "Untitled Job"}
                 </Typography>
-
-                <Typography variant="body1">{job.desc}</Typography>
-
-                {/* Chips */}
+                <Typography mb={3} color="secondary">
+                  {job.employer?.CompanyName || "Unknown Company"}
+                </Typography>
+                <Typography variant="body1">
+                  {job.Description || ""}
+                </Typography>
                 <Box
                   sx={{
                     display: "flex",
@@ -115,15 +114,30 @@ const SavedJobsTab = () => {
                     marginTop: 2,
                   }}
                 >
-                  {Object.entries(job.chips).map(([key, value]) => (
-                    <Chip
-                      key={key}
-                      label={`${value}`}
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                    />
-                  ))}
+                  <Chip
+                    label={job.SalaryRange || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.EducationLevel || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.Location || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.JobType || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
                 </Box>
               </CardContent>
             </CardActionArea>

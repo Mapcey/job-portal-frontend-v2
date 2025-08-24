@@ -22,6 +22,7 @@ import {
   setPersistence,
   browserLocalPersistence,
   deleteUser,
+  sendEmailVerification
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
@@ -92,6 +93,7 @@ const SignupPage = () => {
         const response = await signupSeeker(userPayload);
         console.log(response);
         if (response) {
+          await sendEmailVerification(user);
           console.log("Signup success");
           setUserRoleAndInfo("seeker", response);
           navigate("/seeker/register");

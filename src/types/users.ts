@@ -27,11 +27,42 @@ export interface SEEKER_DATA {
   SocialLinks: string;
   Summary: string;
   IsSubscribed: boolean;
+  careers?: Career[];
+  educations?: Education[];
+  skills?: Skill[];
+  languages?: languages[];
 }
-
+export interface Career {
+  id: number;
+  Designation: string;
+  CompanyName: string;
+  StartDate: string;
+  EndDate?: string;
+  Description?: string;
+}
+export interface Education {
+  id: number;
+  InstituteName: string;
+  FieldOfStudy: string;
+  StartDate: string;
+  EndDate?: string;
+  Status?: string;
+  LevelOfStudy?: string;
+}
 export interface CREATE_SEEKER {
   firstName: string;
   lastName: string;
   phone: string;
   address: string;
+}
+export interface Skill {
+  id: number;
+  Skill: string;
+  ExpertLevel: string;
+}
+
+export interface languages{
+  id: number;
+  Language: string;
+  ExpertLevel: string;
 }
