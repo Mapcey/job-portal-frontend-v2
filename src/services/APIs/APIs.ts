@@ -32,8 +32,8 @@ export const getJobDetails = async (id: string): Promise<JOB> => {
   return response.data;
 };
 
-export const createNewJob = async (data: {}): Promise<CREATE_JOB> => {
-  const response = await axiosInstance.post(`/jobs/`);
+export const createNewJob = async (data: CREATE_JOB): Promise<CREATE_JOB> => {
+  const response = await axiosInstance.post(`/jobs/`, data);
   return response.data;
 };
 

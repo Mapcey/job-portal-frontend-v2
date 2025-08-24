@@ -33,7 +33,7 @@ const AppRoutes = () => (
     <Route
       path="/jobs/details/:id"
       element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
+        <ProtectedRoute>
           <JobDetailsPage />
         </ProtectedRoute>
       }
