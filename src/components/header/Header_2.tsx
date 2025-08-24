@@ -26,7 +26,7 @@ const settings = ["Profile", "Edite", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, userInfo, userRole } = useAuth();
+  const { logout, userInfo, userRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
@@ -84,6 +84,8 @@ const Header_2 = () => {
         console.log(userRole);
       } else {
         console.log("no user role");
+        logout();
+        navigate("/login");
       }
     } else if (setting === "Edite") {
       if (userRole == "seeker") {
@@ -92,6 +94,8 @@ const Header_2 = () => {
         navigate("/employer/edit_profile");
       } else {
         console.log("no user role");
+        logout();
+        navigate("/login");
       }
     }
   };
@@ -114,6 +118,7 @@ const Header_2 = () => {
   const handleTest = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
+    console.log("is auth", isAuthenticated);
   };
 
   return (

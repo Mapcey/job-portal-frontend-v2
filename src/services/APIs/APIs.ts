@@ -1,6 +1,6 @@
 import axiosInstance from "../axiosInstance";
 
-import { Job } from "../../types/job";
+import { JOB, CREATE_JOB } from "../../types/job";
 import { EMPLOYER_DATA } from "../../types/users";
 
 export const getUserInfo = async () => {
@@ -14,12 +14,12 @@ export const userLogin = async () => {
 };
 
 // JOBS -----------------------------------------------------------------
-export const getAllJobs = async (): Promise<Job[]> => {
+export const getAllJobs = async (): Promise<JOB[]> => {
   const response = await axiosInstance.get("/jobs/");
   return response.data;
 };
 
-// export const getAllJobs = async (): Promise<Job[]> => {
+// export const getAllJobs = async (): Promise<JOB[]> => {
 //   return new Promise((resolve) => {
 //     setTimeout(() => {
 //       resolve(mockJobs);
@@ -27,8 +27,13 @@ export const getAllJobs = async (): Promise<Job[]> => {
 //   });
 // };
 
-export const getJobDetails = async (id: string): Promise<Job> => {
+export const getJobDetails = async (id: string): Promise<JOB> => {
   const response = await axiosInstance.get(`/jobs/${id}`);
+  return response.data;
+};
+
+export const createNewJob = async (data: {}): Promise<CREATE_JOB> => {
+  const response = await axiosInstance.post(`/jobs/`);
   return response.data;
 };
 
