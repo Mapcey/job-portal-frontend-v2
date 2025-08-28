@@ -16,7 +16,7 @@ import { Delete, Cancel, RemoveRedEye } from "@mui/icons-material";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
-import { getEmployerPostedJobs } from "../../services/APIs/APIs";
+import { getEmployerPostedJobs, deleteJob } from "../../services/APIs/APIs";
 
 const PostedJobs = () => {
   const [jobs, setJobs] = useState<EMP_POSTED_JOBS[]>([]);
@@ -47,9 +47,18 @@ const PostedJobs = () => {
     // TODO: API call to close job
   };
 
-  const handleDelete = (id: number) => {
-    console.log("Delete job:", id);
-    // TODO: API call to delete job
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteJob(id.toString()); // API expects string id
+      // remove job from state
+      setJobs((prevJobs) => prevJobs.filter((job) => job.JobId !== id));
+    } catch (err) {
+      console.error("Failed to delete job:", err);
+    }
+  };
+
+  const handleview = (id: number) => {
+    navigate(`/jobs/details/${id}`);
   };
 
   const BrowsePostJob = () => {
@@ -81,11 +90,31 @@ const PostedJobs = () => {
       </Box>
 
       {loading ? (
-        <CircularProgress />
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <CircularProgress />
+        </Box>
       ) : jobs.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
-          No jobs posted yet.
-        </Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 6,
+            border: "1px dashed",
+            borderColor: "grey.400",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body1" color="lightgray">
+            No jobs posted yet.
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            sx={{ mt: 2 }}
+            onClick={BrowsePostJob}
+          >
+            Post a Job
+          </Button>
+        </Box>
       ) : (
         <List>
           {jobs.map((job) => (
@@ -125,9 +154,9 @@ const PostedJobs = () => {
                     <Button
                       size="small"
                       startIcon={<RemoveRedEye />}
-                      onClick={() => handleClose(job.JobId)}
+                      onClick={() => handleview(job.JobId)}
                     >
-                      View
+                      Preview
                     </Button>
                     <Button
                       size="small"

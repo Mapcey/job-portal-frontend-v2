@@ -22,7 +22,7 @@ import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
-import { Job } from "../types/job";
+import { JOB } from "../types/job";
 import Loading from "../components/Loading";
 import { getAllJobs } from "../services/APIs/APIs";
 
@@ -30,8 +30,8 @@ const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<JOB[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<JOB[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,26 +50,26 @@ const BrowseJobs = () => {
   const jobsPerPage = 8;
 
   useEffect(() => {
-    getAllJobs().then((data: Job[]) => {
+    getAllJobs().then((data: JOB[]) => {
       setJobs(data);
       setFilteredJobs(data);
       setLoading(false);
 
       setCategories([
-        ...new Set(data.map((job: Job) => job.JobCategory)),
+        ...new Set(data.map((job: JOB) => job.JobCategory)),
       ] as string[]);
 
       setJobTypes([
-        ...new Set(data.map((job: Job) => job.JobType)),
+        ...new Set(data.map((job: JOB) => job.JobType)),
       ] as string[]);
 
       setEducationLevels([
-        ...new Set(data.map((job: Job) => job.EducationLevel)),
+        ...new Set(data.map((job: JOB) => job.EducationLevel)),
       ] as string[]);
 
       setExperienceLevels([
         ...new Set(
-          data.map((job: Job) =>
+          data.map((job: JOB) =>
             job.ProfExperience ? job.ProfExperience.toString() + "+ years" : ""
           )
         ),

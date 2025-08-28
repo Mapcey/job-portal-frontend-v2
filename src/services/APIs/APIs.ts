@@ -44,6 +44,11 @@ export const getEmployerPostedJobs = async (
   return response.data;
 };
 
+export const deleteJob = async (id: string) => {
+  const response = await axiosInstance.delete(`/jobs/${id}`);
+  return response.data;
+};
+
 // SEEKER -----------------------------------------------------------------
 // seeker signup
 export const signupSeeker = async (data: { ContactNo: string }) => {

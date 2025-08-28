@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -9,27 +10,17 @@ import { Button, MenuItem } from "@mui/material";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { CREATE_JOB } from "../../types/job";
+import {
+  JOB_CAT,
+  JOB_TYPES,
+  EDU_LEVELS,
+  LANG,
+  SAL_RANGES,
+} from "../../types/jobOptions";
 import { createNewJob } from "../../services/APIs/APIs";
 
-const jobCategories = [
-  "Engineering",
-  "Design",
-  "Marketing",
-  "Sales",
-  "Finance",
-  "Human Resources",
-];
-
-const jobType = ["full-time", "part-time"];
-
-const language = ["Sinhala", "English", "Tamil"];
-
-const educationLevel = ["O/L", "A/L", "Diploma", "Bachelor", "Master", "PhD"];
-
-const salaryRange = ["0 - 60k", "60k - 100k", "100k - 150k", "150k +"];
-
 const PostJob = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CREATE_JOB>({
     JobTitle: "",
     Location: "",
     JobCategory: "",
@@ -39,10 +30,12 @@ const PostJob = () => {
     ProfExperience: "",
     Languages: "",
     SalaryRange: "",
-    ExpiryDate: "", // default today
+    ExpiryDate: "",
     Description: "",
     Status: "Active",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,10 +65,13 @@ const PostJob = () => {
         description={"this is the description"}
         backgroundImage={"/imgs/backgrounds/bg-1.jpg"}
       />
+      <Button sx={{ p: 2 }} onClick={() => navigate("/employer/profile")}>
+        Back to Profile
+      </Button>
       <div className="post-job-content">
         {/* section */}
         <div className="post-job-content-section-1">
-          <h3 style={{ marginBottom: "0", paddingTop: "20", marginTop: 30 }}>
+          <h3 style={{ marginBottom: "0", paddingTop: "0", marginTop: 30 }}>
             Job Information
           </h3>
         </div>
@@ -122,7 +118,7 @@ const PostJob = () => {
                 onChange={handleChange}
                 required
               >
-                {jobCategories.map((category) => (
+                {JOB_CAT.map((category) => (
                   <MenuItem key={category} value={category}>
                     {category}
                   </MenuItem>
@@ -141,7 +137,7 @@ const PostJob = () => {
                 onChange={handleChange}
                 required
               >
-                {jobType.map((category) => (
+                {JOB_TYPES.map((category) => (
                   <MenuItem key={category} value={category}>
                     {category}
                   </MenuItem>
@@ -162,7 +158,7 @@ const PostJob = () => {
                 value={formData.EducationLevel}
                 onChange={handleChange}
               >
-                {educationLevel.map((category) => (
+                {EDU_LEVELS.map((category) => (
                   <MenuItem key={category} value={category}>
                     {category}
                   </MenuItem>
@@ -190,7 +186,7 @@ const PostJob = () => {
                 value={formData.Languages}
                 onChange={handleChange}
               >
-                {language.map((category) => (
+                {LANG.map((category) => (
                   <MenuItem key={category} value={category}>
                     {category}
                   </MenuItem>
@@ -208,7 +204,7 @@ const PostJob = () => {
                 value={formData.SalaryRange}
                 onChange={handleChange}
               >
-                {salaryRange.map((category) => (
+                {SAL_RANGES.map((category) => (
                   <MenuItem key={category} value={category}>
                     {category}
                   </MenuItem>
