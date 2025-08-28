@@ -13,10 +13,15 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Delete, Cancel, RemoveRedEye } from "@mui/icons-material";
+import { formatDistanceToNow, differenceInDays } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
-import { getEmployerPostedJobs, deleteJob } from "../../services/APIs/APIs";
+import {
+  getEmployerPostedJobs,
+  deleteJob,
+  editJob,
+} from "../../services/APIs/APIs";
 
 const PostedJobs = () => {
   const [jobs, setJobs] = useState<EMP_POSTED_JOBS[]>([]);
@@ -42,9 +47,29 @@ const PostedJobs = () => {
     fetchJobs();
   }, [userInfo]);
 
-  const handleClose = (id: number) => {
-    console.log("Close job:", id);
-    // TODO: API call to close job
+  const handleClose = async (id: number) => {
+    try {
+      // Find the job that needs to be updated
+      const jobToUpdate = jobs.find((job) => job.JobId === id);
+      if (!jobToUpdate) return;
+
+      // Create updated job object with status = Closed
+      const updatedJob = { ...jobToUpdate, Status: "Closed" };
+
+      // Call API to update the job
+      await editJob(id.toString(), updatedJob);
+
+      // Update state locally
+      setJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job.JobId === id ? { ...job, Status: "Closed" } : job
+        )
+      );
+
+      console.log(`Job ${id} closed successfully`);
+    } catch (err) {
+      console.error("Failed to close job:", err);
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -117,68 +142,90 @@ const PostedJobs = () => {
         </Box>
       ) : (
         <List>
-          {jobs.map((job) => (
-            <Box key={job.JobId}>
-              <ListItem
-                sx={{
-                  borderRadius: 2,
-                  boxShadow: 1,
-                  mb: 1,
-                  px: 3,
-                  py: 2,
-                  bgcolor: "background.paper",
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {job.JobTitle}
-                    </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography variant="body2" color="text.secondary">
-                        {job.employer?.CompanyName || ""} – {job.Location}
+          {jobs.map((job) => {
+            const expiryDate = new Date(job.ExpiryDate);
+            const daysRemaining = differenceInDays(expiryDate, new Date());
+
+            return (
+              <Box key={job.JobId}>
+                <ListItem
+                  sx={{
+                    borderRadius: 2,
+                    boxShadow: 1,
+                    mb: 1,
+                    px: 3,
+                    py: 2,
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {job.JobTitle}
                       </Typography>
-                      <Chip
-                        label={`Status: ${job.Status}`}
-                        color={job.Status === "Open" ? "success" : "warning"}
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" color="grey">
+                          {job.employer?.CompanyName || ""} – {job.Location}
+                        </Typography>
+
+                        {/* Status Chip */}
+                        <Chip
+                          label={`Status: ${job.Status}`}
+                          color={job.Status === "Active" ? "success" : "error"}
+                          size="small"
+                          sx={{ mt: 0.5 }}
+                        />
+
+                        {/* Expiry Info */}
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            mt: 1,
+                            color: "black",
+                          }}
+                        >
+                          Expires on: {expiryDate.toDateString()}{" "}
+                          {daysRemaining > 0
+                            ? `(${daysRemaining} days left)`
+                            : "(Expired)"}
+                        </Typography>
+                      </>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <Stack direction="row" spacing={1}>
+                      <Button
                         size="small"
-                        sx={{ mt: 0.5 }}
-                      />
-                    </>
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      size="small"
-                      startIcon={<RemoveRedEye />}
-                      onClick={() => handleview(job.JobId)}
-                    >
-                      Preview
-                    </Button>
-                    <Button
-                      size="small"
-                      color="warning"
-                      startIcon={<Cancel />}
-                      onClick={() => handleClose(job.JobId)}
-                    >
-                      Close Post
-                    </Button>
-                    <Button
-                      size="small"
-                      color="error"
-                      startIcon={<Delete />}
-                      onClick={() => handleDelete(job.JobId)}
-                    >
-                      Delete
-                    </Button>
-                  </Stack>
-                </ListItemSecondaryAction>
-              </ListItem>
-            </Box>
-          ))}
+                        startIcon={<RemoveRedEye />}
+                        onClick={() => handleview(job.JobId)}
+                      >
+                        Preview
+                      </Button>
+                      <Button
+                        size="small"
+                        color="warning"
+                        startIcon={<Cancel />}
+                        onClick={() => handleClose(job.JobId)}
+                        disabled={job.Status === "Closed"}
+                      >
+                        Close Post
+                      </Button>
+                      <Button
+                        size="small"
+                        color="error"
+                        startIcon={<Delete />}
+                        onClick={() => handleDelete(job.JobId)}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              </Box>
+            );
+          })}
         </List>
       )}
     </Box>

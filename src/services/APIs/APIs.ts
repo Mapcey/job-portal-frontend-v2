@@ -49,6 +49,11 @@ export const deleteJob = async (id: string) => {
   return response.data;
 };
 
+export const editJob = async (id: string, data: CREATE_JOB) => {
+  const response = await axiosInstance.put(`/jobs/${id}`, data);
+  return response.data;
+};
+
 // SEEKER -----------------------------------------------------------------
 // seeker signup
 export const signupSeeker = async (data: { ContactNo: string }) => {
