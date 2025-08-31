@@ -61,7 +61,7 @@ const ManageApplicationsTab = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
-        Applied Candidates ({application.length})
+        Applied Jobs ({application.length})
       </Typography>
 
       <Box

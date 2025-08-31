@@ -97,12 +97,46 @@ const [user, setUser] = useState<SEEKER_DATA | null>(null);
                   variant="outlined"
                 />
               )}
-              <Chip label={user?.DateOfBirth.toString() || ""} variant="outlined" />
-              
+              <Chip
+                label={user?.DateOfBirth ? new Date(user.DateOfBirth).toLocaleDateString() : ""}
+                variant="outlined"
+              />
+
             </Box>
           </Box>
         </div>
 
+        {/* section */}
+        <div className="seeker-profile-section-2">
+          <Typography variant="h6">Social links</Typography>
+          <Box className="seeker-profile-text-area-container">
+            <Typography
+              className="seeker-profile-text-area"
+              variant="subtitle1"
+            >
+              <a 
+                href={user?.SocialLinks || "#"} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                >
+                {user?.SocialLinks}
+            </a>
+
+            </Typography>
+          </Box>
+        </div>  
+        {/* section */}
+        <div className="seeker-profile-section-2">
+          <Typography variant="h6">Address</Typography>
+          <Box className="seeker-profile-text-area-container">
+            <Typography
+              className="seeker-profile-text-area"
+              variant="subtitle1"
+            >
+              {user?.Address || ""}
+            </Typography>
+          </Box>
+        </div>   
         {/* section */}
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Professional Summary</Typography>
