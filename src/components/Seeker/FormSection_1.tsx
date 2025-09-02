@@ -14,7 +14,6 @@ import {
 import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-import { CREATE_SEEKER } from "../../types/users";
 
 const options = ["Option 1", "Option 2", "Option 2"];
 
@@ -30,12 +29,6 @@ const FormSection_1 = () => {
   const [skills, setSkills] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
 
-  const [formData, setFormData] = useState<CREATE_SEEKER>({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    address: "",
-  });
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;

@@ -12,56 +12,56 @@ import { useNavigate } from "react-router-dom";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
 import { getSeekerApplications, deleteSeekerApplications } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
-import { ApplicationsSeeker } from "../../types//applicationsSeeker";
+import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 
 const ManageApplicationsTab = () => {
   const { userInfo } = useAuth();
   const navigate = useNavigate();
   const [seekerID, setSeekerID] = useState<number>(0);
-  const [application, setApplication] = useState<ApplicationsSeeker[]>([]);
+  const [applications, setApplications] = useState<ApplicationsSeeker[]>([]);
 
   // Get seeker ID from context
-    useEffect(() => {
-      if (userInfo && "UserId" in userInfo) {
-        setSeekerID(userInfo.UserId);
-        console.log("SeekerID from context:", userInfo.UserId);
-      }
-    }, [userInfo]);
-  
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) {
+      setSeekerID(userInfo.UserId);
+      console.log("SeekerID from context:", userInfo.UserId);
+    }
+  }, [userInfo]);
+
   // Fetch applications
   useEffect(() => {
-      const fetchData = async () => {
-        if (seekerID !== 0) {
-          try {
-            const data = await getSeekerApplications(seekerID.toString());
-            setApplication(data);
-          } catch (error) {
-            console.error("Failed to fetch notifications:", error);
-          }
+    const fetchData = async () => {
+      if (seekerID !== 0) {
+        try {
+          const data = await getSeekerApplications(seekerID.toString());
+          setApplications(data);
+        } catch (error) {
+          console.error("Failed to fetch applications:", error);
         }
-      };
-      fetchData();
-    }, [seekerID]);
-
+      }
+    };
+    fetchData();
+  }, [seekerID]);
 
   const handleOpenApplication = (jobId: number) => {
     navigate(`/jobs/details/${jobId}`);
   };
+
   const handleRemove = async (applicationId: number) => {
-    if (!userInfo || !userInfo.UserId) return;
     try {
-      //await deleteSeekerApplications(userInfo.UserId.toString(), applicationId); // pass both IDs
-      //setApplications((prev) =>
-        //prev.filter((app) => app.ApplicationId !== applicationId)
-      //);
+      await deleteSeekerApplications(applicationId.toString());
+      setApplications((prev) =>
+        prev.filter((app) => app.ApplicationId !== applicationId)
+      );
     } catch (err) {
       console.error("Failed to remove application:", err);
     }
   };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
-        Applied Jobs ({application.length})
+        Applied Jobs ({applications.length})
       </Typography>
 
       <Box
@@ -72,7 +72,7 @@ const ManageApplicationsTab = () => {
           gap: 2,
         }}
       >
-        {application.map((app) => (
+        {applications.map((app) => (
           <Card
             key={app.ApplicationId}
             variant="outlined"
@@ -119,7 +119,7 @@ const ManageApplicationsTab = () => {
           </Card>
         ))}
 
-        {application.length === 0 && (
+        {applications.length === 0 && (
           <Typography variant="h5" color="secondary.light">
             No applications yet.
           </Typography>

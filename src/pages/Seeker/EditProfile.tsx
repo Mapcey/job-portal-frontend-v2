@@ -1,13 +1,25 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, Button, Typography, Divider, LinearProgress } from "@mui/material";
 import { SEEKER_DATA, Skill } from "../../types/users";
-import { getSeekerData, updateSeeker, updateSkill, addSkill, deleteSkill, addEducation, updateEducation, deleteEducation, addCareer, updateCareer, deleteCareer } from "../../services/APIs/APIs";
+import {
+  getSeekerData,
+  updateSeeker,
+  updateSkill,
+  addSkill,
+  deleteSkill,
+  addEducation,
+  updateEducation,
+  deleteEducation,
+  addCareer,
+  updateCareer,
+  deleteCareer
+} from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { storage } from "../../firebase/config";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+//import { storage } from "../../firebase/config";
+//import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-  const EditSeekerProfile = () => {
+const EditSeekerProfile = () => {
   const { userInfo } = useAuth();
   const [seekerID, setSeekerID] = useState<number>(0);
   const [form, setForm] = useState<Partial<SEEKER_DATA>>({});
@@ -34,7 +46,6 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
           setOriginalSkills(data.skills ?? []);
           setOriginalCareers(data.careers ?? []);
           setOriginalEducations(data.educations ?? []);
-
         } catch (error) {
           console.error("Failed to fetch seeker data:", error);
         }
@@ -97,7 +108,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
     }
   };
 
-  const uploadFile = async (file: File, path: string) => {
+  /*const uploadFile = async (file: File, path: string) => {
     return new Promise<string>((resolve, reject) => {
       const storageRef = ref(storage, path);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -115,7 +126,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
         }
       );
     });
-  };
+  };*/
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,16 +138,26 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
       const currentCareers = form.careers ?? [];
       const currentEducations = form.educations ?? [];
 
-      // (Optional) Upload files then attach URLs to updatedData here...
+      // Upload files if present and attach URLs
+      if (profileImage) {
+        //updatedData.profileImageUrl = await uploadFile(profileImage, `seekers/${seekerID}/profile.jpg`);
+      }
+      if (cvFile) {
+        //updatedData.cvUrl = await uploadFile(cvFile, `seekers/${seekerID}/cv.${cvFile.name.split('.').pop()}`);
+      }
+      if (videoFile) {
+        //updatedData.videoUrl = await uploadFile(videoFile, `seekers/${seekerID}/intro.mp4`);
+      }
 
+      // Remove arrays before updating main seeker data
       delete (updatedData as any).skills;
       delete (updatedData as any).educations;
       delete (updatedData as any).careers;
 
       await updateSeeker(seekerID, updatedData);
 
+      // Skills
       const currentSkills: Skill[] = form.skills ?? [];
-
       const toAdd = currentSkills.filter((s) => !s.id);
       const toUpdate = currentSkills.filter((s) => {
         if (!s.id) return false;
@@ -145,6 +166,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
       });
       const toDelete = originalSkills.filter((p) => !currentSkills.some((s) => s.id === p.id));
 
+      // Careers
       const careersToAdd = currentCareers.filter((c) => !c.id);
       const careersToUpdate = currentCareers.filter((c) => {
         if (!c.id) return false;
@@ -152,34 +174,35 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
         return !prev || JSON.stringify(prev) !== JSON.stringify(c);
       });
       const careersToDelete = originalCareers.filter((p) => !currentCareers.some((c) => c.id === p.id));
-      await Promise.all([
-      ...careersToAdd.map((c) => addCareer(seekerID, c)),
-      ...careersToUpdate.map((c) => updateCareer(seekerID, c.id!, c)),
-      ...careersToDelete.map((c) => deleteCareer(seekerID, c.id)),
-    ]);
-    
-
-    const educationsToAdd = currentEducations.filter((e) => !e.id);
-    const educationsToUpdate = currentEducations.filter((e) => {
-      if (!e.id) return false;
-      const prev = originalEducations.find((p) => p.id === e.id);
-      return !prev || JSON.stringify(prev) !== JSON.stringify(e);
-    });
-    const educationsToDelete = originalEducations.filter((p) => !currentEducations.some((e) => e.id === p.id));
-
-    await Promise.all([
-      ...educationsToAdd.map((e)    => addEducation(seekerID, e)),
-      ...educationsToUpdate.map((e) => updateEducation(seekerID, e.id!, e)),
-      ...educationsToDelete.map((e) => deleteEducation(seekerID, e.id)),
-    ]);
-
 
       await Promise.all([
-        ...toAdd.map((s)    => addSkill(seekerID, { Skill: s.Skill, ExpertLevel: s.ExpertLevel })),
+        ...careersToAdd.map((c) => addCareer(seekerID, c)),
+        ...careersToUpdate.map((c) => updateCareer(seekerID, c.id!, c)),
+        ...careersToDelete.map((c) => deleteCareer(seekerID, c.id)),
+      ]);
+
+      // Educations
+      const educationsToAdd = currentEducations.filter((e) => !e.id);
+      const educationsToUpdate = currentEducations.filter((e) => {
+        if (!e.id) return false;
+        const prev = originalEducations.find((p) => p.id === e.id);
+        return !prev || JSON.stringify(prev) !== JSON.stringify(e);
+      });
+      const educationsToDelete = originalEducations.filter((p) => !currentEducations.some((e) => e.id === p.id));
+
+      await Promise.all([
+        ...educationsToAdd.map((e) => addEducation(seekerID, e)),
+        ...educationsToUpdate.map((e) => updateEducation(seekerID, e.id!, e)),
+        ...educationsToDelete.map((e) => deleteEducation(seekerID, e.id)),
+      ]);
+
+      // Skills
+      await Promise.all([
+        ...toAdd.map((s) => addSkill(seekerID, { Skill: s.Skill, ExpertLevel: s.ExpertLevel })),
         ...toUpdate.map((s) => updateSkill(seekerID, s.id!, { Skill: s.Skill, ExpertLevel: s.ExpertLevel })),
         ...toDelete.map((s) => deleteSkill(seekerID, s.id!)),
       ]);
-      
+
       setOriginalCareers(currentCareers);
       setOriginalEducations(currentEducations);
       setOriginalSkills(currentSkills);
@@ -217,14 +240,13 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
   };
 
   const addArrayItem = (type: "careers" | "educations" | "skills") => {
-  const item =
-    type === "careers"
-      ? { id: undefined, Designation: "", CompanyName: "", StartDate: "", EndDate: "", Description: "" }
-      : type === "educations"
-      ? { id: undefined, InstituteName: "", FieldOfStudy: "", StartDate: "", EndDate: "", LevelOfStudy: "", Status: "" }
-      : { id: undefined, Skill: "", ExpertLevel: "" };
-  setForm({ ...form, [type]: [...getArray(type), item] } as Partial<SEEKER_DATA>);
-
+    const item =
+      type === "careers"
+        ? { id: undefined, Designation: "", CompanyName: "", StartDate: "", EndDate: "", Description: "" }
+        : type === "educations"
+        ? { id: undefined, InstituteName: "", FieldOfStudy: "", StartDate: "", EndDate: "", LevelOfStudy: "", Status: "" }
+        : { id: undefined, Skill: "", ExpertLevel: "" };
+    setForm({ ...form, [type]: [...getArray(type), item] } as Partial<SEEKER_DATA>);
   };
 
   const removeArrayItem = (type: "careers" | "educations" | "skills", idx: number) => {
@@ -274,10 +296,10 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
       <form onSubmit={handleSubmit}>
         <Box sx={{ display: "grid", gap: 2 }}>
-          <TextField label="First Name" name="FirstName" value={form.FirstName || ""} onChange={handleChange} fullWidth />
-          <TextField label="Last Name" name="LastName" value={form.LastName || ""}  onChange={handleChange} fullWidth />
-          <TextField label="Email" name="Email" value={form.Email || ""} onChange={handleChange} fullWidth />
-          <TextField label="Contact No" name="ContactNo" value={form.ContactNo || ""} onChange={handleChange} fullWidth />
+          <TextField label="First Name" name="FirstName" value={form.FirstName || ""} fullWidth InputProps={{ readOnly: true }} />
+          <TextField label="Last Name" name="LastName" value={form.LastName || ""} fullWidth InputProps={{ readOnly: true }} />
+          <TextField label="Email" name="Email" value={form.Email || ""} fullWidth InputProps={{ readOnly: true }} />
+          <TextField label="Contact No" name="ContactNo" value={form.ContactNo || ""} fullWidth InputProps={{ readOnly: true }} />
           <TextField label="Address" name="Address" value={form.Address || ""} onChange={handleChange} fullWidth />
           <TextField label="Professional Experience (years)" name="ProfessionalExperience" type="number" value={form.ProfessionalExperience || ""} onChange={handleChange} fullWidth />
           <TextField label="Salary" name="Salary" type="number" value={form.Salary || ""} onChange={handleChange} fullWidth />
