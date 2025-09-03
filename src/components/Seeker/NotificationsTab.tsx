@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -8,55 +8,84 @@ import {
   ListItemButton,
   IconButton,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-const dummyNotifications = [
-  {
-    id: 1,
-    message: "Your application for Frontend Developer has been viewed.",
-    date: "2025-04-18",
-  },
-  {
-    id: 2,
-    message: "New job matching your profile: GIS Analyst",
-    date: "2025-04-17",
-  },
-  {
-    id: 3,
-    message: "Reminder: Complete your profile to get better job matches.",
-    date: "2025-04-15",
-  },
-  {
-    id: 4,
-    message: "Your application for Frontend Developer has been viewed.",
-    date: "2025-04-18",
-  },
-  {
-    id: 5,
-    message: "New job matching your profile: GIS Analyst",
-    date: "2025-04-17",
-  },
-  {
-    id: 6,
-    message: "Reminder: Complete your profile to get better job matches.",
-    date: "2025-04-15",
-  },
-];
+import MailIcon from "@mui/icons-material/Mail";
+import DraftsIcon from "@mui/icons-material/Drafts";
+import { notification } from "../../types/notification";
+import { useAuth } from "../../context/AuthContext";
+import { getSeekerNotifications, markNotificationAsRead } from "../../services/APIs/APIs";
 
 const NotificationsTab = () => {
-  const [notifications, setNotifications] = useState(dummyNotifications);
+  const { userInfo } = useAuth();
+  const [seekerID, setSeekerID] = useState<number>(0);
+  const [notifications, setNotifications] = useState<notification[]>([]);
+  const [selectedNote, setSelectedNote] = useState<notification | null>(null); // For dialog
 
-  const handleRemove = (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  // Get seeker ID from context
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) {
+      setSeekerID(userInfo.UserId);
+      console.log("SeekerID from context:", userInfo.UserId);
+    }
+  }, [userInfo]);
 
-  const handleClick = (message: string) => {
-    alert(`You clicked: "${message}"`);
-  };
+  // Fetch notifications
+  useEffect(() => {
+    const fetchData = async () => {
+      if (seekerID !== 0) {
+        try {
+          const data = await getSeekerNotifications(seekerID.toString());
+          setNotifications(data);
+        } catch (error) {
+          console.error("Failed to fetch notifications:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [seekerID]);
+
+  // 🔹 Mark as read + open dialog
+  const handleClick = async (note: notification) => {
+  setSelectedNote(note);
+
+  if (note.Status === "Unread") {
+    // Optimistically update UI
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.NotificationId === note.NotificationId
+          ? { ...n, Status: "Read" }
+          : n
+      )
+    );
+
+    try {
+      // Call API to mark as read
+      if (userInfo && "UserId" in userInfo) {
+        await markNotificationAsRead(userInfo.UserId.toString(), note.NotificationId);
+        console.log(`Notification ${note.NotificationId} marked as read`);
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read:", err);
+      // Optionally, revert UI change if API fails
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.NotificationId === note.NotificationId
+            ? { ...n, Status: "Unread" }
+            : n
+        )
+      );
+    }
+  }
+};
 
   return (
-    <Box className="notification-tab-container" sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
         Notifications
       </Typography>
@@ -71,7 +100,7 @@ const NotificationsTab = () => {
         }}
       >
         {notifications.map((note) => (
-          <React.Fragment key={note.id}>
+          <React.Fragment key={note.NotificationId}>
             <ListItem
               secondaryAction={
                 <IconButton
@@ -79,7 +108,7 @@ const NotificationsTab = () => {
                   aria-label="delete"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleRemove(note.id);
+                    // handleRemove(note.NotificationId);
                   }}
                 >
                   <DeleteIcon color="error" />
@@ -88,18 +117,22 @@ const NotificationsTab = () => {
               disablePadding
             >
               <ListItemButton
-                onClick={() => handleClick(note.message)}
+                onClick={() => handleClick(note)}
                 sx={{
-                  "&:hover": {
-                    backgroundColor: "#f5f5f5",
-                  },
+                  "&:hover": { backgroundColor: "#f5f5f5" },
                 }}
               >
+                {note.Status === "Unread" ? (
+                  <MailIcon color="primary" sx={{ mr: 2 }} />
+                ) : (
+                  <DraftsIcon sx={{ color: "gray", mr: 2 }} />
+                )}
+
                 <ListItemText
-                  primary={note.message}
+                  primary={note.Message}
                   secondary={
-                    <Typography variant="body2" sx={{ color: "secondary" }}>
-                      {new Date(note.date).toDateString()}
+                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                      {new Date(note.DateTime).toLocaleString()}
                     </Typography>
                   }
                 />
@@ -115,6 +148,33 @@ const NotificationsTab = () => {
           </Typography>
         )}
       </List>
+
+      {/* 🔹 Dialog to show full message */}
+      <Dialog
+        open={!!selectedNote}
+        onClose={() => setSelectedNote(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Notification Details</DialogTitle>
+        <DialogContent dividers>
+          {selectedNote && (
+            <>
+              <Typography variant="subtitle1" gutterBottom>
+                {selectedNote.Message}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {new Date(selectedNote.DateTime).toLocaleString()}
+              </Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSelectedNote(null)} variant="contained">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

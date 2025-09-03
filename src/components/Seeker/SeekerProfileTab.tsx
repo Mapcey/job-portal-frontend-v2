@@ -1,19 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Typography,
   Box,
   Chip,
-  TextField,
   Button,
-  Autocomplete,
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
+import { getSeekerData } from "../../services/APIs/APIs";
+import { SEEKER_DATA } from "../../types/users";
+import { useAuth } from "../../context/AuthContext";
 
 const SeekerProfileTab = () => {
-  const [skills, setSkills] = useState<string[]>(["React", "Python", "SQL"]);
   const navigate = useNavigate();
+
+const { userInfo } = useAuth();
+const [seekerID, setSeekerID] = useState(0);
+const [user, setUser] = useState<SEEKER_DATA | null>(null);
+
+ useEffect(() => {
+    if (userInfo && "UserId" in userInfo) {
+      setSeekerID(userInfo.UserId);
+      console.log(userInfo.UserId);
+    }
+  }, [userInfo]);
+
+  useEffect(() => {
+      const fetchData = async () => {
+        if (seekerID !== 0) {
+          try {
+            const data = await getSeekerData(seekerID.toString());
+            setUser(data);
+            console.log("Seeker data fetched:", data);
+          } catch (error) {
+            console.error("Failed to fetch employer data:", error);
+          }
+        }
+      };
+  
+      fetchData();
+    }, [seekerID]);
 
   return (
     <div className="seeker-profile-tab-container">
@@ -40,32 +67,76 @@ const SeekerProfileTab = () => {
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 4 }}>
               <Box>
-                <Typography variant="h4">Isuru Prasad</Typography>
+                <Typography variant="h4">{user?.FirstName || ""}</Typography>
                 <Typography variant="subtitle1">Software Engineer</Typography>
               </Box>
               <Box>
-                <Typography variant="h6">Phone Number</Typography>
-                <Typography variant="subtitle1">011 22334455</Typography>
+                <Typography variant="h6">Phone No</Typography>
+                <Typography variant="subtitle1">{user?.ContactNo}</Typography>
               </Box>
               <Box>
                 <Typography variant="h6">Email</Typography>
-                <Typography variant="subtitle1">isuru@email.com</Typography>
+                <Typography variant="subtitle1">{user?.Email || ""}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
-              <Chip label="Bachelor's" variant="outlined" />
               <Chip label="Colombo" variant="outlined" />
-              <Chip label="3 - 5 Years" variant="outlined" />
-              <Chip label="Hybrid" variant="outlined" />
+              <Chip label={'Experence: '+user?.ProfessionalExperience + 'years' || ""} variant="outlined" />
+              <Chip label={user?.JobType || ""} variant="outlined" />
+              <Chip label={user?.JobType2 || ""} variant="outlined" />
             </Box>
             <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
-              <Chip label="Rs 50k - 75K" variant="outlined" />
-              <Chip label="English" variant="outlined" />
-              <Chip label="25-30 Yrs" variant="outlined" />
+              <Chip label={user?.Salary || ""} variant="outlined" />
+              {user?.languages && user.languages.length > 0 && (
+                <Chip
+                  label={
+                    user.languages.find(l => l.ExpertLevel === "Fluent")
+                      ? `Fluent: ${user.languages.find(l => l.ExpertLevel === "Fluent")?.Language}`
+                      : `Fluent: ${user.languages[0].Language}`
+                  }
+                  variant="outlined"
+                />
+              )}
+              <Chip
+                label={user?.DateOfBirth ? new Date(user.DateOfBirth).toLocaleDateString() : ""}
+                variant="outlined"
+              />
+
             </Box>
           </Box>
         </div>
 
+        {/* section */}
+        <div className="seeker-profile-section-2">
+          <Typography variant="h6">Social links</Typography>
+          <Box className="seeker-profile-text-area-container">
+            <Typography
+              className="seeker-profile-text-area"
+              variant="subtitle1"
+            >
+              <a 
+                href={user?.SocialLinks || "#"} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                >
+                {user?.SocialLinks}
+            </a>
+
+            </Typography>
+          </Box>
+        </div>  
+        {/* section */}
+        <div className="seeker-profile-section-2">
+          <Typography variant="h6">Address</Typography>
+          <Box className="seeker-profile-text-area-container">
+            <Typography
+              className="seeker-profile-text-area"
+              variant="subtitle1"
+            >
+              {user?.Address || ""}
+            </Typography>
+          </Box>
+        </div>   
         {/* section */}
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Professional Summary</Typography>
@@ -74,9 +145,7 @@ const SeekerProfileTab = () => {
               className="seeker-profile-text-area"
               variant="subtitle1"
             >
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-              blanditiis tenetur unde suscipit, quam beatae rerum inventore
-              consectetur, neque doloribus,
+              {user?.Summary || ""}
             </Typography>
           </Box>
         </div>
@@ -85,66 +154,77 @@ const SeekerProfileTab = () => {
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Career History</Typography>
           <Box className="seeker-profile-text-area-container">
-            <Typography ml={2} mt={2} variant="h6">
-              Software Engineer
-            </Typography>
-            <Typography ml={2} variant="subtitle2">
-              ABC Company
-            </Typography>
-            <Typography className="seeker-profile-text-area" variant="body1">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-              blanditiis tenetur unde suscipit, quam beatae rerum inventore
-              consectetur, neque doloribus,
-            </Typography>
-          </Box>
+            {user?.careers && user.careers.length > 0 ? (
+              user.careers.map((career) => (
+                <Box key={career.id} mb={2}>
+                  <Typography ml={2} mt={2} variant="h6">
+                    {career.Designation}
+                  </Typography>
+                  <Typography ml={2} variant="subtitle2">
+                    {career.CompanyName}
+                  </Typography>
+                  <Typography ml={2} variant="body2">
+                    {career.StartDate} - {career.EndDate ? career.EndDate : "Present"}
+                  </Typography>
+                  <Typography className="seeker-profile-text-area" variant="body1">
+                    {career.Description}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography ml={2} variant="body2">
+                No career history available.
+              </Typography>
+            )}
+            </Box>
         </div>
 
         {/* section */}
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Education</Typography>
           <Box className="seeker-profile-text-area-container">
-            <Typography ml={2} mt={2} variant="h6">
-              ABC University
-            </Typography>
-            <Typography ml={2} variant="subtitle2">
-              B.Sc. Software Engineering
-            </Typography>
-            <Typography className="seeker-profile-text-area" variant="body1">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-              blanditiis tenetur unde suscipit, quam beatae rerum inventore
-              consectetur, neque doloribus,
-            </Typography>
+            {user?.educations && user.educations.length > 0 ? (
+              user.educations.map((edu) => (
+                <Box key={edu.id} mb={2}>
+                  <Typography ml={2} mt={2} variant="h6">
+                    {edu.InstituteName}
+                  </Typography>
+                  <Typography ml={2} variant="subtitle2">
+                    {edu.FieldOfStudy}
+                  </Typography>
+                  <Typography ml={2} variant="body2">
+                    {edu.StartDate} - {edu.EndDate ? edu.EndDate : "Present"}
+                  </Typography>
+                  <Typography ml={2} variant="body2">
+                    {edu.LevelOfStudy} {edu.Status ? `(${edu.Status})` : ""}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography ml={2} variant="body2">
+                No education history available.
+              </Typography>
+            )}
           </Box>
         </div>
 
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Skills</Typography>
-          <Autocomplete
-            disabled
-            sx={{ marginTop: "0" }}
-            className="text-input-1"
-            multiple
-            freeSolo
-            options={[]} // No predefined options, user can type freely
-            value={skills}
-            onChange={(event, newValue) => {
-              console.log(event);
-              setSkills(newValue);
-            }}
-            renderTags={(value: readonly string[], getTagProps) =>
-              value.map((option: string, index: number) => (
+          <Box className="seeker-profile-text-area-container" sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {user?.skills && user.skills.length > 0 ? (
+              user.skills.map((skill) => (
                 <Chip
+                  key={skill.id}
+                  label={`${skill.Skill} (${skill.ExpertLevel})`}
                   variant="outlined"
-                  label={option}
-                  {...getTagProps({ index })}
-                  key={option}
                 />
               ))
-            }
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Add Skills" />
+            ) : (
+              <Typography ml={2} variant="body2">
+                No skills available.
+              </Typography>
             )}
-          />
+          </Box>
         </div>
       </div>
     </div>

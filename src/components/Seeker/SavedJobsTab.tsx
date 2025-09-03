@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -8,83 +8,111 @@ import {
   Chip,
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
-
+import { useNavigate } from "react-router-dom";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
-
-const dummyJobs = [
-  {
-    id: 1,
-    title: "Frontend Developer",
-    company: "TechCorp",
-    test: "ss",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "50K - 70K",
-      education: "Bachelor's",
-      location: "Remote",
-    },
-  },
-  {
-    id: 2,
-    title: "Backend Engineer",
-    company: "DataSoft",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "70K - 90K",
-      education: "Bachelor's",
-      location: "Colombo",
-    },
-  },
-  {
-    id: 3,
-    title: "GIS Analyst",
-    company: "GeoMapping Ltd",
-    desc: " blanditiis tenetur unde suscipit, quam beatae rerum inventore. blanditiis tenetur unde suscipit, quam beatae rerum inventore",
-    chips: {
-      salary: "60K - 80K",
-      education: "Master's",
-      location: "Kandy",
-    },
-  },
-];
+import FlagIcon from "@mui/icons-material/Flag";
+import { getSeekerSavedJobs, deleteSeekerSavedJob } from "../../services/APIs/APIs";
+import { useAuth } from "../../context/AuthContext";
+import { saved_jobs } from "../../types/job";
 
 const SavedJobsTab = () => {
-  const [savedJobs, setSavedJobs] = useState(dummyJobs);
+  const { userInfo } = useAuth();
+  const [seekerID, setSeekerID] = useState<number>(0);
+  const [savedJobs, setSavedJobs] = useState<saved_jobs[]>([]);
+  const navigate = useNavigate();
 
-  const handleRemove = (id: number) => {
-    const updatedJobs = savedJobs.filter((job) => job.id !== id);
-    setSavedJobs(updatedJobs);
+  // Get seeker ID
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) {
+      setSeekerID(userInfo.UserId);
+    }
+  }, [userInfo]);
+
+  // Fetch saved jobs
+  useEffect(() => {
+    const fetchSavedJobs = async () => {
+      if (seekerID !== 0) {
+        try {
+          const data: saved_jobs[] = await getSeekerSavedJobs(seekerID.toString());
+          setSavedJobs(data);
+        } catch (err) {
+          console.error("Failed to fetch saved jobs:", err);
+        }
+      }
+    };
+    fetchSavedJobs();
+  }, [seekerID]);
+
+  // Remove saved job
+  const handleRemove = async (jobId: number) => {
+    if (!seekerID) return;
+    try {
+      await deleteSeekerSavedJob(seekerID.toString(), jobId);
+      setSavedJobs((prev) => prev.filter((job) => job.JobId !== jobId));
+    } catch (err) {
+      console.error("Failed to remove job:", err);
+    }
+  };
+
+  // Report job
+  const handleReport = (jobId: number) => {
+    alert(`Reported Job ID: ${jobId}`);
+    // TODO: Call report API here
+  };
+
+  // Navigate to job details
+  const handleOpenJob = (jobId: number) => {
+    navigate(`/jobs/details/${jobId}`);
   };
 
   return (
-    <Box className="saved-jobs-tab-container" sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
         Saved Jobs ({savedJobs.length})
       </Typography>
 
       <Box
-        className="saved-jobs-tab-content"
         sx={{
-          maxHeight: "600px",
+          maxHeight: 600,
           overflowY: "auto",
-          // display: "flex",
+          display: "flex",
           flexDirection: "column",
           gap: 2,
         }}
       >
         {savedJobs.map((job) => (
           <Card
-            key={job.id}
+            key={job.JobId}
             variant="outlined"
-            sx={{
-              position: "relative",
-              paddingTop: "20px",
-              marginBottom: "20px",
-            }}
+            sx={{ position: "relative", paddingTop: 2 }}
           >
+            {/* Remove Job Icon */}
             <IconButton
               size="small"
-              onClick={() => handleRemove(job.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemove(job.JobId);
+              }}
+              sx={{
+                position: "absolute",
+                top: 5,
+                right: 35, // Shift left for report icon
+                zIndex: 1,
+                backgroundColor: "white",
+                boxShadow: 1,
+                ":hover": { backgroundColor: "#f5f5f5" },
+              }}
+            >
+              <BookmarkRemoveIcon />
+            </IconButton>
+
+            {/* Report Job Icon */}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleReport(job.JobId);
+              }}
               sx={{
                 position: "absolute",
                 top: 5,
@@ -95,35 +123,44 @@ const SavedJobsTab = () => {
                 ":hover": { backgroundColor: "#f5f5f5" },
               }}
             >
-              <BookmarkRemoveIcon />
+              <FlagIcon />
             </IconButton>
-            <CardActionArea>
+
+            <CardActionArea onClick={() => handleOpenJob(job.JobId)}>
               <CardContent>
-                <Typography variant="h6">{job.title}</Typography>
-                <Typography mb={3} color="secondary">
-                  {job.company}
+                <Typography variant="h6">{job.JobTitle || "Untitled Job"}</Typography>
+                <Typography mb={1} color="text.secondary">
+                  {job.employer?.CompanyName || "Unknown Company"}
+                </Typography>
+                <Typography variant="body2" mb={1}>
+                  {job.Description || ""}
                 </Typography>
 
-                <Typography variant="body1">{job.desc}</Typography>
-
-                {/* Chips */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    marginTop: 2,
-                  }}
-                >
-                  {Object.entries(job.chips).map(([key, value]) => (
-                    <Chip
-                      key={key}
-                      label={`${value}`}
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                    />
-                  ))}
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
+                  <Chip
+                    label={job.SalaryRange || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.EducationLevel || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.Location || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={job.JobType || "-"}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
                 </Box>
               </CardContent>
             </CardActionArea>
@@ -131,7 +168,7 @@ const SavedJobsTab = () => {
         ))}
 
         {savedJobs.length === 0 && (
-          <Typography variant="h3" color="secondary.light">
+          <Typography variant="h5" color="text.secondary">
             No saved jobs yet.
           </Typography>
         )}
