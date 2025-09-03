@@ -1,11 +1,15 @@
 import axiosInstance from "../axiosInstance";
 
-import { Job } from "../../types/job";
-import { Career, Education, EMPLOYER_DATA, SEEKER_DATA, Skill } from "../../types/users";
+import {
+  Career,
+  Education,
+  EMPLOYER_DATA,
+  SEEKER_DATA,
+  Skill,
+} from "../../types/users";
 import { saved_jobs } from "../../types/job";
 import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 import { JOB, CREATE_JOB, EMP_POSTED_JOBS } from "../../types/job";
-import { EMPLOYER_DATA } from "../../types/users";
 
 // ------------------ USER ------------------J
 // get user info
@@ -23,8 +27,6 @@ export const userLogin = async () => {
 // ------------------ JOBS ------------------
 
 // get all jobs
-export const getAllJobs = async (): Promise<Job[]> => {
-// JOBS -----------------------------------------------------------------
 export const getAllJobs = async (): Promise<JOB[]> => {
   const response = await axiosInstance.get("/jobs/");
   return response.data;
@@ -39,10 +41,10 @@ export const getAllJobs = async (): Promise<JOB[]> => {
 // };
 
 // ------------------ SEEKER ------------------
-export const getJobDetails = async (id: string): Promise<JOB> => {
-  const response = await axiosInstance.get(`/jobs/${id}`);
-  return response.data;
-};
+// export const getJobDetails = async (id: string): Promise<JOB> => {
+//   const response = await axiosInstance.get(`/jobs/${id}`);
+//   return response.data;
+// };
 
 export const createNewJob = async (data: CREATE_JOB): Promise<CREATE_JOB> => {
   const response = await axiosInstance.post(`/jobs/`, data);
@@ -82,27 +84,27 @@ export const getSeekerData = async (id: string): Promise<SEEKER_DATA> => {
 export const getSeekerSavedJobs = async (id: string): Promise<saved_jobs[]> => {
   const response = await axiosInstance.get(`/seekers/${id}/saved_jobs`);
   return response.data;
-  
 };
 
 // Delete saved job for a seeker
 export const deleteSavedJobs = async (
   seekerId: string,
-  jobId: string,
+  jobId: string
 ): Promise<void> => {
   await axiosInstance.delete(`/seekers/${seekerId}/saved_jobs/${jobId}`);
 };
 
 // seeker applications data get
-export const getSeekerApplications = async (id: string): Promise<ApplicationsSeeker[]> => {
+export const getSeekerApplications = async (
+  id: string
+): Promise<ApplicationsSeeker[]> => {
   const response = await axiosInstance.get(`/seekers/${id}/applications`);
   return response.data;
-  
 };
 
 // Delete application for a seeker
 export const deleteSeekerApplications = async (
-  applicationid: string,
+  applicationid: string
 ): Promise<void> => {
   await axiosInstance.delete(`/jobs/applications/${applicationid}`);
 };
@@ -115,7 +117,6 @@ export const updateSeeker = async (
   const response = await axiosInstance.put(`/seekers/${SeekerId}`, data);
   return response.data;
 };
-
 
 // ------------------ EMPLOYER ------------------
 
@@ -152,11 +153,10 @@ export const getAllEmployer = async (id: string) => {
   return response.data;
 };
 
-
 // ------------------JOB DETAILS -------------------
 
 // job details by id
-export const getJobDetails = async (id: string): Promise<Job> => {
+export const getJobDetails = async (id: string): Promise<JOB> => {
   const response = await axiosInstance.get(`/jobs/${id}`);
   return response.data;
 };
@@ -169,21 +169,24 @@ export const deleteSeekerSavedJob = async (
   await axiosInstance.delete(`/seekers/${seekerId}/saved_jobs/${jobId}`);
 };
 
-
 //-------------Notification Managementr------------------
 
 // Get notifications for a seeker
 export const getSeekerNotifications = async (seekerId: string) => {
-  const response = await axiosInstance.get(`/seekers/${seekerId}/notifications`);
+  const response = await axiosInstance.get(
+    `/seekers/${seekerId}/notifications`
+  );
   return response.data;
-}
+};
 
 // Mark a notification as read
 export const markNotificationAsRead = async (
   seekerId: string,
   notificationId: number
 ) => {
-  await axiosInstance.put(`/seekers/${seekerId}/notifications/${notificationId}`);
+  await axiosInstance.put(
+    `/seekers/${seekerId}/notifications/${notificationId}`
+  );
 };
 
 /*export const deleteNotifications = async (
@@ -193,16 +196,12 @@ export const markNotificationAsRead = async (
   await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
 };*/
 
-
-
-
-
 //-------------Skills Management for Seeker------------------
 
 // Update an existing skill
 export const updateSkill = async (
-  SeekerId: number, 
-  SkillId: number, 
+  SeekerId: number,
+  SkillId: number,
   data: Partial<Skill>
 ) => {
   const response = await axiosInstance.put(
@@ -213,10 +212,7 @@ export const updateSkill = async (
 };
 
 // Add a new skill
-export const addSkill = async (
-  SeekerId: number,   
-  data: Partial<Skill>
-) => {
+export const addSkill = async (SeekerId: number, data: Partial<Skill>) => {
   const response = await axiosInstance.post(
     `/seekers/${SeekerId}/skills`,
     data
@@ -226,8 +222,8 @@ export const addSkill = async (
 
 // Delete a skill
 export const deleteSkill = async (
-  SeekerId: number, 
-  SkillId: number,
+  SeekerId: number,
+  SkillId: number
 ): Promise<void> => {
   await axiosInstance.delete(`/seekers/${SeekerId}/skills/${SkillId}`);
 };
@@ -235,8 +231,8 @@ export const deleteSkill = async (
 //-------------Education Management for Seeker------------------
 // Update an existing education
 export const updateEducation = async (
-  SeekerId: number, 
-  EducationId: number, 
+  SeekerId: number,
+  EducationId: number,
   data: Partial<Education>
 ) => {
   const response = await axiosInstance.put(
@@ -247,10 +243,7 @@ export const updateEducation = async (
 };
 
 // Add a new education
-export const addEducation = async (
-  SeekerId: number,   
-  data: Partial<Skill>
-) => {
+export const addEducation = async (SeekerId: number, data: Partial<Skill>) => {
   const response = await axiosInstance.post(
     `/seekers/${SeekerId}/educations`,
     data
@@ -260,8 +253,8 @@ export const addEducation = async (
 
 // Delete a education
 export const deleteEducation = async (
-  SeekerId: number, 
-  EducationId: number,
+  SeekerId: number,
+  EducationId: number
 ): Promise<void> => {
   await axiosInstance.delete(`/seekers/${SeekerId}/educations/${EducationId}`);
 };
@@ -270,8 +263,8 @@ export const deleteEducation = async (
 
 // Update an existing Career
 export const updateCareer = async (
-  SeekerId: number, 
-  CareerId: number, 
+  SeekerId: number,
+  CareerId: number,
   data: Partial<Skill>
 ) => {
   const response = await axiosInstance.put(
@@ -282,10 +275,7 @@ export const updateCareer = async (
 };
 
 // Add a new Career
-export const addCareer = async (
-  SeekerId: number,   
-  data: Partial<Career>
-) => {
+export const addCareer = async (SeekerId: number, data: Partial<Career>) => {
   const response = await axiosInstance.post(
     `/seekers/${SeekerId}/careers`,
     data
@@ -295,9 +285,8 @@ export const addCareer = async (
 
 // Delete a Career
 export const deleteCareer = async (
-  SeekerId: number, 
-  CareerId: number,
+  SeekerId: number,
+  CareerId: number
 ): Promise<void> => {
   await axiosInstance.delete(`/seekers/${SeekerId}/careers/${CareerId}`);
 };
-

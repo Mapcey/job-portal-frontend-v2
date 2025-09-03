@@ -9,14 +9,14 @@ import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
-import { Job } from "../types/job";
+import { JOB } from "../types/job";
 import Loading from "../components/Loading";
 
 import { getJobDetails } from "../services/APIs/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [job, setJob] = useState<Job | null>(null);
+  const [job, setJob] = useState<JOB | null>(null);
   const { isAuthenticated } = useAuth();
 
   // useEffect(() => {
