@@ -1,11 +1,11 @@
 // src/store/jobStore.ts
 import { create } from "zustand";
-import { Job } from "../types/job"; // Adjust path to your Job type
+import { JOB } from "../types/job"; // Adjust path to your Job type
 
 interface JobStore {
-  jobs: Job[] | null;
+  jobs: JOB[] | null;
   lastFetched: number | null;
-  setJobs: (jobs: Job[]) => void;
+  setJobs: (jobs: JOB[]) => void;
   clearJobs: () => void;
   isCacheValid: () => boolean;
 }

@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Delete, Cancel, RemoveRedEye } from "@mui/icons-material";
-import { formatDistanceToNow, differenceInDays } from "date-fns";
+import { differenceInDays } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
