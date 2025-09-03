@@ -12,8 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import { Job } from "../types/job";
 import Loading from "../components/Loading";
 
-import { getJobById } from "../services/APIs/seekerApis";
-import { getJobDetails } from "../services/APIs";
+import { getJobDetails } from "../services/APIs/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();

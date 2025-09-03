@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -13,21 +13,21 @@ import {
   Tabs,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
   setPersistence,
   browserLocalPersistence,
+  deleteUser,
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
 import Header_1 from "../components/header/Header_1";
 import { useAuth } from "../context/AuthContext";
 
-import { signinSeeker } from "../services/APIs";
-import { signinEmployer } from "../services/APIs";
+import { signupSeeker } from "../services/APIs/APIs";
+import { signupEmployer } from "../services/APIs/APIs";
 
 const SignupPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -37,18 +37,34 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const [submitting, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
-  const { login } = useAuth();
+  const { setUserRoleAndInfo } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error("Failed to set Firebase persistence:", error);
+    });
+  }, []);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
+    // setSubmitting(true);
+    setError("");
     await setPersistence(auth, browserLocalPersistence);
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      // setSubmitting(false);
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -57,7 +73,7 @@ const SignupPage = () => {
       );
 
       const user = userCredential.user;
-      const token = await user.getIdToken();
+      // const token = await user.getIdToken();
       const uid = user.uid;
       const firebaseEmail = user.email;
 
@@ -65,79 +81,87 @@ const SignupPage = () => {
         throw new Error("Email not found in Firebase user object.");
       }
 
-      console.log({
-        token: token,
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        phoneNumber: user.phoneNumber,
-        photoURL: user.photoURL,
-        emailVerified: user.emailVerified,
-        providerId: user.providerId,
-        metadata: user.metadata,
-      });
-
-      await login(token); // Store token in context or localStorage
-
-      // 👇 Call your backend API with the new user info
       const userPayload = {
-        uid,
-        email: firebaseEmail,
+        ContactNo: "12345",
+        Email: firebaseEmail,
       };
 
       if (selectedTab === 0) {
-        // Seeker
-        await signinSeeker(userPayload);
-        navigate("/seeker/profile");
-        console.log("seeker api", userPayload);
+        const response = await signupSeeker(userPayload);
+        console.log(response);
+        if (response) {
+          console.log("Signup success");
+          setUserRoleAndInfo("seeker", response);
+          navigate("/seeker/register");
+        }
       } else {
-        // Employer
-        await signinEmployer(userPayload);
-        navigate("/employer/profile");
-        console.log("employer api", userPayload);
+        const response = await signupEmployer(userPayload);
+        console.log(response);
+        if (response.FirebaseUID == uid) {
+          console.log("Signup success");
+          setUserRoleAndInfo("employer", response);
+          navigate("/employer/register");
+        } else {
+          throw new Error(response.message || "Signup failed");
+        }
       }
     } catch (err: any) {
       console.error("Signup failed:", err);
+      const user = auth.currentUser;
+      if (user) {
+        await deleteUser(user).catch((deleteErr) =>
+          console.warn("Failed to delete Firebase user:", deleteErr)
+        );
+      }
       setError(err.message || "An unexpected error occurred during signup");
+    } finally {
+      // setSubmitting(false);
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    await setPersistence(auth, browserLocalPersistence);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const token = await user.getIdToken();
-      const uid = user.uid;
-      const firebaseEmail = user.email;
+  // const handleGoogleSignUp = async () => {
+  //   await setPersistence(auth, browserLocalPersistence);
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const user = result.user;
+  //     const token = await user.getIdToken();
+  //     const uid = user.uid;
+  //     const firebaseEmail = user.email;
 
-      if (!firebaseEmail) {
-        throw new Error("Email not found in Firebase user object.");
-      }
+  //     if (!firebaseEmail) {
+  //       throw new Error("Email not found in Firebase user object.");
+  //     }
 
-      const userPayload = {
-        uid,
-        email: firebaseEmail,
-      };
+  //     const userPayload = {
+  //       IsSub: false,
+  //     };
 
-      login(token);
+  //     login(token);
 
-      if (selectedTab === 0) {
-        await signinSeeker(userPayload);
-        navigate("/seeker/profile");
-        console.log("seeker api - gmail", userPayload);
-      } else {
-        await signinEmployer(userPayload);
-        navigate("/employer/profile");
-        console.log("employer api - gmail", userPayload);
-      }
-    } catch (err: any) {
-      setError(
-        err.message || "An unexpected error occurred during Google Sign-Up"
-      );
-    }
-  };
+  //     if (selectedTab === 0) {
+  //       await signupSeeker(userPayload);
+  //       navigate("/seeker/register");
+  //       console.log("seeker api - gmail", userPayload);
+  //     } else {
+  //       console.log("employer");
+
+  //       const response = await signupEmployer(userPayload);
+  //       console.log(response);
+
+  //       if (response.success) {
+  //         console.log("Signup confirmed:", response.data);
+  //         navigate("/seeker/register");
+  //       } else {
+  //         throw new Error(response.message || "Signup failed");
+  //       }
+  //     }
+  //   } catch (err: any) {
+  //     setError(
+  //       err.message || "An unexpected error occurred during Google Sign-Up"
+  //     );
+  //   }
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -173,9 +197,24 @@ const SignupPage = () => {
         </Tabs>
 
         {error && (
-          <Typography variant="body2" color="error" sx={{ marginBottom: 2 }}>
-            {error}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              px: 2,
+              py: 1,
+              backgroundColor: "#fdecea",
+              border: "1px solid #f5c6cb",
+              borderRadius: 2,
+              color: "error.main",
+            }}
+          >
+            <ErrorOutlineIcon sx={{ mr: 1 }} />
+            <Typography variant="body2" fontWeight={500}>
+              {error}
+            </Typography>
+          </Box>
         )}
 
         <Box
@@ -267,7 +306,7 @@ const SignupPage = () => {
           color="primary"
           fullWidth
           sx={{ padding: "10px 0", borderRadius: 2 }}
-          onClick={handleGoogleSignUp}
+          // onClick={handleGoogleSignUp}
         >
           Sign up with Google
         </Button>

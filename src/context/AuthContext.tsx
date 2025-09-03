@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { getUserInfo } from "../services/APIs";
+import { userLogin } from "../services/APIs/APIs";
 
 // --- Types ---
 interface AuthContextType {
@@ -15,9 +15,11 @@ interface AuthContextType {
   token: string | null;
   firebaseUser: User | null;
   userRole: string | null;
-  login: (token: string) => Promise<boolean>;
+  login: (token: string) => Promise<string>;
   logout: () => void;
   loading: boolean;
+  userInfo: any;
+  setUserRoleAndInfo: (role: string, info: any) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -29,19 +31,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userInfo, setUserInfo] = useState<string | null>(null);
 
-  const login = async (token: string): Promise<boolean> => {
+  const setUserRoleAndInfo = (role: string, info: any) => {
+    setUserRole(role);
+    setUserInfo(info);
+    setIsAuthenticated(true);
+  };
+
+  const login = async (token: string): Promise<string> => {
     setToken(token);
     try {
-      const userData = await getUserInfo(); // Token sent via axios interceptor
-      setIsAuthenticated(true);
-      if (userData.role) setUserRole(userData.role);
-      return true;
+      const response = await userLogin(); // backend API
+      if (response) {
+        const role = response.role;
+        const userData =
+          role === "seeker" ? response.seeker : response.employer;
+
+        setUserRole(role);
+        console.log("role set :", role);
+
+        setUserInfo(userData);
+        console.log("info set: ", userData);
+        setIsAuthenticated(true);
+
+        return role;
+      }
     } catch (error) {
       console.error("Login failed:", error);
       logout();
-      return false;
+      return "null";
     }
+
+    setLoading(false);
+
+    return "null";
   };
 
   const logout = () => {
@@ -50,20 +74,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setIsAuthenticated(false);
     signOut(auth);
+    console.log("logout function - OK");
   };
 
   // Persist session and fetch backend user info on refresh
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log("presist");
+
       if (user) {
         const token = await user.getIdToken();
         setFirebaseUser(user);
         setToken(token);
+        setIsAuthenticated(true);
+
+        const isNewUser =
+          user.metadata.creationTime === user.metadata.lastSignInTime;
+        if (isNewUser) {
+          console.log("New user just signed up — skip userLogin");
+          setLoading(false); // Still update UI state
+          return;
+        }
 
         try {
-          const userData = await getUserInfo();
-          setUserRole(userData.role);
-          setIsAuthenticated(true);
+          const response = await userLogin(); // backend API
+          if (response) {
+            const role = response.role;
+            const userData =
+              role === "seeker" ? response.seeker : response.employer;
+            setUserRole(role);
+            setUserInfo(userData);
+            setIsAuthenticated(true);
+          }
         } catch (err) {
           console.error("Failed to fetch user info on auth state change:", err);
           logout();
@@ -71,6 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         logout();
       }
+      console.log("loading finish");
       setLoading(false);
     });
 
@@ -87,6 +130,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         loading,
+        userInfo,
+        setUserRoleAndInfo,
       }}
     >
       {children}

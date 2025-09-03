@@ -10,3 +10,12 @@
   color: var(--color-secondary, black);
   font-size: 16px;
 }
+
+.text-field-dis .MuiInputBase-input.Mui-disabled {
+  -webkit-text-fill-color: black; /* Important for WebKit browsers */
+  color: black; /* Fallback */
+}
+
+.text-field-1 .MuiInputLabel-root {
+  color: rgb(99, 99, 99);
+}

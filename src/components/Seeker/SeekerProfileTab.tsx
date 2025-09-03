@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Typography,
   Box,
@@ -8,11 +9,25 @@ import {
   Autocomplete,
 } from "@mui/material";
 
+import EditIcon from "@mui/icons-material/Edit";
+
 const SeekerProfileTab = () => {
   const [skills, setSkills] = useState<string[]>(["React", "Python", "SQL"]);
+  const navigate = useNavigate();
 
   return (
     <div className="seeker-profile-tab-container">
+      <Box
+        sx={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}
+      >
+        <Button
+          variant="outlined"
+          startIcon={<EditIcon />}
+          onClick={() => navigate("edit")}
+        >
+          Edit Profile
+        </Button>
+      </Box>
       <div className="seeker-profile-tab-content">
         {/* section */}
         <div className="seeker-profile-section-1">
@@ -84,8 +99,6 @@ const SeekerProfileTab = () => {
           </Box>
         </div>
 
-        <Button variant="contained">Add Career</Button>
-
         {/* section */}
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Education</Typography>
@@ -103,8 +116,6 @@ const SeekerProfileTab = () => {
             </Typography>
           </Box>
         </div>
-
-        <Button variant="contained">Add Education</Button>
 
         <div className="seeker-profile-section-2">
           <Typography variant="h6">Skills</Typography>
@@ -135,8 +146,6 @@ const SeekerProfileTab = () => {
             )}
           />
         </div>
-
-        <Button variant="contained">Add Skills</Button>
       </div>
     </div>
   );

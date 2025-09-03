@@ -9,8 +9,8 @@ const CreateNewAcEmployer = () => {
       <div>
         <Header_2 />
         <Breadcrumb
-          title="Profile > Create New Employer Account"
-          description="Create a new account to access all features and services. Create a new account to access all features and services."
+          title="Complete Your New Employer Profile"
+          description="Create a new account to access all features and services. "
           backgroundImage="/imgs/backgrounds/bg-1.jpg"
         />
         <FormSection_1 />

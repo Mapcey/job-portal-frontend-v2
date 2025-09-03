@@ -1,16 +1,20 @@
 import React, { useRef, useState } from "react";
-import TextField from "@mui/material/TextField";
-import Avatar from "@mui/material/Avatar";
-import { Box, Typography, Grid } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import BackupIcon from "@mui/icons-material/Backup";
-import Autocomplete from "@mui/material/Autocomplete";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
-import Chip from "@mui/material/Chip";
-import UploadFileIcon from "@mui/icons-material/UploadFile";
-import DeleteIcon from "@mui/icons-material/Delete";
+
+import {
+  TextField,
+  Avatar,
+  Box,
+  Typography,
+  Grid,
+  IconButton,
+  Button,
+  Autocomplete,
+  Chip,
+} from "@mui/material";
+import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+
+import { CREATE_SEEKER } from "../../types/users";
 
 const options = ["Option 1", "Option 2", "Option 2"];
 
@@ -21,13 +25,17 @@ const Input = styled("input")({
 const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
-
   const [value, setValue] = React.useState<string | null>(options[0]);
   const [inputValue, setInputValue] = React.useState("");
-
   const [skills, setSkills] = useState<string[]>([]);
-
   const [images, setImages] = useState<File[]>([]);
+
+  const [formData, setFormData] = useState<CREATE_SEEKER>({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    address: "",
+  });
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -81,7 +89,7 @@ const FormSection_1 = () => {
                 },
               }}
             >
-              <BackupIcon />
+              <Backup />
             </IconButton>
           </Box>
 
@@ -279,7 +287,7 @@ const FormSection_1 = () => {
           <Box className="form-area">
             <div className="form-area-content">
               <h4>Impress employers and Stand out !</h4>
-              <PlayCircleIcon />
+              <PlayCircle />
               <Button
                 variant="contained"
                 color="primary"
@@ -311,7 +319,7 @@ const FormSection_1 = () => {
               sx={{ width: "100%" }}
               variant="outlined"
               component="span"
-              startIcon={<UploadFileIcon />}
+              startIcon={<UploadFile />}
             >
               Upload Images
             </Button>
@@ -346,7 +354,7 @@ const FormSection_1 = () => {
                     }}
                     size="small"
                   >
-                    <DeleteIcon fontSize="small" />
+                    <Delete fontSize="small" />
                   </IconButton>
                 </Box>
               </Grid>

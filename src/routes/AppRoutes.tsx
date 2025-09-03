@@ -14,35 +14,36 @@ import CreateNewAcEmployer from "../pages/Employer/CreateNewAccount";
 import EmployerProfilePage from "../pages/Employer/ProfilePage";
 import PostJob from "../pages/Employer/PostJob";
 import ProtectedRoute from "./PrivatRoute";
+import SeekerEditPage from "../pages/Seeker/EditProfile";
+import EditProfileEmployer from "../pages/Employer/EditProfileEmployer";
 
 const AppRoutes = () => (
   <Routes>
+    <Route path="*" element={<NotFoundPage />} />
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
-    {/* <Route path="/jobs/details/:id" element={<JobDetailsPage />} /> */}
     <Route path="/jobs" element={<BrowseJobs />} />
-    <Route path="/seeker/create_account" element={<CreateNewAcSeeker />} />
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/contact" element={<ContactPage />} />
+    <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
 
     {/* Protected routes */}
     <Route
       path="/jobs/details/:id"
       element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
+        <ProtectedRoute>
           <JobDetailsPage />
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/seeker/profile"
       element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
-          <SeekerProfile />
-        </ProtectedRoute>
+        // <ProtectedRoute allowedRoles={["seeker"]}>
+        <SeekerProfile />
+        // </ProtectedRoute>
       }
     />
     <Route
@@ -61,15 +62,32 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
+
     <Route
-      path="/employer/create_account"
+      path="/employer/register"
       element={
         <ProtectedRoute allowedRoles={["employer"]}>
           <CreateNewAcEmployer />
         </ProtectedRoute>
       }
     />
-    <Route path="*" element={<NotFoundPage />} />
+    <Route
+      path="/seeker/register"
+      element={
+        <ProtectedRoute allowedRoles={["seeker"]}>
+          <CreateNewAcSeeker />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/employer/edit_profile"
+      element={
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <EditProfileEmployer />
+        </ProtectedRoute>
+      }
+    />
   </Routes>
 );
 

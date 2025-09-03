@@ -21,37 +21,6 @@ const EmployerProfilePage = () => {
     setSelectedTab(newValue);
   };
 
-  const jobs = [
-    {
-      id: 1,
-      title: "Frontend Developer",
-      company: "Suicul",
-      location: "Remote",
-      status: "Open",
-    },
-    {
-      id: 2,
-      title: "UI/UX Designer",
-      company: "Suicul",
-      location: "Colombo",
-      status: "Closed",
-    },
-    {
-      id: 3,
-      title: "UI/UX Designer",
-      company: "Suicul",
-      location: "Colombo",
-      status: "Closed",
-    },
-    {
-      id: 4,
-      title: "UI/UX Designer",
-      company: "Suicul",
-      location: "Colombo",
-      status: "Closed",
-    },
-  ];
-
   const pendingJobs = [
     {
       id: 101,
@@ -112,13 +81,7 @@ const EmployerProfilePage = () => {
       case 1:
         return <ManageCandidatesTab />;
       case 2:
-        return (
-          <PostedJobs
-            jobs={jobs}
-            onClose={(id) => console.log("Close job:", id)}
-            onDelete={(id) => console.log("Delete job:", id)}
-          />
-        );
+        return <PostedJobs />;
       case 3:
         return <NotificationsTab />;
       case 4:
@@ -169,27 +132,41 @@ const EmployerProfilePage = () => {
               sx={{
                 color: "secondary.main",
                 alignItems: "flex-start",
+                textAlign: "left",
               }}
             />
             <Tab
               label="Manage Candidates"
               sx={{
                 color: "secondary.main",
+                textAlign: "left",
                 alignItems: "flex-start",
               }}
             />
             <Tab
               label="Posted Jobs"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              sx={{
+                color: "secondary.main",
+                alignItems: "flex-start",
+                textAlign: "left",
+              }}
             />
             <Tab
               label="Notifications"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              sx={{
+                color: "secondary.main",
+                alignItems: "flex-start",
+                textAlign: "left",
+              }}
             />
 
             <Tab
               label="Pending Approvals"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              sx={{
+                color: "secondary.main",
+                alignItems: "flex-start",
+                textAlign: "left",
+              }}
             />
           </Tabs>
 
