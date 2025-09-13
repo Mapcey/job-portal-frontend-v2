@@ -3,13 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCfnXjFHlWfyNUXSzjAjg1_uQ_XWNIdiyU",
-  authDomain: "suicul-job-portal.firebaseapp.com",
-  projectId: "suicul-job-portal",
-  storageBucket: "suicul-job-portal.firebasestorage.app",
-  messagingSenderId: "116976838431",
-  appId: "1:116976838431:web:eda7d2a393bc302758f22a",
-  measurementId: "G-WB7N753Q0P",
+  apiKey: "AIzaSyA0Fp9iaoIroGVa4-TDxJgtutRpU5XDGss",
+  authDomain: "suicul-job-portal-e6de7.firebaseapp.com",
+  projectId: "suicul-job-portal-e6de7",
+  storageBucket: "suicul-job-portal-e6de7.firebasestorage.app",
+  messagingSenderId: "611744858178",
+  appId: "1:611744858178:web:c93d7a374b3c89aed1addb",
+  measurementId: "G-Z6WK6V2SQT",
 };
 
 // Initialize Firebase
