@@ -24,7 +24,7 @@ const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
   const [images, setImages] = useState<File[]>([]);
-  const { userInfo, login, token } = useAuth();
+  const { userInfo } = useAuth();
   const [employerID, setEmployerID] = useState(0);
 
   useEffect(() => {

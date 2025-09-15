@@ -3,7 +3,7 @@ export interface ApplicationsSeeker {
   JobId: number;
   JobTitle: string;
   JobCategory: string;
-  Description: string;
+  Description: string;  
   Status: string;
   ApplicantName: string;
   AppliedDateTime: string;

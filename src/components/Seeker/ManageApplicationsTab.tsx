@@ -50,10 +50,10 @@ const ManageApplicationsTab = () => {
   const handleRemove = async (applicationId: number) => {
     if (!userInfo || !userInfo.UserId) return;
     try {
-      //await deleteSeekerApplications(userInfo.UserId.toString(), applicationId); // pass both IDs
-      //setApplications((prev) =>
-        //prev.filter((app) => app.ApplicationId !== applicationId)
-      //);
+      await deleteSeekerApplications(applicationId); // pass both IDs
+    setApplication((prev) =>
+      prev.filter((app) => app.ApplicationId !== applicationId)
+    );
     } catch (err) {
       console.error("Failed to remove application:", err);
     }

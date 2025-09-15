@@ -37,3 +37,7 @@ export interface saved_jobs {
   Description: string;
   Status: string;
 }
+export interface SavedJob {
+  JobId: number;
+  SavedDateTime?: string;
+}

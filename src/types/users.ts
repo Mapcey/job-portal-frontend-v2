@@ -66,3 +66,12 @@ export interface languages{
   Language: string;
   ExpertLevel: string;
 }
+export interface seekerFiles{
+  id: number;
+  user_id: number;
+  file_name: string;
+  file_url: string;
+  uploaded_at: Date;
+  file_type: string;
+}
+

@@ -1,4 +1,4 @@
-import { Job } from "../types/job";
+import { Job } from "../../types/job";
 
 const sampleDescription = `We are seeking a passionate and dedicated Elementary School Teacher to join our dynamic team in a 
   vibrant school district. The ideal candidate will create engaging lesson plans, foster a positive 
@@ -12,7 +12,6 @@ export const mockJobs: Job[] = [
     JobId: 1,
     CompanyId: 1,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Frontend Developer",
     Location: "Remote",
     JobCategory: "IT",
@@ -31,7 +30,6 @@ export const mockJobs: Job[] = [
     JobId: 2,
     CompanyId: 1,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Backend Developer",
     Location: "Colombo",
     JobCategory: "IT",
@@ -50,7 +48,6 @@ export const mockJobs: Job[] = [
     JobId: 3,
     CompanyId: 1,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Backend Developer",
     Location: "Colombo",
     JobCategory: "IT",
@@ -69,7 +66,6 @@ export const mockJobs: Job[] = [
     JobId: 4,
     CompanyId: 2,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Backend Developer",
     Location: "Colombo",
     JobCategory: "IT",
@@ -88,7 +84,6 @@ export const mockJobs: Job[] = [
     JobId: 5,
     CompanyId: 2,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Mechanical Engineer",
     Location: "Ratnapura",
     JobCategory: "Engineering",
@@ -107,7 +102,6 @@ export const mockJobs: Job[] = [
     JobId: 6,
     CompanyId: 3,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Registered Nurse",
     Location: "Ratnapura",
     JobCategory: "Healthcare",
@@ -126,7 +120,6 @@ export const mockJobs: Job[] = [
     JobId: 7,
     CompanyId: 4,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Marketing Coordinator",
     Location: "Ratnapura",
     JobCategory: "Marketing",
@@ -145,7 +138,6 @@ export const mockJobs: Job[] = [
     JobId: 8,
     CompanyId: 5,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
     JobTitle: "Financial Analyst",
     Location: "Ratnapura",
     JobCategory: "Finance",
@@ -164,7 +156,7 @@ export const mockJobs: Job[] = [
     JobId: 9,
     CompanyId: 6,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "Supply Chain Manager",
     Location: "Ratnapura",
     JobCategory: "Logistics",
@@ -183,7 +175,7 @@ export const mockJobs: Job[] = [
     JobId: 10,
     CompanyId: 7,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "Civil Engineer",
     Location: "Badulla",
     JobCategory: "Construction",
@@ -202,7 +194,7 @@ export const mockJobs: Job[] = [
     JobId: 11,
     CompanyId: 8,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "High School Teacher",
     Location: "Badulla",
     JobCategory: "Education",
@@ -221,7 +213,7 @@ export const mockJobs: Job[] = [
     JobId: 12,
     CompanyId: 9,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "Graphic Designer",
     Location: "Badulla",
     JobCategory: "Design",
@@ -240,7 +232,7 @@ export const mockJobs: Job[] = [
     JobId: 13,
     CompanyId: 10,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "Environmental Scientist",
     Location: "Badulla",
     JobCategory: "Environmental",
@@ -259,7 +251,7 @@ export const mockJobs: Job[] = [
     JobId: 14,
     CompanyId: 11,
     CompanyName: "Google Inc",
-    DatePublished: "2025-07-01T00:00:00Z",
+    
     JobTitle: "Restaurant Manager",
     Location: "Nugegoda",
     JobCategory: "Hospitality",

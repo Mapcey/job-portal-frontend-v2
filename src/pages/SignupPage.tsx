@@ -12,13 +12,11 @@ import {
   Tab,
   Tabs,
 } from "@mui/material";
-import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
   setPersistence,
   browserLocalPersistence,
   deleteUser,
@@ -40,7 +38,7 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [_, setSubmitting] = useState(false);
 
   const [error, setError] = useState("");
   const { setUserRoleAndInfo } = useAuth();
@@ -76,7 +74,6 @@ const SignupPage = () => {
       );
 
       const user = userCredential.user;
-      const token = await user.getIdToken();
       const uid = user.uid;
       const firebaseEmail = user.email;
 

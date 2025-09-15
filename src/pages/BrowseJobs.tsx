@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-// MUI
+import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
   Button,
@@ -17,14 +15,14 @@ import {
   InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-// FIELS
+
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
 import { Job } from "../types/job";
 import Loading from "../components/Loading";
-import { getAllJobs } from "../services/APIs/APIs";
+import { getAllJobs, addJobApplication } from "../services/APIs/APIs"; // 👈 import addJobApplication
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
@@ -47,6 +45,8 @@ const BrowseJobs = () => {
   const [educationLevels, setEducationLevels] = useState<string[]>([]);
   const [experienceLevels, setExperienceLevels] = useState<string[]>([]);
 
+  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set()); // 👈 track applied jobs
+
   const jobsPerPage = 8;
 
   useEffect(() => {
@@ -55,18 +55,9 @@ const BrowseJobs = () => {
       setFilteredJobs(data);
       setLoading(false);
 
-      setCategories([
-        ...new Set(data.map((job: Job) => job.JobCategory)),
-      ] as string[]);
-
-      setJobTypes([
-        ...new Set(data.map((job: Job) => job.JobType)),
-      ] as string[]);
-
-      setEducationLevels([
-        ...new Set(data.map((job: Job) => job.EducationLevel)),
-      ] as string[]);
-
+      setCategories([...new Set(data.map((job: Job) => job.JobCategory))] as string[]);
+      setJobTypes([...new Set(data.map((job: Job) => job.JobType))] as string[]);
+      setEducationLevels([...new Set(data.map((job: Job) => job.EducationLevel))] as string[]);
       setExperienceLevels([
         ...new Set(
           data.map((job: Job) =>
@@ -77,29 +68,16 @@ const BrowseJobs = () => {
     });
   }, []);
 
-  // Load jobs from backend
-  useEffect(() => {
-    getAllJobs().then((data) => {
-      setJobs(data);
-      setFilteredJobs(data); // initially show all
-      setLoading(false);
-    });
-  }, []);
-
-  // Filter logic (optional if you wire it to the Filter button)
+  // Filter logic
   const handleFilter = () => {
     let result = [...jobs];
-
     if (category) result = result.filter((job) => job.JobCategory === category);
     if (jobType) result = result.filter((job) => job.JobType === jobType);
     if (educationLevel)
       result = result.filter((job) => job.EducationLevel === educationLevel);
-
     if (experienceLevel) {
-      // Extract numeric part from string like "2+ years"
       const match = experienceLevel.match(/^(\d+)/);
       const experienceNumber = match ? parseInt(match[1], 10) : NaN;
-
       if (!isNaN(experienceNumber)) {
         result = result.filter((job) =>
           typeof job.ProfExperience === "number"
@@ -107,17 +85,13 @@ const BrowseJobs = () => {
             : false
         );
       }
-
-      console.log("Filtering for experience >= ", experienceNumber);
     }
-
     if (searchQuery)
       result = result.filter((job) =>
         job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
       );
-
     setFilteredJobs(result);
-    setPage(1); // Reset to first page
+    setPage(1);
   };
 
   const handleResetFilters = () => {
@@ -126,8 +100,8 @@ const BrowseJobs = () => {
     setEducationLevel("");
     setExperienceLevel("");
     setSearchQuery("");
-    setFilteredJobs(jobs); // show all jobs again
-    setPage(1); // reset to first page
+    setFilteredJobs(jobs);
+    setPage(1);
   };
 
   const handleSearch = () => {
@@ -135,15 +109,36 @@ const BrowseJobs = () => {
       job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredJobs(result);
-    setPage(1); // Reset to first page
+    setPage(1);
+  };
+
+  const handlePageChange = (_: any, value: number) => setPage(value);
+
+  // 👇 main apply function
+  const handleApply = async (job: Job) => {
+    try {
+      await addJobApplication(job.JobId, {
+        JobId: job.JobId,
+        JobTitle: job.JobTitle,
+        JobCategory: job.JobCategory,
+        Description: job.Description,
+        Status: "Applied",
+        ApplicantName: "John Doe", // replace with logged-in user's name
+        AppliedDateTime: new Date().toISOString(),
+      });
+      // mark as applied in UI
+      setAppliedJobs((prev) => new Set(prev).add(job.JobId));
+      alert(`Application submitted for ${job.JobTitle}`);
+    } catch (err) {
+      console.error("Failed to apply:", err);
+      alert("Could not apply for this job. Please try again.");
+    }
   };
 
   const displayedJobs = filteredJobs.slice(
     (page - 1) * jobsPerPage,
     page * jobsPerPage
   );
-
-  const handlePageChange = (_: any, value: number) => setPage(value);
 
   if (loading) return <Loading text="Loading All the Jobs..." />;
 
@@ -160,17 +155,9 @@ const BrowseJobs = () => {
       {/* Search and Filter Section */}
       <Box sx={{ display: "flex", gap: 4, padding: 4 }}>
         {/* Filters */}
-        <Box
-          sx={{
-            width: "25%",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
+        <Box sx={{ width: "25%", display: "flex", flexDirection: "column", gap: 2 }}>
           <Typography variant="h6">Filters</Typography>
 
-          {/* Location */}
           <TextField
             className="b-j-input-style-1"
             label="Location"
@@ -178,7 +165,6 @@ const BrowseJobs = () => {
             size="small"
           />
 
-          {/* categories */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -195,7 +181,6 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* job type */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -212,7 +197,6 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* education level */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -229,7 +213,6 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* experience level */}
           <TextField
             className="b-j-input-style-1"
             select
@@ -246,21 +229,13 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          <Button
-            variant="contained"
-            sx={{ borderRadius: 2 }}
-            onClick={handleFilter}
-          >
+          <Button variant="contained" sx={{ borderRadius: 2 }} onClick={handleFilter}>
             Filter
           </Button>
 
           <Button
             variant="contained"
-            sx={{
-              borderRadius: 2,
-              bgcolor: "secondary.light",
-              color: "secondary.main",
-            }}
+            sx={{ borderRadius: 2, bgcolor: "secondary.light", color: "secondary.main" }}
             onClick={handleResetFilters}
           >
             Clear Filter
@@ -280,10 +255,7 @@ const BrowseJobs = () => {
               sx={{
                 mb: 3,
                 mr: 3,
-
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "30px",
-                },
+                "& .MuiOutlinedInput-root": { borderRadius: "30px" },
               }}
               InputProps={{
                 startAdornment: (
@@ -293,14 +265,12 @@ const BrowseJobs = () => {
                 ),
               }}
             />
-
             <Button
               variant="contained"
               color="primary"
               sx={{
                 height: "38px",
                 alignSelf: "flex-start",
-
                 borderRadius: "30px",
                 textTransform: "none",
                 px: 3,
@@ -311,11 +281,7 @@ const BrowseJobs = () => {
             </Button>
           </Box>
 
-          <Box
-            display="grid"
-            gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-            gap={3}
-          >
+          <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={3}>
             {displayedJobs.map((job) => (
               <Card
                 key={job.JobId}
@@ -328,22 +294,15 @@ const BrowseJobs = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <CardActionArea
-                  onClick={() => navigate(`/jobs/details/${job.JobId}`)}
-                >
+                <CardActionArea onClick={() => navigate(`/jobs/details/${job.JobId}`)}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       {job.JobTitle}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
                       {job.Location}
                     </Typography>
 
-                    {/* Chips container (max 2 lines) */}
                     <Box
                       sx={{
                         mt: 1,
@@ -356,11 +315,7 @@ const BrowseJobs = () => {
                     >
                       <Chip
                         label={
-                          <Typography
-                            fontSize={12}
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                          >
+                          <Typography fontSize={12} noWrap sx={{ maxWidth: 100 }}>
                             {job.SalaryRange}
                           </Typography>
                         }
@@ -369,11 +324,7 @@ const BrowseJobs = () => {
                       />
                       <Chip
                         label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
+                          <Typography noWrap sx={{ maxWidth: 100 }} fontSize={12}>
                             {job.EducationLevel}
                           </Typography>
                         }
@@ -382,11 +333,7 @@ const BrowseJobs = () => {
                       />
                       <Chip
                         label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
+                          <Typography noWrap sx={{ maxWidth: 100 }} fontSize={12}>
                             {job.JobCategory}
                           </Typography>
                         }
@@ -395,11 +342,7 @@ const BrowseJobs = () => {
                       />
                       <Chip
                         label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
+                          <Typography noWrap sx={{ maxWidth: 100 }} fontSize={12}>
                             {job.JobType}
                           </Typography>
                         }
@@ -410,20 +353,21 @@ const BrowseJobs = () => {
                   </CardContent>
                 </CardActionArea>
                 <CardActions>
-                  <Button
-                    size="small"
-                    component={Link}
-                    to={`/jobs/details/${job.JobId}`}
-                  >
+                  <Button size="small" component={Link} to={`/jobs/details/${job.JobId}`}>
                     View
                   </Button>
-                  <Button size="small">Apply</Button>
+                  <Button
+                    size="small"
+                    disabled={appliedJobs.has(job.JobId)}
+                    onClick={() => handleApply(job)}
+                  >
+                    {appliedJobs.has(job.JobId) ? "Applied" : "Apply"}
+                  </Button>
                 </CardActions>
               </Card>
             ))}
           </Box>
 
-          {/* Pagination */}
           <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Pagination
               count={Math.ceil(filteredJobs.length / jobsPerPage)}

@@ -8,8 +8,8 @@ import {
 } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
-import { getSeekerData } from "../../services/APIs/APIs";
-import { SEEKER_DATA } from "../../types/users";
+import { getSeekerData, getSeekerFiles } from "../../services/APIs/APIs";
+import { SEEKER_DATA, seekerFiles } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 
 const SeekerProfileTab = () => {
@@ -18,6 +18,7 @@ const SeekerProfileTab = () => {
 const { userInfo } = useAuth();
 const [seekerID, setSeekerID] = useState(0);
 const [user, setUser] = useState<SEEKER_DATA | null>(null);
+const [files, setFiles] = useState<seekerFiles[] | null>(null);
 
  useEffect(() => {
     if (userInfo && "UserId" in userInfo) {
@@ -27,20 +28,26 @@ const [user, setUser] = useState<SEEKER_DATA | null>(null);
   }, [userInfo]);
 
   useEffect(() => {
-      const fetchData = async () => {
-        if (seekerID !== 0) {
-          try {
-            const data = await getSeekerData(seekerID.toString());
-            setUser(data);
-            console.log("Seeker data fetched:", data);
-          } catch (error) {
-            console.error("Failed to fetch employer data:", error);
-          }
+    const fetchData = async () => {
+      if (seekerID !== 0) {
+        try {
+          const data = await getSeekerData(seekerID.toString());
+          setUser(data);
+          console.log("Seeker data fetched:", data);
+        } catch (error) {
+          console.error("Failed to fetch seeker data:", error);
         }
-      };
-  
-      fetchData();
-    }, [seekerID]);
+        try {
+          const filesData = await getSeekerFiles(seekerID.toString());
+          setFiles(Array.isArray(filesData) ? filesData : [filesData]);
+          console.log("Seeker files fetched:", filesData);
+        } catch (error) {
+          console.error("Failed to fetch seeker files:", error);
+        }
+      }
+    };
+    fetchData();
+  }, [seekerID]);
 
   return (
     <div className="seeker-profile-tab-container">
@@ -58,6 +65,38 @@ const [user, setUser] = useState<SEEKER_DATA | null>(null);
       <div className="seeker-profile-tab-content">
         {/* section */}
         <div className="seeker-profile-section-1">
+          {/* Seeker Files Section */}
+          {files && files.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              {files.map((file) => {
+                if (file.file_name.match(/\.(jpg|jpeg|png)$/i)) {
+                  return (
+                    <Box key={file.id} sx={{ mb: 1 }}>
+                      <Typography variant="subtitle2">Profile Image:</Typography>
+                      <img src={file.file_url} alt="Profile" style={{ maxWidth: 200, borderRadius: 8 }} />
+                    </Box>
+                  );
+                }
+                if (file.file_name.match(/\.(mp4)$/i)) {
+                  return (
+                    <Box key={file.id} sx={{ mb: 1 }}>
+                      <Typography variant="subtitle2">Intro Video:</Typography>
+                      <video src={file.file_url} controls style={{ maxWidth: 300, borderRadius: 8 }} />
+                    </Box>
+                  );
+                }
+                if (file.file_name.match(/\.(pdf|docx)$/i)) {
+                  return (
+                    <Box key={file.id} sx={{ mb: 1 }}>
+                      <Typography variant="subtitle2">CV:</Typography>
+                      <a href={file.file_url} target="_blank" rel="noopener noreferrer">Download CV</a>
+                    </Box>
+                  );
+                }
+                return null;
+              })}
+            </Box>
+          )}
           <img
             title="profile image"
             height={"100px"}
