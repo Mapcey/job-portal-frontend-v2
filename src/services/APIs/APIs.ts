@@ -153,6 +153,12 @@ export const getAllEmployer = async (id: string) => {
   return response.data;
 };
 
+// get all application for an employer
+export const getAllApplications = async (id: string) => {
+  const response = await axiosInstance.get(`/employers/${id}/applications`);
+  return response.data;
+};
+
 // ------------------JOB DETAILS -------------------
 
 // job details by id

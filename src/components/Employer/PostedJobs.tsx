@@ -91,7 +91,7 @@ const PostedJobs = () => {
   };
 
   return (
-    <Box sx={{ mt: 6 }}>
+    <Box sx={{ p: 2 }}>
       {/* Header and Button */}
       <Box
         sx={{
@@ -101,9 +101,7 @@ const PostedJobs = () => {
           mb: 3,
         }}
       >
-        <Typography variant="h6" color="secondary.main">
-          Manage Job Openings
-        </Typography>
+        <Typography variant="h6">Manage Job Openings</Typography>
         <Button
           variant="contained"
           color="secondary"
