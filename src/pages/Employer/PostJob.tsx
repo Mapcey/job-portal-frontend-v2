@@ -6,16 +6,23 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from "@mui/material/TextField";
 import { Button, MenuItem } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 
 import Header_2 from "../../components/header/Header_2";
+import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { CREATE_JOB } from "../../types/job";
+import { sriLankaCities } from "../../assets/data/sriLankaCities";
+
+import RichTextBox from "../../components/RichTextBox";
+
 import {
   JOB_CAT,
   JOB_TYPES,
   EDU_LEVELS,
   LANG,
   SAL_RANGES,
+  WORK_TYPE,
 } from "../../types/jobOptions";
 import { createNewJob } from "../../services/APIs/APIs";
 
@@ -92,16 +99,23 @@ const PostJob = () => {
                 onChange={handleChange}
                 required
               />
-              <TextField
-                name="Location"
-                label="Location"
-                variant="outlined"
-                // placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+
+              <Autocomplete
+                options={sriLankaCities}
                 value={formData.Location}
-                onChange={handleChange}
+                className="text-input-3"
+                sx={{ mr: 5, mt: 3 }}
+                onChange={(e, newValue) =>
+                  setFormData((prev) => ({ ...prev, Location: newValue || "" }))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Location"
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
               />
             </div>
             <div className="p-j-form-row">
@@ -164,14 +178,40 @@ const PostJob = () => {
                   </MenuItem>
                 ))}
               </TextField>
-              <TextField
+              {/* <TextField
                 label="Professional Experience"
                 variant="outlined"
                 placeholder="Add your full name"
                 className="text-input-3"
                 size="small"
                 sx={{ mr: 5, mt: 3 }}
-              />
+              /> */}
+
+              <TextField
+                select
+                name="ProfExperience"
+                label="Professional Experience"
+                variant="outlined"
+                className="text-input-3"
+                size="small"
+                sx={{ mr: 5, mt: 3 }}
+                value={formData.ProfExperience}
+                onChange={handleChange}
+                fullWidth
+              >
+                {[
+                  "No experience",
+                  "1 year",
+                  "2 years",
+                  "3 years",
+                  "5 years",
+                  "10+ years",
+                ].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
             </div>
             <div className="p-j-form-row">
               <TextField
@@ -212,7 +252,7 @@ const PostJob = () => {
               </TextField>
             </div>
             <div className="p-j-form-row">
-              <TextField
+              {/* <TextField
                 name="WorkType"
                 label="Wrok Type"
                 variant="outlined"
@@ -222,13 +262,33 @@ const PostJob = () => {
                 sx={{ mr: 5, mt: 3 }}
                 value={formData.WorkType}
                 onChange={handleChange}
-              />
+              /> */}
+
+              <TextField
+                select
+                name="WorkType" // ✅ match the formData key exactly
+                label="Work Type"
+                variant="outlined"
+                className="text-input-3"
+                size="small"
+                sx={{ mr: 5, mt: 3 }}
+                value={formData.WorkType}
+                onChange={handleChange}
+              >
+                {WORK_TYPE.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </TextField>
+
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Closing Date"
                   value={
                     formData.ExpiryDate ? dayjs(formData.ExpiryDate) : null
                   }
+                  minDate={dayjs()} // ✅ prevents past dates
                   onChange={(newValue) => {
                     setFormData((prev) => ({
                       ...prev,
@@ -253,29 +313,14 @@ const PostJob = () => {
 
         {/* section */}
         <div className="post-job-content-section-1">
-          <TextField
-            label="Professional Experience"
-            variant="outlined"
-            placeholder="Add your professional experience"
-            className="text-input-3"
-            size="small"
-            sx={{ mr: 5, mt: 3 }}
-            value={formData.ProfExperience || ""}
-            onChange={handleChange}
-            fullWidth
-          />
-        </div>
-
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <h3 style={{ marginBottom: "0", paddingTop: "20", marginTop: 30 }}>
+          <h3 style={{ marginBottom: 5, paddingTop: "20", marginTop: 30 }}>
             Job Description
           </h3>
         </div>
 
         {/* section */}
         <div className="post-job-content-section-1">
-          <TextField
+          {/* <TextField
             name="Description"
             id="outlined-multiline-static"
             label="Add a Detailed Description"
@@ -287,6 +332,13 @@ const PostJob = () => {
             sx={{ width: "100%" }}
             value={formData.Description || ""}
             onChange={handleChange}
+          /> */}
+
+          <RichTextBox
+            value={formData.Description}
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, Description: val }))
+            }
           />
         </div>
 
@@ -301,6 +353,7 @@ const PostJob = () => {
           </Button>
         </div>
       </div>
+      <FooterSection_1 />
     </div>
   );
 };

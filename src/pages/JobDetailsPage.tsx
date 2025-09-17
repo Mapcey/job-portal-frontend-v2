@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { Box, Typography, Button, Chip } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import WorkIcon from "@mui/icons-material/Work";
+import CategoryIcon from "@mui/icons-material/Category";
+import SchoolIcon from "@mui/icons-material/School";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import HistoryIcon from "@mui/icons-material/History";
+import EventNoteIcon from "@mui/icons-material/EventNote";
+
 // FILES
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
@@ -11,6 +19,7 @@ import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
 import { JOB } from "../types/job";
 import Loading from "../components/Loading";
+import DOMPurify from "dompurify";
 
 import { getJobDetails } from "../services/APIs/APIs";
 
@@ -19,20 +28,13 @@ const JobDetailsPage = () => {
   const [job, setJob] = useState<JOB | null>(null);
   const { isAuthenticated } = useAuth();
 
-  // useEffect(() => {
-  //   if (id) {
-  //     getJobById(id).then((data) => {
-  //       if (data) setJob(data);
-  //       else setJob(null);
-  //     });
-  //   }
-  // }, [id]);
-
   useEffect(() => {
     if (id) {
       getJobDetails(id).then((data) => {
-        if (data) setJob(data);
-        else setJob(null);
+        if (data) {
+          setJob(data);
+          console.log(data);
+        } else setJob(null);
       });
     }
   }, [id]);
@@ -47,6 +49,12 @@ const JobDetailsPage = () => {
   };
 
   if (!job) return <Loading text="Loading Job Data..." />;
+
+  // Calculate days left
+  const expiryDate = new Date(job.ExpiryDate);
+  const today = new Date();
+  const timeDiff = expiryDate.getTime() - today.getTime();
+  const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
   return (
     <div className="job-details-page-container">
@@ -80,9 +88,18 @@ const JobDetailsPage = () => {
             >
               <Typography variant="h4">{job.JobTitle}</Typography>
               {/* <Typography variant="h5">{job.CompanyName}</Typography> */}
-              <Typography mb={2} variant="subtitle1">
-                Data published:{" "}
-                {/* {new Date(job.DatePublished).toLocaleDateString("en-GB")} */}
+              <Typography
+                mb={2}
+                display="flex"
+                alignItems="center"
+                gap={1}
+                variant="subtitle1"
+              >
+                <EventNoteIcon fontSize="small" />
+                Expire: {expiryDate.toLocaleDateString("en-GB")}{" "}
+                {daysLeft >= 0
+                  ? `(${daysLeft} day${daysLeft > 1 ? "s" : ""} left)`
+                  : "(Expired)"}
               </Typography>
               <Chip
                 label={job.JobType}
@@ -116,8 +133,25 @@ const JobDetailsPage = () => {
             <Typography mb={2} variant="h5">
               Job Description
             </Typography>
-            <Box bgcolor={"#ebebeb"} borderRadius={3}>
-              <Typography p={2}>{job.Description}</Typography>
+            <Box
+              bgcolor="#ffffffff"
+              borderRadius={3}
+              p={2}
+              sx={{
+                "& ul": { pl: 5, lineHeight: 0.2, mb: 5 },
+                "& ol": { pl: 5, lineHeight: 0.2, mb: 5 },
+                "& li": { mb: 0.1 }, // reduces spacing between list items
+                "& p": { mb: 2 }, // spacing for paragraphs
+                "& strong": { fontWeight: 600 },
+                "& em": { fontStyle: "italic" },
+                "& h1, & h2, & h3, & h4, & h5, & h6": { mt: 2, mb: 2 },
+              }}
+            >
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(job.Description || ""),
+                }}
+              />
             </Box>
           </Box>
           <Box flex={1}>
@@ -137,24 +171,35 @@ const JobDetailsPage = () => {
               <Typography mb={2} variant="h4">
                 Job Overview
               </Typography>
-              <Box p={2} borderRadius={2} bgcolor={"#ebebeb"}>
-                <Typography mb={1}>
-                  <strong> Job Overview:</strong> {job.JobType}
+              <Box p={2} borderRadius={2} bgcolor={"#ffffffff"}>
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <WorkIcon fontSize="small" /> <strong>Job Type:</strong>{" "}
+                  {job.JobType}
                 </Typography>
-                <Typography mb={1}>
-                  <strong> Job Category:</strong> {tags.category}
+
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <CategoryIcon fontSize="small" />{" "}
+                  <strong>Job Category:</strong> {tags.category}
                 </Typography>
-                <Typography mb={1}>
-                  <strong> Job Experience:</strong> {tags.experince}
+
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <HistoryIcon fontSize="small" />{" "}
+                  <strong>Job Experience:</strong> {tags.experince}
                 </Typography>
-                <Typography mb={1}>
-                  <strong> Education Level:</strong> {tags.education}
+
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <SchoolIcon fontSize="small" />{" "}
+                  <strong>Education Level:</strong> {tags.education}
                 </Typography>
-                <Typography mb={1}>
-                  <strong> Location:</strong> {tags.location}
+
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <LocationOnIcon fontSize="small" /> <strong>Location:</strong>{" "}
+                  {tags.location}
                 </Typography>
-                <Typography mb={1}>
-                  <strong> Salery:</strong> {tags.salary}
+
+                <Typography mb={1} display="flex" alignItems="center" gap={1}>
+                  <MonetizationOnIcon fontSize="small" />{" "}
+                  <strong>Salary:</strong> {tags.salary}
                 </Typography>
               </Box>
             </Box>

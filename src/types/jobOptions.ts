@@ -27,3 +27,5 @@ export const EDU_LEVELS = [
 export const LANG = ["Sinhala", "English", "Tamil"];
 
 export const SAL_RANGES = ["0 - 60k", "60k - 100k", "100k - 150k", "150k +"];
+
+export const WORK_TYPE = ["On-Site", "Remote", "Hybrid"];
