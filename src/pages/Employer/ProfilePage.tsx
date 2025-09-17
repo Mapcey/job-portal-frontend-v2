@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Box, Tabs, Tab, Button } from "@mui/material";
 
 import Header_2 from "../../components/header/Header_2";
+import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import EmployerProfileTab from "../../components/Employer/EmployerProfileTab";
 import ManageCandidatesTab from "../../components/Employer/ManageCandidates";
-import NotificationsTab from "../../components/Seeker/NotificationsTab";
+import NotificationsTab from "../../components/Employer/NotificationsTab";
 import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 
@@ -170,16 +171,6 @@ const EmployerProfilePage = () => {
             />
           </Tabs>
 
-          {/* <Box
-            className="seeker-video-container"
-            sx={{ marginTop: 2, marginBottom: 3 }}
-          >
-            <video controls width="100%" style={{ borderRadius: "8px" }}>
-              <source src="/videos/self-intro.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </Box> */}
-
           <Button sx={{ mt: 5 }} fullWidth variant="contained">
             Start Head Hunting
           </Button>
@@ -204,6 +195,7 @@ const EmployerProfilePage = () => {
           {renderTabContent()}
         </Box>
       </div>
+      <FooterSection_1 />
     </div>
   );
 };

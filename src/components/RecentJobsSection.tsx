@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -7,23 +7,31 @@ import {
   Button,
   Pagination,
   Grid,
+  Chip,
+  Stack,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
-
-const dummyJobs = Array.from({ length: 20 }).map((_, i) => ({
-  id: i,
-  title: `Job Title ${i + 1}`,
-  company: `Company ${i + 1}`,
-  location: `City ${i + 1}`,
-  description: `This is a short description for job  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-          blanditiis tenetur unde suscipit, ${i + 1}.`,
-}));
+import { JOB } from "../types/job";
+import { getAllJobs } from "../services/APIs/APIs";
+import Loading from "../components/Loading";
 
 const RecentJobsSection = () => {
+  const [jobs, setJobs] = useState<JOB[]>([]);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const jobsPerPage = 6;
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    getAllJobs()
+      .then((data: JOB[]) => {
+        setJobs(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
@@ -32,7 +40,9 @@ const RecentJobsSection = () => {
     setPage(value);
   };
 
-  const displayedJobs = dummyJobs.slice(
+  if (loading) return <Loading text="Loading recent jobs..." />;
+
+  const displayedJobs = jobs.slice(
     (page - 1) * jobsPerPage,
     page * jobsPerPage
   );
@@ -51,65 +61,83 @@ const RecentJobsSection = () => {
           textAlign={"center"}
           variant="body1"
           className="recent-jobs-title"
-          sx={{ width: "50%", marginTop: "10px" }}
+          sx={{ width: "50%", marginTop: "10px", mx: "auto" }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-          blanditiis tenetur unde suscipit, quam beatae rerum inventore
-          consectetur, neque doloribus,
+          Find the most recent opportunities posted by employers
         </Typography>
 
         <div className="recent-jobs-section-cards">
           <Grid container spacing={3} justifyContent="center">
             {displayedJobs.map((job) => (
-              <Grid key={job.id || job.title}>
-                <Card
-                  sx={{ width: "500px", borderRadius: "10px" }}
-                  variant="outlined"
-                >
-                  <CardActions sx={{ justifyContent: "right" }}>
-                    <Button size="small">Details</Button>
-                    <Button variant="contained" sx={{ borderRadius: "10px" }}>
-                      Apply
-                    </Button>
-                  </CardActions>
-                  <CardContent>
-                    <Typography variant="h6">{job.title}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {job.company} — {job.location}
-                    </Typography>
-                    <Typography variant="body2" mt={1}>
-                      {job.description}
-                    </Typography>
-                  </CardContent>
-                  <Stack direction="row" m={2} spacing={1}>
+              <Card
+                sx={{ width: "500px", borderRadius: "10px" }}
+                variant="outlined"
+              >
+                <CardActions sx={{ justifyContent: "right" }}>
+                  <Button
+                    size="small"
+                    onClick={() => navigate(`/jobs/details/${job.JobId}`)}
+                  >
+                    Details
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ borderRadius: "10px" }}
+                    onClick={() => navigate(`/jobs/details/${job.JobId}`)}
+                  >
+                    Apply
+                  </Button>
+                </CardActions>
+                <CardContent>
+                  <Typography variant="h6">{job.JobTitle}</Typography>
+                  <Typography variant="body2">
+                    {job.JobCategory} — {job.Location}
+                  </Typography>
+                  <Typography variant="body2" mt={1}>
+                    {job.Description
+                      ? job.Description.replace(/<\/?[^>]+(>|$)/g, "").slice(
+                          0,
+                          150
+                        ) + "..."
+                      : ""}
+                  </Typography>
+                </CardContent>
+                <Stack direction="row" m={2} spacing={1}>
+                  {job.SalaryRange && (
                     <Chip
                       sx={{ bgcolor: "secondary.light" }}
                       size="small"
-                      label="Rs. 50k - 75k"
+                      label={job.SalaryRange}
                     />
+                  )}
+                  {job.EducationLevel && (
                     <Chip
                       sx={{ bgcolor: "secondary.light" }}
                       size="small"
-                      label="Bachelor's"
+                      label={job.EducationLevel}
                     />
+                  )}
+                  {job.Location && (
                     <Chip
                       sx={{ bgcolor: "secondary.light" }}
                       size="small"
-                      label="Colombo"
+                      label={job.Location}
                     />
+                  )}
+                  {job.JobType && (
                     <Chip
                       sx={{ bgcolor: "secondary.light" }}
                       size="small"
-                      label="Fulltime"
+                      label={job.JobType}
                     />
-                  </Stack>
-                </Card>
-              </Grid>
+                  )}
+                </Stack>
+              </Card>
             ))}
           </Grid>
 
           <Pagination
-            count={Math.ceil(dummyJobs.length / jobsPerPage)}
+            count={Math.ceil(jobs.length / jobsPerPage)}
             page={page}
             onChange={handlePageChange}
             sx={{ mt: 4, display: "flex", justifyContent: "center" }}

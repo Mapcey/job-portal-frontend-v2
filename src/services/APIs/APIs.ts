@@ -159,6 +159,19 @@ export const getAllApplications = async (id: string) => {
   return response.data;
 };
 
+// get all notifications for an employer
+export const getAllEmployerNotifications = async (id: string) => {
+  const response = await axiosInstance.get(`/employers/${id}/notifications`);
+  return response.data;
+};
+
+export const updateEmployerNotification = async (
+  id: string,
+  notificationId: number
+) => {
+  await axiosInstance.put(`/seekers/${id}/notifications/${notificationId}`);
+};
+
 // ------------------JOB DETAILS -------------------
 
 // job details by id

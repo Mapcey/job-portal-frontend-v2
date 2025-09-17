@@ -12,7 +12,12 @@ import {
   Chip,
   CircularProgress,
 } from "@mui/material";
-import { Delete, Cancel, RemoveRedEye } from "@mui/icons-material";
+import {
+  Delete,
+  Cancel,
+  RemoveRedEye,
+  DocumentScanner,
+} from "@mui/icons-material";
 import { differenceInDays } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
@@ -149,7 +154,7 @@ const PostedJobs = () => {
                 <ListItem
                   sx={{
                     borderRadius: 2,
-                    boxShadow: 1,
+                    boxShadow: 2,
                     mb: 1,
                     px: 3,
                     py: 2,
@@ -164,10 +169,6 @@ const PostedJobs = () => {
                     }
                     secondary={
                       <>
-                        <Typography variant="body2" color="grey">
-                          {job.employer?.CompanyName || ""} – {job.Location}
-                        </Typography>
-
                         {/* Status Chip */}
                         <Chip
                           label={`Status: ${job.Status}`}
@@ -196,11 +197,22 @@ const PostedJobs = () => {
                     <Stack direction="row" spacing={1}>
                       <Button
                         size="small"
+                        sx={{ color: "secondary.main" }}
                         startIcon={<RemoveRedEye />}
                         onClick={() => handleview(job.JobId)}
                       >
                         Preview
                       </Button>
+                      <Button
+                        size="small"
+                        sx={{ color: "secondary.main" }}
+                        startIcon={<DocumentScanner />}
+                        onClick={() => handleview(job.JobId)}
+                      >
+                        Applicants
+                      </Button>
+                    </Stack>
+                    <Stack direction="row" spacing={1}>
                       <Button
                         size="small"
                         color="warning"
@@ -213,6 +225,7 @@ const PostedJobs = () => {
                       <Button
                         size="small"
                         color="error"
+                        variant="outlined"
                         startIcon={<Delete />}
                         onClick={() => handleDelete(job.JobId)}
                       >
