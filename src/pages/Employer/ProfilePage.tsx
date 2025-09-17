@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Tabs, Tab, Button } from "@mui/material";
+import { useSearchParams } from "react-router-dom";
 
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
@@ -11,7 +12,10 @@ import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 
 const EmployerProfilePage = () => {
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = Number(searchParams.get("tab")) || 0;
+
+  const [selectedTab, setSelectedTab] = useState(tabFromUrl);
 
   const [breadcrumb, setBreadcrumb] = useState({
     title: "My Profile",
@@ -20,6 +24,7 @@ const EmployerProfilePage = () => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
+    setSearchParams({ tab: newValue.toString() }); // 🔑 update URL without reload
   };
 
   const pendingJobs = [
@@ -130,44 +135,23 @@ const EmployerProfilePage = () => {
           >
             <Tab
               label="My Profile"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-                textAlign: "left",
-              }}
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
             <Tab
               label="Manage Candidates"
-              sx={{
-                color: "secondary.main",
-                textAlign: "left",
-                alignItems: "flex-start",
-              }}
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
             <Tab
               label="Posted Jobs"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-                textAlign: "left",
-              }}
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
             <Tab
               label="Notifications"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-                textAlign: "left",
-              }}
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
-
             <Tab
               label="Pending Approvals"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-                textAlign: "left",
-              }}
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
           </Tabs>
 

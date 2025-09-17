@@ -106,7 +106,9 @@ const PostedJobs = () => {
           mb: 3,
         }}
       >
-        <Typography variant="h6">Manage Job Openings</Typography>
+        <Typography variant="h6">
+          Manage Job Openings ({jobs.length})
+        </Typography>
         <Button
           variant="contained"
           color="secondary"

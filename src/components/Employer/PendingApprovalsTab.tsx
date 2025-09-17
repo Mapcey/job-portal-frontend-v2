@@ -27,8 +27,8 @@ const PendingApprovalsTab = ({
   onDelete: (id: number) => void;
 }) => {
   return (
-    <Box sx={{ mt: 8 }}>
-      <Typography variant="h6" color="secondary.main" gutterBottom>
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h6" gutterBottom>
         Pending Job Approvals
       </Typography>
 

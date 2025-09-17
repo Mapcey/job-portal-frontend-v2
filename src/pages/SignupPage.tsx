@@ -301,7 +301,7 @@ const SignupPage = () => {
           </Button>
         </Box>
 
-        <Typography variant="body2" sx={{ margin: "10px 0" }}>
+        {/* <Typography variant="body2" sx={{ margin: "10px 0" }}>
           Or
         </Typography>
 
@@ -313,7 +313,7 @@ const SignupPage = () => {
           // onClick={handleGoogleSignUp}
         >
           Sign up with Google
-        </Button>
+        </Button> */}
 
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Already have an account?{" "}
