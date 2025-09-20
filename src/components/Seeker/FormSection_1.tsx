@@ -5,9 +5,14 @@ import {
   Button,
   Typography,
   Autocomplete,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
-import { updateSeeker } from "../../services/APIs/APIs"; // adjust path
+import { updateSeeker } from "../../services/APIs/APIs"; 
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const jobTypes = [
   "Full-time",
@@ -17,10 +22,16 @@ const jobTypes = [
   "Freelance",
   "Remote",
 ];
+const jobModeOptions = [
+    { value: "On-site", label: "On-site" },
+    { value: "Remote", label: "Remote" },
+    { value: "Hybrid", label: "Hybrid" },
+  ];
 
 const CreateSeeker: React.FC = () => {
   const { userInfo } = useAuth(); // ✅ hook inside component
   const [seekerID, setSeekerID] = useState<number>(0);
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     FirstName: "",
     LastName: "",
@@ -31,7 +42,6 @@ const CreateSeeker: React.FC = () => {
     Email: "",
     ProfessionalExperience: 0,
     DateOfBirth: "",
-    Salary: 0,
     JobType: "",
     JobType2: "",
     SocialLinks: "",
@@ -50,8 +60,9 @@ const CreateSeeker: React.FC = () => {
   const handleSubmit = async () => {
     try {
       // For updateSeeker, you need a SeekerId. Replace 1 with actual ID if available.
-      await updateSeeker(seekerID, { ...form, DateOfBirth: new Date(form.DateOfBirth) });
+      await updateSeeker(seekerID, { ...form, Email:form.Email, DateOfBirth: new Date(form.DateOfBirth) });
       alert("Seeker profile updated successfully!");
+      setTimeout(() => navigate(-1), 1500);
     } catch (error) {
       alert("Failed to update seeker");
       console.error(error);
@@ -139,7 +150,7 @@ const CreateSeeker: React.FC = () => {
         />
       </Box>
 
-      {/* Professional Experience / Salary */}
+      {/* Professional Experience /*/}
       <Box display="flex" gap={2} mb={2}>
         <TextField
           fullWidth
@@ -150,14 +161,6 @@ const CreateSeeker: React.FC = () => {
           onChange={(e) =>
             handleChange("ProfessionalExperience", Number(e.target.value))
           }
-        />
-        <TextField
-          fullWidth
-          type="number"
-          label="Salary"
-          placeholder="Enter expected salary"
-          value={form.Salary}
-          onChange={(e) => handleChange("Salary", Number(e.target.value))}
         />
       </Box>
 
@@ -183,15 +186,21 @@ const CreateSeeker: React.FC = () => {
             <TextField {...params} label="Job Type" placeholder="Select job type" />
           )}
         />
-        <Autocomplete
-          fullWidth
-          options={jobTypes}
-          value={form.JobType2}
-          onChange={(_, newValue) => handleChange("JobType2", newValue || "")}
-          renderInput={(params) => (
-            <TextField {...params} label="Job Type 2" placeholder="Select job type 2" />
-          )}
-        />
+        <FormControl fullWidth>
+            <InputLabel id="job-mode-label">Work Mode</InputLabel>
+            <Select
+              labelId="job-mode-label"
+              value={form.JobType2 || ""}
+              name="JobType2"
+              onChange={(e) => setForm({ ...form, JobType2: e.target.value })}
+            >
+              {jobModeOptions.map((opt) => (
+                <MenuItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
       </Box>
 
       {/* Social Links */}

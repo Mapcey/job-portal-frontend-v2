@@ -55,6 +55,7 @@ const LoginPage = () => {
           navigate("/employer/profile/");
         } else if (success === "seeker") {
           navigate("/seeker/profile/");
+          console.log(token);
         }
       } else {
         setError("Authentication failed. Please try again.");

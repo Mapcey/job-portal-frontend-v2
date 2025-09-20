@@ -9,11 +9,22 @@ import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 // Add a new seeker file (image, video, cv) for a seeker
 export const addSeekerFile = async (
   seekerId: number,
-  data: Partial<seekerFiles>
+  file: File,
+  fileType: string,
+  userId: number
 ) => {
-  const response = await axiosInstance.post(`/seeker_files/${seekerId}/files`, data);
-  return response.data;
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("file_type", fileType);
+  formData.append("user_id", String(userId));
+
+  return axiosInstance.post(
+    `/seeker_files/${seekerId}/files`,
+    formData,
+    { headers: { 'Content-Type': undefined } } // important!
+  );
 };
+
 // Update a specific seeker file (image, video, cv) by file ID
 export const updateSeekerFile = async (
   seekerId: number,

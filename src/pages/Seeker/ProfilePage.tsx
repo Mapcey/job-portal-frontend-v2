@@ -7,6 +7,8 @@ import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 
 import SeekerProfileTab from "../../components/Seeker/SeekerProfileTab";
+import { getSeekerFiles } from "../../services/APIs/APIs";
+import { useAuth } from "../../context/AuthContext";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
@@ -15,6 +17,31 @@ import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab
 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const { userInfo } = useAuth();
+  const [latestVideo, setLatestVideo] = useState<any>(null);
+  // Fetch latest video file for seeker
+  useEffect(() => {
+    const fetchVideo = async () => {
+      if (userInfo && userInfo.UserId) {
+        try {
+          const filesData = await getSeekerFiles(userInfo.UserId.toString());
+          const filesArr = Array.isArray(filesData) ? filesData : [filesData];
+          const videoFiles = filesArr.filter(f => f.file_name.match(/\.mp4$/i));
+          if (videoFiles.length > 0) {
+            const latest = videoFiles.sort(
+              (a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+            )[0];
+            setLatestVideo(latest);
+          } else {
+            setLatestVideo(null);
+          }
+        } catch (error) {
+          console.log('null video');
+        }
+      }
+    };
+    fetchVideo();
+  }, [userInfo]);
   const navigate = useNavigate();
 
   const [breadcrumb, setBreadcrumb] = useState({
@@ -125,15 +152,48 @@ const SeekerProfilePage = () => {
             />
           </Tabs>
 
+
           <Box
             className="seeker-video-container"
-            sx={{ marginTop: 2, marginBottom: 3 }}
+            sx={{
+              marginTop: 2,
+              marginBottom: 3,
+              width: 300,        // fixed width for uniformity
+              height: 200,       // fixed height for box shape
+              borderRadius: 2,   // border radius
+              overflow: "hidden", // ensures video fits inside rounded corners
+              boxShadow: 3,       // optional shadow
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#000", // fallback background
+            }}
           >
-            <video controls width="100%" style={{ borderRadius: "8px" }}>
-              <source src="/videos/self-intro.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            {latestVideo ? (
+              <video
+                src={latestVideo.file_url}
+                controls
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            ) : (
+              <video
+                controls
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              >
+                <source src="/videos/self-intro.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
           </Box>
+
 
           <Button
             fullWidth

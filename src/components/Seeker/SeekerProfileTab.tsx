@@ -63,87 +63,120 @@ const [files, setFiles] = useState<seekerFiles[] | null>(null);
         </Button>
       </Box>
       <div className="seeker-profile-tab-content">
-        {/* section */}
-        <div className="seeker-profile-section-1">
-          {/* Seeker Files Section */}
-          {files && files.length > 0 && (
-            <Box sx={{ mb: 2 }}>
-              {files.map((file) => {
-                if (file.file_name.match(/\.(jpg|jpeg|png)$/i)) {
-                  return (
-                    <Box key={file.id} sx={{ mb: 1 }}>
-                      <Typography variant="subtitle2">Profile Image:</Typography>
-                      <img src={file.file_url} alt="Profile" style={{ maxWidth: 200, borderRadius: 8 }} />
-                    </Box>
-                  );
-                }
-                if (file.file_name.match(/\.(mp4)$/i)) {
-                  return (
-                    <Box key={file.id} sx={{ mb: 1 }}>
-                      <Typography variant="subtitle2">Intro Video:</Typography>
-                      <video src={file.file_url} controls style={{ maxWidth: 300, borderRadius: 8 }} />
-                    </Box>
-                  );
-                }
-                if (file.file_name.match(/\.(pdf|docx)$/i)) {
-                  return (
-                    <Box key={file.id} sx={{ mb: 1 }}>
-                      <Typography variant="subtitle2">CV:</Typography>
-                      <a href={file.file_url} target="_blank" rel="noopener noreferrer">Download CV</a>
-                    </Box>
-                  );
-                }
-                return null;
-              })}
-            </Box>
-          )}
-          <img
-            title="profile image"
-            height={"100px"}
-            className="seeker-profile-tab-image"
-            src="/imgs/people/p2.jpg"
-          />
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 4 }}>
-              <Box>
-                <Typography variant="h4">{user?.FirstName || ""}</Typography>
-                <Typography variant="subtitle1">Software Engineer</Typography>
-              </Box>
-              <Box>
-                <Typography variant="h6">Phone No</Typography>
-                <Typography variant="subtitle1">{user?.ContactNo}</Typography>
-              </Box>
-              <Box>
-                <Typography variant="h6">Email</Typography>
-                <Typography variant="subtitle1">{user?.Email || ""}</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
-              <Chip label="Colombo" variant="outlined" />
-              <Chip label={'Experence: '+user?.ProfessionalExperience + 'years' || ""} variant="outlined" />
-              <Chip label={user?.JobType || ""} variant="outlined" />
-              <Chip label={user?.JobType2 || ""} variant="outlined" />
-            </Box>
-            <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
-              <Chip label={user?.Salary || ""} variant="outlined" />
-              {user?.languages && user.languages.length > 0 && (
-                <Chip
-                  label={
-                    user.languages.find(l => l.ExpertLevel === "Fluent")
-                      ? `Fluent: ${user.languages.find(l => l.ExpertLevel === "Fluent")?.Language}`
-                      : `Fluent: ${user.languages[0].Language}`
-                  }
-                  variant="outlined"
-                />
-              )}
-              <Chip
-                label={user?.DateOfBirth ? new Date(user.DateOfBirth).toLocaleDateString() : ""}
-                variant="outlined"
-              />
+      <div className="seeker-profile-section-1">
+        {files && files.length > 0 && (() => {
+          const getLatestByType = (regex: RegExp) =>
+            ([...files]
+              .filter(f => regex.test(f.file_name))
+              .sort(
+                (a, b) =>
+                  new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+              )[0] || null);
 
+          const latestImage = getLatestByType(/\.(jpg|jpeg|png)$/i);
+          const latestCV = getLatestByType(/\.(pdf|docx)$/i);
+
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 2 }}>
+              {/* Image Box */}
+              {latestImage && (
+                <Box
+                  sx={{
+                    width: 200,
+                    height: 200,
+                    borderRadius: 2,
+                    overflow: "hidden",
+                    boxShadow: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#f0f0f0",
+                  }}
+                >
+                  <img
+                    src={latestImage.file_url}
+                    alt="Profile"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+
+              {/* CV Box */}
+              {latestCV && (
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    boxShadow: 1,
+                    backgroundColor: "#fafafa",
+                  }}
+                >
+                <a
+                  href={latestCV.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "#1976d2" }}
+                >
+                  Download CV
+                </a>
+                </Box>
+              )}
+            </Box>
+          );
+        })()}
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          <Box sx={{ display: "flex", flexDirection: "row", gap: 4 }}>
+            <Box>
+              <Typography variant="h4">{user?.FirstName || ""}</Typography>
+              <Typography variant="subtitle1">Software Engineer</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6">Phone No</Typography>
+              <Typography variant="subtitle1">{user?.ContactNo}</Typography>
+            </Box>
+            <Box>
+              <Typography variant="h6">Email</Typography>
+              <Typography variant="subtitle1">{user?.Email || ""}</Typography>
             </Box>
           </Box>
-        </div>
+
+          <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
+            <Chip label="Colombo" variant="outlined" />
+            <Chip
+              label={"Experience: " + user?.ProfessionalExperience + " years" || ""}
+              variant="outlined"
+            />
+            <Chip label={user?.JobType || ""} variant="outlined" />
+            <Chip label={user?.JobType2 || ""} variant="outlined" />
+          </Box>
+
+          <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
+            <Chip label={"Expected salary("+user?.Currency+"): "+ user?.MinSalary +" - "+ user?.MaxSalary || ""} variant="outlined" />
+            {user?.languages && user.languages.length > 0 && (
+              <Chip
+                label={
+                  user.languages.find((l) => l.ExpertLevel === "Fluent")
+                    ? `Fluent: ${
+                        user.languages.find((l) => l.ExpertLevel === "Fluent")
+                          ?.Language
+                      }`
+                    : `Fluent: ${user.languages[0].Language}`
+                }
+                variant="outlined"
+              />
+            )}
+            <Chip
+              label={
+                user?.DateOfBirth
+                  ? new Date(user.DateOfBirth).toLocaleDateString()
+                  : ""
+              }
+              variant="outlined"
+            />
+          </Box>
+        </Box>
+      </div>
+
 
         {/* section */}
         <div className="seeker-profile-section-2">

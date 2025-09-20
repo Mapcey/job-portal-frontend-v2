@@ -53,7 +53,7 @@ const JobDetailsPage = () => {
           JobCategory: job.JobCategory,
           Description: job.Description,
           Status: "Applied",
-          ApplicantName: "John Doe", // replace with logged-in user's name
+          ApplicantName: userInfo?.FirstName && userInfo?.LastName ? `${userInfo.FirstName} ${userInfo.LastName}` : userInfo?.FirstName || userInfo?.LastName || "",
           AppliedDateTime: new Date().toISOString(),
         });
         // mark as applied in UI

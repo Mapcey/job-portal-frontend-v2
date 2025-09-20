@@ -21,7 +21,10 @@ export interface SEEKER_DATA {
   Email: string;
   ProfessionalExperience: number;
   DateOfBirth: Date;
-  Salary: number;
+  MinSalary?: number | null;
+  MaxSalary?: number | null;
+  Currency?: string;
+  PayPeriod?: string | "null";
   JobType: string;
   JobType2: string;
   SocialLinks: string;
