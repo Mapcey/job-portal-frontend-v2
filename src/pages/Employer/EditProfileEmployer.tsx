@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Container, TextField, Box } from "@mui/material";
 import Header_2 from "../../components/header/Header_2";
+import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { getEmployerData, putEmployerData } from "../../services/APIs/APIs";
 import { EMPLOYER_DATA } from "../../types/users";
@@ -118,7 +119,7 @@ const EditProfileEmployer = () => {
               fullWidth
               label="Website"
               name="Website"
-              value="web site*"
+              value={formData.WebSite || ""}
               onChange={handleChange}
               size="small"
               className="text-field-1"
@@ -171,6 +172,7 @@ const EditProfileEmployer = () => {
           </Button>
         </Box>
       </Container>
+      <FooterSection_1 />
     </div>
   );
 };

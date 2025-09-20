@@ -131,7 +131,6 @@ const EmployerProfileTab = () => {
           </div>
         </div>
 
-        {/* section */}
         <div className="create-ac-form-section">
           <div className="fs-text-inputs-2">
             <TextField
@@ -141,6 +140,20 @@ const EmployerProfileTab = () => {
               disabled
               multiline
               rows={4}
+              className="text-field-dis"
+              size="small"
+            />
+          </div>
+        </div>
+
+        {/* section */}
+        <div className="create-ac-form-section">
+          <div className="fs-text-inputs-2">
+            <TextField
+              label="Website"
+              disabled
+              value={user?.WebSite || ""}
+              variant="outlined"
               className="text-field-dis"
               size="small"
             />
