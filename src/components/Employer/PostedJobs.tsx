@@ -170,7 +170,7 @@ const PostedJobs = () => {
                       </Typography>
                     }
                     secondary={
-                      <>
+                      <div>
                         {/* Status Chip */}
                         <Chip
                           label={`Status: ${job.Status}`}
@@ -192,7 +192,7 @@ const PostedJobs = () => {
                             ? `(${daysRemaining} days left)`
                             : "(Expired)"}
                         </Typography>
-                      </>
+                      </div>
                     }
                   />
                   <ListItemSecondaryAction>

@@ -10,6 +10,7 @@ import ManageCandidatesTab from "../../components/Employer/ManageCandidates";
 import NotificationsTab from "../../components/Employer/NotificationsTab";
 import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
+import ManageEditorsTab from "../../components/Employer/ManageEditorsTab";
 
 const EmployerProfilePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -75,6 +76,12 @@ const EmployerProfilePage = () => {
           desc: "Check your applications here.",
         });
         break;
+      case 5:
+        setBreadcrumb({
+          title: "Manage Editors",
+          desc: "Manage editors accounts here.",
+        });
+        break;
       default:
         break;
     }
@@ -99,6 +106,8 @@ const EmployerProfilePage = () => {
             onDelete={(id) => console.log("Deleted:", id)}
           />
         );
+      case 5:
+        return <ManageEditorsTab />;
       default:
         return null;
     }
@@ -151,6 +160,10 @@ const EmployerProfilePage = () => {
             />
             <Tab
               label="Pending Approvals"
+              sx={{ color: "secondary.main", alignItems: "flex-start" }}
+            />
+            <Tab
+              label="Manage Editors"
               sx={{ color: "secondary.main", alignItems: "flex-start" }}
             />
           </Tabs>

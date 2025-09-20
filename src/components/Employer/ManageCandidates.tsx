@@ -1,34 +1,28 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Box,
   Typography,
   Card,
   CardContent,
-  IconButton,
   Chip,
   CircularProgress,
+  Avatar,
+  Button,
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
+import { SelectAllRounded } from "@mui/icons-material";
+import { format } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
-import { getAllApplications } from "../../services/APIs/APIs";
-
-interface CandidateApplication {
-  ApplicationId: number;
-  SeekerName: string;
-  JobTitle: string;
-  Description: string;
-  SalaryRange: string;
-  EducationLevel: string;
-  Location: string;
-}
+import { getAllCandidates } from "../../services/APIs/APIs";
+import { applicationStatusUpdate } from "../../services/APIs/APIs";
+import { candidate } from "../../types/candidates";
 
 const ManageCandidatesTab = () => {
   const { userInfo } = useAuth();
-  const [appliedCandidates, setAppliedCandidates] = useState<
-    CandidateApplication[]
-  >([]);
+  const [appliedCandidates, setAppliedCandidates] = useState<candidate[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch applications for this employer
@@ -38,8 +32,11 @@ const ManageCandidatesTab = () => {
 
       try {
         setLoading(true);
-        const data = await getAllApplications(userInfo.EmployerId.toString());
-        setAppliedCandidates(data);
+        const data = await getAllCandidates(userInfo.EmployerId.toString());
+        // ✅ filter out rejected applications
+        setAppliedCandidates(
+          data.filter((a: candidate) => a.Status !== "Rejected")
+        );
       } catch (error) {
         console.error("Failed to fetch applications:", error);
       } finally {
@@ -50,12 +47,53 @@ const ManageCandidatesTab = () => {
     fetchApplications();
   }, [userInfo]);
 
-  const handleRemove = (id: number) => {
-    // UI-only remove for now (API call can be added later)
-    const updatedJobs = appliedCandidates.filter(
-      (job) => job.ApplicationId !== id
-    );
-    setAppliedCandidates(updatedJobs);
+  // Utility function for random color
+  const getRandomColor = (name: string) => {
+    const colors = [
+      "#FF6B6B",
+      "#6BCB77",
+      "#4D96FF",
+      "#FFD93D",
+      "#845EC2",
+      "#FF9671",
+      "#00C9A7",
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
+  // ✅ Update status handler
+  const handleStatusUpdate = async (
+    applicationId: string,
+    newStatus: string
+  ) => {
+    try {
+      // Update status in backend
+      await applicationStatusUpdate(applicationId, {
+        Status: newStatus,
+      });
+
+      setAppliedCandidates((prev) => {
+        if (newStatus === "Rejected") {
+          // Remove rejected candidate
+          return prev.filter(
+            (a) => a.ApplicationId.toString() !== applicationId
+          );
+        } else {
+          // Update status for selected/shortlisted
+          return prev.map((a) =>
+            a.ApplicationId.toString() === applicationId
+              ? { ...a, Status: newStatus }
+              : a
+          );
+        }
+      });
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
   };
 
   return (
@@ -86,31 +124,119 @@ const ManageCandidatesTab = () => {
                 position: "relative",
                 paddingTop: "20px",
                 marginBottom: "20px",
+                boxShadow: 2,
+                borderRadius: 2,
               }}
             >
-              <IconButton
-                size="small"
-                onClick={() => handleRemove(job.ApplicationId)}
+              <Button
                 sx={{
                   position: "absolute",
+                  borderRadius: 2,
                   top: 5,
                   right: 5,
                   zIndex: 1,
-                  backgroundColor: "white",
+                  backgroundColor: "error.main",
+                  opacity: 0.7,
+                  color: "white",
                   boxShadow: 1,
-                  ":hover": { backgroundColor: "#f5f5f5" },
+                  ":hover": { backgroundColor: "error.main", opacity: 1 },
                 }}
+                onClick={() =>
+                  handleStatusUpdate(job.ApplicationId.toString(), "Rejected")
+                }
               >
-                <PersonRemoveAlt1Icon />
-              </IconButton>
+                <PersonRemoveAlt1Icon sx={{ mr: 1 }} />
+                Reject
+              </Button>
+
+              <Button
+                sx={{
+                  position: "absolute",
+                  borderRadius: 2,
+                  bottom: 5,
+                  right: 5,
+                  zIndex: 1,
+                  backgroundColor: "success.main",
+                  opacity: 0.7,
+                  color: "white",
+                  boxShadow: 1,
+                  ":hover": { backgroundColor: "success.main", opacity: 1 },
+                }}
+                onClick={() =>
+                  handleStatusUpdate(job.ApplicationId.toString(), "Selected")
+                }
+              >
+                <SelectAllRounded sx={{ mr: 1 }} />
+                Select
+              </Button>
+
               <CardActionArea>
                 <CardContent>
-                  <Typography variant="h6">{job.SeekerName}</Typography>
-                  <Typography mb={3} color="secondary">
-                    {job.JobTitle}
-                  </Typography>
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <Avatar
+                      alt={job.ApplicantName}
+                      src={"/default-avatar.png"}
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        mr: 2,
+                        bgcolor: getRandomColor(job.ApplicantName || "U"),
+                      }}
+                    />
+                    <Box>
+                      {/* Seeker name link */}
+                      <Link
+                        to={`/seeker_account/${job.SeekerId}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            cursor: "pointer",
+                            "&:hover": {
+                              fontWeight: "bold",
+                              textDecoration: "underline",
+                            },
+                          }}
+                        >
+                          {job.ApplicantName}
+                        </Typography>
+                      </Link>
 
-                  <Typography variant="body1">{job.Description}</Typography>
+                      {/* Job title link */}
+                      <Link
+                        to={`/jobs/details/${job.JobId}`}
+                        style={{ textDecoration: "none", color: "inherit" }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            cursor: "pointer",
+                            "&:hover": {
+                              fontWeight: "bold",
+                              textDecoration: "underline",
+                            },
+                          }}
+                        >
+                          {job.JobTitle}
+                        </Typography>
+                      </Link>
+                    </Box>
+                  </Box>
+
+                  {/* Description (truncated) */}
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3, // show max 3 lines
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {job.Description}
+                  </Typography>
 
                   {/* Chips */}
                   <Box
@@ -118,23 +244,24 @@ const ManageCandidatesTab = () => {
                       display: "flex",
                       flexWrap: "wrap",
                       gap: 1,
-                      marginTop: 2,
+                      mt: 2,
                     }}
                   >
                     <Chip
-                      label={job.SalaryRange}
+                      label={job.JobCategory}
                       variant="outlined"
                       color="primary"
                       size="small"
                     />
                     <Chip
-                      label={job.EducationLevel}
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                    />
-                    <Chip
-                      label={job.Location}
+                      label={
+                        job.AppliedDateTime
+                          ? format(
+                              new Date(job.AppliedDateTime),
+                              "dd MMM yyyy, hh:mm a"
+                            )
+                          : "N/A"
+                      }
                       variant="outlined"
                       color="primary"
                       size="small"

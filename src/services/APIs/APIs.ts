@@ -141,12 +141,6 @@ export const putEmployerData = async (
   return response.data;
 };
 
-// // regiter form after signup
-// export const employerRegister = async (data: CREATE_EMPLOYER) => {
-//   const response = await axiosInstance.post(`/employers/register`, data);
-//   return response.data;
-// };
-
 // get all employers
 export const getAllEmployer = async (id: string) => {
   const response = await axiosInstance.get(`/employers/${id}`);
@@ -154,14 +148,28 @@ export const getAllEmployer = async (id: string) => {
 };
 
 // get all application for an employer
-export const getAllApplications = async (id: string) => {
-  const response = await axiosInstance.get(`/employers/${id}/applications`);
+export const getAllCandidates = async (employerId: string) => {
+  const response = await axiosInstance.get(
+    `jobs/employer/${employerId}/applications`
+  );
+  return response.data;
+};
+
+// update candidate status
+export const applicationStatusUpdate = async (
+  applicationId: string,
+  data: { Status: string }
+) => {
+  const response = await axiosInstance.put(
+    `/jobs/applications/${applicationId}`,
+    data
+  );
   return response.data;
 };
 
 // get all notifications for an employer
 export const getAllEmployerNotifications = async (id: string) => {
-  const response = await axiosInstance.get(`/employers/${id}/notifications`);
+  const response = await axiosInstance.get(`employers/${id}/notifications`);
   return response.data;
 };
 
