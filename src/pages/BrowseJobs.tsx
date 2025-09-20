@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 // MUI
 import {
   Box,
   Button,
   Card,
-  CardActions,
-  CardContent,
-  CardActionArea,
+  // CardActions,
+  // CardContent,
+  // CardActionArea,
   Chip,
   MenuItem,
   Pagination,
@@ -31,7 +31,7 @@ import { getAllJobs } from "../services/APIs/APIs";
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [jobs, setJobs] = useState<saved_jobs[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<saved_jobs[]>([]);

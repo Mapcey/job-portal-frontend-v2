@@ -12,12 +12,12 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-import { JOB } from "../types/job";
+import { saved_jobs } from "../types/job";
 import { getAllJobs } from "../services/APIs/APIs";
 import Loading from "../components/Loading";
 
 const RecentJobsSection = () => {
-  const [jobs, setJobs] = useState<JOB[]>([]);
+  const [jobs, setJobs] = useState<saved_jobs[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const jobsPerPage = 6;
@@ -26,7 +26,7 @@ const RecentJobsSection = () => {
 
   useEffect(() => {
     getAllJobs()
-      .then((data: JOB[]) => {
+      .then((data: saved_jobs[]) => {
         setJobs(data);
         setLoading(false);
       })

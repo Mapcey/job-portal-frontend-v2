@@ -105,7 +105,7 @@ const PostJob = () => {
                 value={formData.Location}
                 className="text-input-3"
                 sx={{ mr: 5, mt: 3 }}
-                onChange={(e, newValue) =>
+                onChange={(_e, newValue) =>
                   setFormData((prev) => ({ ...prev, Location: newValue || "" }))
                 }
                 renderInput={(params) => (

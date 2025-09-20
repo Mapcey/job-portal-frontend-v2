@@ -17,7 +17,7 @@ import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
-import { JOB } from "../types/job";
+import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
 import DOMPurify from "dompurify";
 
@@ -25,7 +25,7 @@ import { getJobDetails } from "../services/APIs/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const [job, setJob] = useState<JOB | null>(null);
+  const [job, setJob] = useState<saved_jobs | null>(null);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {

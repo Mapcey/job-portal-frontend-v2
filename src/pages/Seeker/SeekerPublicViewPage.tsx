@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Avatar,
-  Chip,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Chip, CircularProgress } from "@mui/material";
 
 import { getSeekerData } from "../../services/APIs/APIs"; // assume you have an API function
 import { SEEKER_DATA } from "../../types/users";

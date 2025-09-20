@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -8,10 +8,10 @@ import {
   CardContent,
   CardActions,
   Grid,
-  IconButton,
-  Switch,
+  // IconButton,
+  // Switch,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import { useAuth } from "../../context/AuthContext";
 // import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
 
@@ -50,6 +50,8 @@ const ManageEditorsTab = () => {
       //   }
     };
     fetchEditors();
+
+    setEditors;
   }, [userInfo]);
 
   // Create new editor
