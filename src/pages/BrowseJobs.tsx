@@ -15,14 +15,17 @@ import {
   TextField,
   Typography,
   InputAdornment,
+  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { Work, Category, School } from "@mui/icons-material";
+
 // FIELS
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
-import { JOB } from "../types/job";
+import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
 import { getAllJobs } from "../services/APIs/APIs";
 
@@ -30,8 +33,8 @@ const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const [jobs, setJobs] = useState<JOB[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<JOB[]>([]);
+  const [jobs, setJobs] = useState<saved_jobs[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<saved_jobs[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,26 +53,26 @@ const BrowseJobs = () => {
   const jobsPerPage = 8;
 
   useEffect(() => {
-    getAllJobs().then((data: JOB[]) => {
+    getAllJobs().then((data: saved_jobs[]) => {
       setJobs(data);
       setFilteredJobs(data);
       setLoading(false);
 
       setCategories([
-        ...new Set(data.map((job: JOB) => job.JobCategory)),
+        ...new Set(data.map((job: saved_jobs) => job.JobCategory)),
       ] as string[]);
 
       setJobTypes([
-        ...new Set(data.map((job: JOB) => job.JobType)),
+        ...new Set(data.map((job: saved_jobs) => job.JobType)),
       ] as string[]);
 
       setEducationLevels([
-        ...new Set(data.map((job: JOB) => job.EducationLevel)),
+        ...new Set(data.map((job: saved_jobs) => job.EducationLevel)),
       ] as string[]);
 
       setExperienceLevels([
         ...new Set(
-          data.map((job: JOB) =>
+          data.map((job: saved_jobs) =>
             job.ProfExperience ? job.ProfExperience.toString() + "+ years" : ""
           )
         ),
@@ -149,17 +152,19 @@ const BrowseJobs = () => {
 
   return (
     <Box className="browse-jobs-container">
+      {/* Header changes based on auth state */}
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
 
+      {/* Breadcrumb / Hero section */}
       <Breadcrumb
         title="Browse Jobs"
         description="Find your dream job here"
         backgroundImage="/imgs/backgrounds/bg-5.jpeg"
       />
 
-      {/* Search and Filter Section */}
+      {/* Main layout: filters on the left, jobs on the right */}
       <Box sx={{ display: "flex", gap: 4, padding: 4 }}>
-        {/* Filters */}
+        {/* ---------------- Left: Filter Panel ---------------- */}
         <Box
           sx={{
             width: "25%",
@@ -170,7 +175,7 @@ const BrowseJobs = () => {
         >
           <Typography variant="h6">Filters</Typography>
 
-          {/* Location */}
+          {/* Location (Autocomplete could be used later) */}
           <TextField
             className="b-j-input-style-1"
             label="Location"
@@ -178,15 +183,14 @@ const BrowseJobs = () => {
             size="small"
           />
 
-          {/* categories */}
+          {/* Category */}
           <TextField
             className="b-j-input-style-1"
             select
             label="Category"
             value={category}
-            variant="outlined"
-            size="small"
             onChange={(e) => setCategory(e.target.value)}
+            size="small"
           >
             {[...categories].sort().map((cat) => (
               <MenuItem key={cat} value={cat}>
@@ -195,15 +199,14 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* job type */}
+          {/* Job Type */}
           <TextField
             className="b-j-input-style-1"
             select
             label="Job Type"
-            variant="outlined"
-            size="small"
             value={jobType}
             onChange={(e) => setJobType(e.target.value)}
+            size="small"
           >
             {jobTypes.map((type) => (
               <MenuItem key={type} value={type}>
@@ -212,15 +215,14 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* education level */}
+          {/* Education Level */}
           <TextField
             className="b-j-input-style-1"
             select
             label="Education Level"
-            variant="outlined"
-            size="small"
             value={educationLevel}
             onChange={(e) => setEducationLevel(e.target.value)}
+            size="small"
           >
             {educationLevels.map((edu) => (
               <MenuItem key={edu} value={edu}>
@@ -229,15 +231,14 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
-          {/* experience level */}
+          {/* Experience Level */}
           <TextField
             className="b-j-input-style-1"
             select
             label="Experience Level"
-            variant="outlined"
-            size="small"
             value={experienceLevel}
             onChange={(e) => setExperienceLevel(e.target.value)}
+            size="small"
           >
             {[...experienceLevels].sort().map((exp) => (
               <MenuItem key={exp} value={exp}>
@@ -246,6 +247,7 @@ const BrowseJobs = () => {
             ))}
           </TextField>
 
+          {/* Filter + Reset buttons */}
           <Button
             variant="contained"
             sx={{ borderRadius: 2 }}
@@ -253,7 +255,6 @@ const BrowseJobs = () => {
           >
             Filter
           </Button>
-
           <Button
             variant="contained"
             sx={{
@@ -267,23 +268,20 @@ const BrowseJobs = () => {
           </Button>
         </Box>
 
-        {/* Results */}
+        {/* ---------------- Right: Job Results ---------------- */}
         <Box sx={{ width: "75%" }}>
-          <Box display={"flex"} flexDirection={"row"}>
+          {/* Search bar + Search button */}
+          <Box display="flex" flexDirection="row">
             <TextField
               size="small"
               fullWidth
-              variant="outlined"
               placeholder="Search jobs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               sx={{
                 mb: 3,
                 mr: 3,
-
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "30px",
-                },
+                "& .MuiOutlinedInput-root": { borderRadius: "30px" },
               }}
               InputProps={{
                 startAdornment: (
@@ -293,123 +291,101 @@ const BrowseJobs = () => {
                 ),
               }}
             />
-
             <Button
               variant="contained"
-              color="primary"
-              sx={{
-                height: "38px",
-                alignSelf: "flex-start",
-
-                borderRadius: "30px",
-                textTransform: "none",
-                px: 3,
-              }}
+              sx={{ height: 38, borderRadius: "30px", px: 3 }}
               onClick={handleSearch}
             >
               Search
             </Button>
           </Box>
 
-          <Box
-            display="grid"
-            gridTemplateColumns="repeat(auto-fit, minmax(300px, 1fr))"
-            gap={3}
-          >
+          {/* Results Info + Sorting Option */}
+          <Box display="flex" justifyContent="space-between" mb={2}>
+            <Typography variant="body2" color="text.default">
+              {filteredJobs.length} results found
+            </Typography>
+            {/* Sorting dropdown (recent/oldest) */}
+            {/* <TextField
+              select
+              size="small"
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <MenuItem value="recent">Most Recent</MenuItem>
+              <MenuItem value="oldest">Oldest</MenuItem>
+            </TextField> */}
+          </Box>
+
+          {/* Job List (currently Cards but can be list rows) */}
+          <Box display="grid" gridTemplateColumns="1fr" gap={2}>
             {displayedJobs.map((job) => (
               <Card
                 key={job.JobId}
                 variant="outlined"
                 sx={{
                   borderRadius: 2,
-                  height: "100%",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
+                  alignItems: "center",
+                  p: 2,
                 }}
               >
-                <CardActionArea
-                  onClick={() => navigate(`/jobs/details/${job.JobId}`)}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {job.JobTitle}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
-                      {job.Location}
-                    </Typography>
+                {/* Company avatar / logo */}
+                <Box sx={{ mr: 2 }}>
+                  <Avatar
+                    alt={job.employer.CompanyName}
+                    src={""} // if no logo, Avatar shows fallback
+                    sx={{ width: 48, height: 48 }}
+                  >
+                    {job.employer.CompanyName
+                      ? job.employer.CompanyName.charAt(0).toUpperCase()
+                      : "C"}
+                  </Avatar>
+                </Box>
 
-                    {/* Chips container (max 2 lines) */}
-                    <Box
-                      sx={{
-                        mt: 1,
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 1,
-                        maxHeight: "3.6em",
-                        overflow: "hidden",
-                      }}
-                    >
+                {/* Job info */}
+                <Box flex={1}>
+                  <Typography variant="h6">{job.JobTitle}</Typography>
+                  <Typography variant="body2" color="text.default">
+                    {job.employer.CompanyName} • {job.Location}
+                  </Typography>
+
+                  {/* Tags */}
+                  <Box
+                    sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}
+                  >
+                    {job.JobType && (
                       <Chip
-                        label={
-                          <Typography
-                            fontSize={12}
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                          >
-                            {job.SalaryRange}
-                          </Typography>
-                        }
                         variant="outlined"
+                        label={job.JobType}
                         size="small"
+                        sx={{ opacity: 0.6 }}
+                        icon={<Work sx={{ p: 0.3 }} />}
                       />
+                    )}
+                    {job.JobCategory && (
                       <Chip
-                        label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
-                            {job.EducationLevel}
-                          </Typography>
-                        }
                         variant="outlined"
+                        label={job.JobCategory}
                         size="small"
+                        sx={{ opacity: 0.6 }}
+                        icon={<Category sx={{ p: 0.3 }} />}
                       />
+                    )}
+                    {job.EducationLevel && (
                       <Chip
-                        label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
-                            {job.JobCategory}
-                          </Typography>
-                        }
                         variant="outlined"
+                        label={job.EducationLevel}
                         size="small"
+                        sx={{ opacity: 0.6 }}
+                        icon={<School sx={{ p: 0.3 }} />}
                       />
-                      <Chip
-                        label={
-                          <Typography
-                            noWrap
-                            sx={{ maxWidth: 100 }}
-                            fontSize={12}
-                          >
-                            {job.JobType}
-                          </Typography>
-                        }
-                        variant="outlined"
-                        size="small"
-                      />
-                    </Box>
-                  </CardContent>
-                </CardActionArea>
-                <CardActions>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* Actions */}
+                <Box>
                   <Button
                     size="small"
                     component={Link}
@@ -418,7 +394,7 @@ const BrowseJobs = () => {
                     View
                   </Button>
                   <Button size="small">Apply</Button>
-                </CardActions>
+                </Box>
               </Card>
             ))}
           </Box>

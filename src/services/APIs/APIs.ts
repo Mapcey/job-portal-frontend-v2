@@ -9,7 +9,7 @@ import {
 } from "../../types/users";
 import { saved_jobs } from "../../types/job";
 import { ApplicationsSeeker } from "../../types/applicationsSeeker";
-import { JOB, CREATE_JOB, EMP_POSTED_JOBS } from "../../types/job";
+import { CREATE_JOB, EMP_POSTED_JOBS } from "../../types/job";
 
 // ------------------ USER ------------------J
 // get user info
@@ -27,7 +27,7 @@ export const userLogin = async () => {
 // ------------------ JOBS ------------------
 
 // get all jobs
-export const getAllJobs = async (): Promise<JOB[]> => {
+export const getAllJobs = async (): Promise<saved_jobs[]> => {
   const response = await axiosInstance.get("/jobs/");
   return response.data;
 };
@@ -183,7 +183,7 @@ export const updateEmployerNotification = async (
 // ------------------JOB DETAILS -------------------
 
 // job details by id
-export const getJobDetails = async (id: string): Promise<JOB> => {
+export const getJobDetails = async (id: string): Promise<saved_jobs> => {
   const response = await axiosInstance.get(`/jobs/${id}`);
   return response.data;
 };

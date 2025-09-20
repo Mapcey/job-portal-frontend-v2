@@ -1,3 +1,4 @@
+import { Settings } from "@mui/icons-material";
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -36,7 +37,7 @@ const theme = createTheme({
     },
 
     text: {
-      primary: "#333333",
+      primary: "#000000ff",
       secondary: "#ffffff",
       disabled: "#999999",
     },
