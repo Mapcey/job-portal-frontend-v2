@@ -37,6 +37,10 @@ export interface saved_jobs {
   Description: string;
   Status: string;
 }
+export interface SavedJob {
+  JobId: number;
+  SavedDateTime?: string;
+}
 
 export interface CREATE_JOB {
   JobTitle: string;

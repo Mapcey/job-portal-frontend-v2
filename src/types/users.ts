@@ -21,7 +21,10 @@ export interface SEEKER_DATA {
   Email: string;
   ProfessionalExperience: number;
   DateOfBirth: Date;
-  Salary: number;
+  MinSalary?: number | null;
+  MaxSalary?: number | null;
+  Currency?: string;
+  PayPeriod?: string | "null";
   JobType: string;
   JobType2: string;
   SocialLinks: string;
@@ -66,3 +69,12 @@ export interface languages{
   Language: string;
   ExpertLevel: string;
 }
+export interface seekerFiles{
+  id: number;
+  user_id: number;
+  file_name: string;
+  file_url: string;
+  uploaded_at: Date;
+  file_type: string;
+}
+

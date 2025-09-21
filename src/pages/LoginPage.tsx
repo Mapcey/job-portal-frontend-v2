@@ -55,8 +55,7 @@ const LoginPage = () => {
           navigate("/employer/profile/");
         } else if (success == "seeker") {
           navigate("/seeker/profile/");
-        } else {
-          console.log("user role not found");
+          console.log(token);
         }
       } else {
         setError("Authentication failed. Please try again.");
@@ -70,12 +69,7 @@ const LoginPage = () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const uid = result.user.uid;
-      const token = await result.user.getIdToken();
-      console.log("User id:", uid);
-      console.log("Token:", token);
-      console.log("Google Sign-In successful:", user);
+      console.log("Google Sign-In successful:", result.user);
       navigate("/seeker/profile");
     } catch (err: any) {
       console.error("Error during Google Sign-In:", err);

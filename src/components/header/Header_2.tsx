@@ -22,7 +22,7 @@ import { useAuth } from "../../context/AuthContext";
 
 import NotificationPopover from "./NotificationPop";
 
-const settings = ["Profile", "Edite", "Logout"];
+const settings = ["Profile", "Edit", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
@@ -87,9 +87,9 @@ const Header_2 = () => {
         logout();
         navigate("/login");
       }
-    } else if (setting === "Edite") {
+    } else if (setting === "Edit") {
       if (userRole == "seeker") {
-        navigate("/seeker/register");
+        navigate("/seeker/profile/edit");
       } else if (userRole == "employer") {
         navigate("/employer/edit_profile");
       } else {

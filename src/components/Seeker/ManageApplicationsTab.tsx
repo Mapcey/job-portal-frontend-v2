@@ -10,7 +10,10 @@ import {
 import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router-dom";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
-import { getSeekerApplications, deleteSeekerApplications } from "../../services/APIs/APIs";
+import {
+  getSeekerApplications,
+  deleteSeekerApplications,
+} from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 
@@ -49,8 +52,8 @@ const ManageApplicationsTab = () => {
 
   const handleRemove = async (applicationId: number) => {
     try {
-      await deleteSeekerApplications(applicationId.toString());
-      setApplications((prev) =>
+      await deleteSeekerApplications(applicationId); // pass both IDs
+      setApplication((prev) =>
         prev.filter((app) => app.ApplicationId !== applicationId)
       );
     } catch (err) {
@@ -76,11 +79,18 @@ const ManageApplicationsTab = () => {
           <Card
             key={app.ApplicationId}
             variant="outlined"
-            sx={{ position: "relative", paddingTop: "20px", marginBottom: "20px" }}
+            sx={{
+              position: "relative",
+              paddingTop: "20px",
+              marginBottom: "20px",
+            }}
           >
             <IconButton
               size="small"
-              onClick={(e) => { e.stopPropagation(); handleRemove(app.ApplicationId); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRemove(app.ApplicationId);
+              }}
               sx={{
                 position: "absolute",
                 top: 5,
@@ -111,8 +121,18 @@ const ManageApplicationsTab = () => {
                 </Typography>
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
-                  <Chip label={app.Status} variant="outlined" color="primary" size="small" />
-                  <Chip label={app.JobCategory} variant="outlined" color="secondary" size="small" />
+                  <Chip
+                    label={app.Status}
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                  />
+                  <Chip
+                    label={app.JobCategory}
+                    variant="outlined"
+                    color="secondary"
+                    size="small"
+                  />
                 </Box>
               </CardContent>
             </CardActionArea>

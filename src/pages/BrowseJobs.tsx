@@ -27,7 +27,7 @@ import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
 import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
-import { getAllJobs } from "../services/APIs/APIs";
+import { getAllJobs, addJobApplication } from "../services/APIs/APIs"; // 👈 import addJobApplication
 
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
@@ -49,6 +49,8 @@ const BrowseJobs = () => {
   const [jobTypes, setJobTypes] = useState<string[]>([]);
   const [educationLevels, setEducationLevels] = useState<string[]>([]);
   const [experienceLevels, setExperienceLevels] = useState<string[]>([]);
+
+  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set()); // 👈 track applied jobs
 
   const jobsPerPage = 8;
 
@@ -80,29 +82,16 @@ const BrowseJobs = () => {
     });
   }, []);
 
-  // Load jobs from backend
-  useEffect(() => {
-    getAllJobs().then((data) => {
-      setJobs(data);
-      setFilteredJobs(data); // initially show all
-      setLoading(false);
-    });
-  }, []);
-
-  // Filter logic (optional if you wire it to the Filter button)
+  // Filter logic
   const handleFilter = () => {
     let result = [...jobs];
-
     if (category) result = result.filter((job) => job.JobCategory === category);
     if (jobType) result = result.filter((job) => job.JobType === jobType);
     if (educationLevel)
       result = result.filter((job) => job.EducationLevel === educationLevel);
-
     if (experienceLevel) {
-      // Extract numeric part from string like "2+ years"
       const match = experienceLevel.match(/^(\d+)/);
       const experienceNumber = match ? parseInt(match[1], 10) : NaN;
-
       if (!isNaN(experienceNumber)) {
         result = result.filter((job) =>
           typeof job.ProfExperience === "number"
@@ -110,17 +99,13 @@ const BrowseJobs = () => {
             : false
         );
       }
-
-      console.log("Filtering for experience >= ", experienceNumber);
     }
-
     if (searchQuery)
       result = result.filter((job) =>
         job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
       );
-
     setFilteredJobs(result);
-    setPage(1); // Reset to first page
+    setPage(1);
   };
 
   const handleResetFilters = () => {
@@ -129,8 +114,8 @@ const BrowseJobs = () => {
     setEducationLevel("");
     setExperienceLevel("");
     setSearchQuery("");
-    setFilteredJobs(jobs); // show all jobs again
-    setPage(1); // reset to first page
+    setFilteredJobs(jobs);
+    setPage(1);
   };
 
   const handleSearch = () => {
@@ -138,15 +123,36 @@ const BrowseJobs = () => {
       job.JobTitle.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredJobs(result);
-    setPage(1); // Reset to first page
+    setPage(1);
+  };
+
+  const handlePageChange = (_: any, value: number) => setPage(value);
+
+  // 👇 main apply function
+  const handleApply = async (job: Job) => {
+    try {
+      await addJobApplication(job.JobId, {
+        JobId: job.JobId,
+        JobTitle: job.JobTitle,
+        JobCategory: job.JobCategory,
+        Description: job.Description,
+        Status: "Applied",
+        ApplicantName: "John Doe", // replace with logged-in user's name
+        AppliedDateTime: new Date().toISOString(),
+      });
+      // mark as applied in UI
+      setAppliedJobs((prev) => new Set(prev).add(job.JobId));
+      alert(`Application submitted for ${job.JobTitle}`);
+    } catch (err) {
+      console.error("Failed to apply:", err);
+      alert("Could not apply for this job. Please try again.");
+    }
   };
 
   const displayedJobs = filteredJobs.slice(
     (page - 1) * jobsPerPage,
     page * jobsPerPage
   );
-
-  const handlePageChange = (_: any, value: number) => setPage(value);
 
   if (loading) return <Loading text="Loading All the Jobs..." />;
 
@@ -282,6 +288,7 @@ const BrowseJobs = () => {
                 mb: 3,
                 mr: 3,
                 "& .MuiOutlinedInput-root": { borderRadius: "30px" },
+                "& .MuiOutlinedInput-root": { borderRadius: "30px" },
               }}
               InputProps={{
                 startAdornment: (
@@ -388,10 +395,10 @@ const BrowseJobs = () => {
                 <Box>
                   <Button
                     size="small"
-                    component={Link}
-                    to={`/jobs/details/${job.JobId}`}
+                    disabled={appliedJobs.has(job.JobId)}
+                    onClick={() => handleApply(job)}
                   >
-                    View
+                    {appliedJobs.has(job.JobId) ? "Applied" : "Apply"}
                   </Button>
                   <Button size="small">Apply</Button>
                 </Box>
@@ -399,7 +406,6 @@ const BrowseJobs = () => {
             ))}
           </Box>
 
-          {/* Pagination */}
           <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Pagination
               count={Math.ceil(filteredJobs.length / jobsPerPage)}

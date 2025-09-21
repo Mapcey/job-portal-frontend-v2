@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-// MUI
+
 import { Box, Typography, Button, Chip } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -38,7 +38,9 @@ const JobDetailsPage = () => {
       });
     }
   }, [id]);
-
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
+  }, [userInfo]);
   const tags = {
     salary: job?.SalaryRange,
     education: job?.EducationLevel,
@@ -46,6 +48,53 @@ const JobDetailsPage = () => {
     langulage: job?.Languages,
     experince: `${job?.ProfExperience} Years`,
     category: job?.JobCategory,
+  };
+
+  // 👇 main apply function
+  const handleApply = async (job: Job) => {
+    try {
+      await addJobApplication(job.JobId, {
+        JobId: job.JobId,
+        JobTitle: job.JobTitle,
+        JobCategory: job.JobCategory,
+        Description: job.Description,
+        Status: "Applied",
+        ApplicantName:
+          userInfo?.FirstName && userInfo?.LastName
+            ? `${userInfo.FirstName} ${userInfo.LastName}`
+            : userInfo?.FirstName || userInfo?.LastName || "",
+        AppliedDateTime: new Date().toISOString(),
+      });
+      // mark as applied in UI
+      setAppliedJobs((prev) => new Set(prev).add(job.JobId));
+      alert(`Application submitted for ${job.JobTitle}`);
+    } catch (err) {
+      console.error("Failed to apply:", err);
+      alert("Could not apply for this job. Please try again.");
+    }
+  };
+
+  const handleSaveJob = async () => {
+    if (!userInfo?.UserId || !job?.JobId) return;
+
+    try {
+      // Check if already saved
+      if (savedJob.includes(job.JobId)) {
+        alert("Job already saved!");
+        return;
+      }
+
+      const savedJobObj = {
+        JobId: job.JobId,
+        SavedDateTime: new Date().toISOString(),
+      };
+      await addSavedJob(userInfo.UserId, savedJobObj);
+      setSavedJobs([...savedJob, job.JobId]);
+      alert("Job saved successfully!");
+    } catch (err) {
+      console.error("Failed to save job:", err);
+      alert("Failed to save job. Try again.");
+    }
   };
 
   if (!job) return <Loading text="Loading Job Data..." />;
@@ -159,11 +208,18 @@ const JobDetailsPage = () => {
               <Button
                 variant="outlined"
                 sx={{ width: "47%", marginRight: "5%" }}
+                onClick={handleSaveJob}
+                disabled={savedJob.includes(job.JobId)}
               >
                 <FavoriteIcon />
-                Save Job
+                {savedJob.includes(job.JobId) ? "Saved" : "Save Job"}
               </Button>
-              <Button variant="contained" sx={{ width: "47%" }}>
+
+              <Button
+                variant="contained"
+                sx={{ width: "47%" }}
+                onClick={() => handleApply(job)}
+              >
                 Apply Now
               </Button>
             </Box>
