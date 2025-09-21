@@ -107,7 +107,7 @@ const SeekerPublicViewPage = () => {
                   <Chip label={seeker?.JobType2 || ""} variant="outlined" />
                 </Box>
                 <Box sx={{ display: "flex", marginTop: "5px", gap: "10px" }}>
-                  <Chip label={seeker?.Salary || ""} variant="outlined" />
+                  <Chip label={seeker?.MinSalary || ""} variant="outlined" />
                   {seeker?.languages && seeker.languages.length > 0 && (
                     <Chip
                       label={
