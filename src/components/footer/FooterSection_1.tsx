@@ -136,7 +136,7 @@ const FooterSection_1 = () => {
         variant="body2"
         sx={{ opacity: 0.6, fontSize: "0.875rem" }}
       >
-        © {new Date().getFullYear()} Jobify. All rights reserved.
+        © {new Date().getFullYear()} Suicul. All rights reserved.
       </Typography>
     </Box>
   );
