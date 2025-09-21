@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Typography, Chip, CircularProgress } from "@mui/material";
+import { Box, Typography, Chip, CircularProgress, Button } from "@mui/material";
+import { Report } from "@mui/icons-material";
 
 import { getSeekerData } from "../../services/APIs/APIs"; // assume you have an API function
 import { SEEKER_DATA } from "../../types/users";
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
+import ReportDialog from "../../components/ReportDialog";
 
 const SeekerPublicViewPage = () => {
   const { seekerID } = useParams<{ seekerID: string }>();
   const [seeker, setSeeker] = useState<SEEKER_DATA | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     const fetchSeekerProfile = async () => {
@@ -263,6 +270,19 @@ const SeekerPublicViewPage = () => {
             </div>
           </div>
         </div>
+        <Button onClick={handleOpen} sx={{ gap: 1 }}>
+          <Report sx={{ color: "secondary.main" }} />
+          <Typography color="secondary.light" variant="body2">
+            Report Problem
+          </Typography>
+        </Button>
+        {/* feed the seeker id from here */}
+        <ReportDialog
+          open={open}
+          onClose={handleClose}
+          mode={"seeker"}
+          id={seeker.UserId}
+        />
       </Box>
       <FooterSection_1 />
     </div>

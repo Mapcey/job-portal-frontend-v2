@@ -15,11 +15,13 @@ import EventNoteIcon from "@mui/icons-material/EventNote";
 // FILES
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
+import FooterSection_1 from "../components/footer/FooterSection_1";
 import Breadcrumb from "../components/common/Breadcrumb";
 import { useAuth } from "../context/AuthContext";
 import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
 import DOMPurify from "dompurify";
+import ReportDialog from "../components/ReportDialog";
 
 import {
   getJobDetails,
@@ -35,6 +37,11 @@ const JobDetailsPage = () => {
   const [_, setSeekerID] = useState<number>(0);
   const [savedJob, setSavedJobs] = useState<number[]>([]);
   const [__, setAppliedJobs] = useState<Set<number>>(new Set());
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   useEffect(() => {
     if (id) {
@@ -269,13 +276,21 @@ const JobDetailsPage = () => {
             </Box>
           </Box>
         </Box>
-        <Button>
+        <Button onClick={handleOpen} sx={{ gap: 1 }}>
           <ReportIcon sx={{ color: "secondary.main" }} />
           <Typography color="secondary.light" variant="body2">
             Report Problem
           </Typography>
         </Button>
+        {/* feed the job id from here */}
+        <ReportDialog
+          open={open}
+          onClose={handleClose}
+          mode={"job"}
+          id={job.JobId}
+        />
       </div>
+      <FooterSection_1 />
     </div>
   );
 };
