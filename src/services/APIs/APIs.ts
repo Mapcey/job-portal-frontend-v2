@@ -1,6 +1,5 @@
 import axiosInstance from "../axiosInstance";
 
-import { Job } from "../../types/job";
 import {
   Career,
   Education,
@@ -10,7 +9,12 @@ import {
   Skill,
   seekerFiles,
 } from "../../types/users";
-import { saved_jobs, SavedJob } from "../../types/job";
+import {
+  saved_jobs,
+  SavedJob,
+  CREATE_JOB,
+  EMP_POSTED_JOBS,
+} from "../../types/job";
 import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 
 // Add a new seeker file (image, video, cv) for a seeker

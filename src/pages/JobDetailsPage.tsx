@@ -21,7 +21,7 @@ import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
 import DOMPurify from "dompurify";
 
-import { getJobDetails } from "../services/APIs/APIs";
+import { getJobDetails, addJobApplication } from "../services/APIs/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();

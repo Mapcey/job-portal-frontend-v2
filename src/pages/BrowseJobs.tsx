@@ -129,7 +129,7 @@ const BrowseJobs = () => {
   const handlePageChange = (_: any, value: number) => setPage(value);
 
   // 👇 main apply function
-  const handleApply = async (job: Job) => {
+  const handleApply = async (job: saved_jobs) => {
     try {
       await addJobApplication(job.JobId, {
         JobId: job.JobId,
