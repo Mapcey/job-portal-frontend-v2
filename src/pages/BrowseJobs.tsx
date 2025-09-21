@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 // MUI
 import {
@@ -39,6 +40,8 @@ const BrowseJobs = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
 
   const [category, setCategory] = useState("");
   const [jobType, setJobType] = useState("");
@@ -53,6 +56,10 @@ const BrowseJobs = () => {
   const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set()); // 👈 track applied jobs
 
   const jobsPerPage = 8;
+
+  useEffect(() => {
+    setPage(pageParam);
+  }, [pageParam]);
 
   useEffect(() => {
     getAllJobs().then((data: saved_jobs[]) => {
@@ -126,7 +133,10 @@ const BrowseJobs = () => {
     setPage(1);
   };
 
-  const handlePageChange = (_: any, value: number) => setPage(value);
+  const handlePageChange = (_: any, value: number) => {
+    setPage(value);
+    setSearchParams({ page: value.toString() });
+  };
 
   // 👇 main apply function
   const handleApply = async (job: saved_jobs) => {
@@ -288,7 +298,6 @@ const BrowseJobs = () => {
                 mb: 3,
                 mr: 3,
                 "& .MuiOutlinedInput-root": { borderRadius: "30px" },
-                "& .MuiOutlinedInput-root": { borderRadius: "30px" },
               }}
               InputProps={{
                 startAdornment: (
@@ -395,12 +404,19 @@ const BrowseJobs = () => {
                 <Box>
                   <Button
                     size="small"
+                    component={Link}
+                    to={`/jobs/details/${job.JobId}`}
+                  >
+                    View
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
                     disabled={appliedJobs.has(job.JobId)}
                     onClick={() => handleApply(job)}
                   >
                     {appliedJobs.has(job.JobId) ? "Applied" : "Apply"}
                   </Button>
-                  <Button size="small">Apply</Button>
                 </Box>
               </Card>
             ))}

@@ -21,7 +21,7 @@ const ManageApplicationsTab = () => {
   const { userInfo } = useAuth();
   const navigate = useNavigate();
   const [seekerID, setSeekerID] = useState<number>(0);
-  const [applications, setApplications] = useState<ApplicationsSeeker[]>([]);
+  const [application, setApplication] = useState<ApplicationsSeeker[]>([]);
 
   // Get seeker ID from context
   useEffect(() => {
@@ -37,7 +37,7 @@ const ManageApplicationsTab = () => {
       if (seekerID !== 0) {
         try {
           const data = await getSeekerApplications(seekerID.toString());
-          setApplications(data);
+          setApplication(data);
         } catch (error) {
           console.error("Failed to fetch applications:", error);
         }
@@ -64,7 +64,7 @@ const ManageApplicationsTab = () => {
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
-        Applied Jobs ({applications.length})
+        Applied Jobs ({application.length})
       </Typography>
 
       <Box
@@ -75,7 +75,7 @@ const ManageApplicationsTab = () => {
           gap: 2,
         }}
       >
-        {applications.map((app) => (
+        {application.map((app) => (
           <Card
             key={app.ApplicationId}
             variant="outlined"
@@ -110,9 +110,19 @@ const ManageApplicationsTab = () => {
                 <Typography mb={1} color="secondary">
                   {app.JobTitle} - {app.JobCategory}
                 </Typography>
-                <Typography variant="body1" mb={1}>
-                  {app.Description}
-                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  // 👇 This makes the HTML content render properly
+                  dangerouslySetInnerHTML={{ __html: app.Description }}
+                />
+
                 <Typography variant="body2" color="text.secondary">
                   Status: {app.Status}
                 </Typography>
@@ -139,7 +149,7 @@ const ManageApplicationsTab = () => {
           </Card>
         ))}
 
-        {applications.length === 0 && (
+        {application.length === 0 && (
           <Typography variant="h5" color="secondary.light">
             No applications yet.
           </Typography>

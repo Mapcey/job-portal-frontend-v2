@@ -11,7 +11,10 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router-dom";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 import FlagIcon from "@mui/icons-material/Flag";
-import { getSeekerSavedJobs, deleteSeekerSavedJob } from "../../services/APIs/APIs";
+import {
+  getSeekerSavedJobs,
+  deleteSeekerSavedJob,
+} from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { saved_jobs } from "../../types/job";
 
@@ -33,7 +36,9 @@ const SavedJobsTab = () => {
     const fetchSavedJobs = async () => {
       if (seekerID !== 0) {
         try {
-          const data: saved_jobs[] = await getSeekerSavedJobs(seekerID.toString());
+          const data: saved_jobs[] = await getSeekerSavedJobs(
+            seekerID.toString()
+          );
           setSavedJobs(data);
         } catch (err) {
           console.error("Failed to fetch saved jobs:", err);
@@ -128,13 +133,24 @@ const SavedJobsTab = () => {
 
             <CardActionArea onClick={() => handleOpenJob(job.JobId)}>
               <CardContent>
-                <Typography variant="h6">{job.JobTitle || "Untitled Job"}</Typography>
+                <Typography variant="h6">
+                  {job.JobTitle || "Untitled Job"}
+                </Typography>
                 <Typography mb={1} color="text.secondary">
                   {job.employer?.CompanyName || "Unknown Company"}
                 </Typography>
-                <Typography variant="body2" mb={1}>
-                  {job.Description || ""}
-                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  // 👇 This makes the HTML content render properly
+                  dangerouslySetInnerHTML={{ __html: job.Description }}
+                />
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 1 }}>
                   <Chip

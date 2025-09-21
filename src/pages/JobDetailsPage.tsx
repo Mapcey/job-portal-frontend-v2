@@ -21,12 +21,20 @@ import { saved_jobs } from "../types/job";
 import Loading from "../components/Loading";
 import DOMPurify from "dompurify";
 
-import { getJobDetails, addJobApplication } from "../services/APIs/APIs";
+import {
+  getJobDetails,
+  addJobApplication,
+  addSavedJob,
+} from "../services/APIs/APIs";
 
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<saved_jobs | null>(null);
   const { isAuthenticated } = useAuth();
+  const { userInfo } = useAuth();
+  const [_, setSeekerID] = useState<number>(0);
+  const [savedJob, setSavedJobs] = useState<number[]>([]);
+  const [__, setAppliedJobs] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (id) {
@@ -51,7 +59,7 @@ const JobDetailsPage = () => {
   };
 
   // 👇 main apply function
-  const handleApply = async (job: Job) => {
+  const handleApply = async (job: saved_jobs) => {
     try {
       await addJobApplication(job.JobId, {
         JobId: job.JobId,

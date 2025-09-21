@@ -34,8 +34,8 @@ import {
 } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-//import { storage } from "../../firebase/config";
-//import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "../../firebase/config";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const EditSeekerProfile = () => {
   const { userInfo } = useAuth();
@@ -156,7 +156,7 @@ const EditSeekerProfile = () => {
     }
   };
 
-  /*const uploadFile = async (file: File, path: string) => {
+  const uploadFile = async (file: File, path: string) => {
     return new Promise<string>((resolve, reject) => {
       const storageRef = ref(storage, path);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -174,7 +174,7 @@ const EditSeekerProfile = () => {
         }
       );
     });
-  };*/
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -752,18 +752,21 @@ const EditSeekerProfile = () => {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Typography>Profile Image (.jpg / .png, ≤5 MB)</Typography>
           <input
+            title="image"
             type="file"
             accept="image/png, image/jpeg"
             onChange={(e) => handleFileChange(e, "image")}
           />
           <Typography>CV (.pdf / .docx, ≤5 MB)</Typography>
           <input
+            title="image"
             type="file"
             accept=".pdf,.docx"
             onChange={(e) => handleFileChange(e, "cv")}
           />
           <Typography>Intro Video (.mp4, ≤50 MB)</Typography>
           <input
+            title="image"
             type="file"
             accept="video/mp4"
             onChange={(e) => handleFileChange(e, "video")}
