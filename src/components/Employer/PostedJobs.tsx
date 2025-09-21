@@ -11,6 +11,8 @@ import {
   Stack,
   Chip,
   CircularProgress,
+  Badge,
+  Dialog,
 } from "@mui/material";
 import {
   Delete,
@@ -19,6 +21,14 @@ import {
   DocumentScanner,
 } from "@mui/icons-material";
 import { differenceInDays } from "date-fns";
+import {
+  DialogTitle,
+  DialogContent,
+  ListItemAvatar,
+  Avatar,
+  DialogActions,
+} from "@mui/material";
+import { format } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
@@ -26,6 +36,7 @@ import {
   getEmployerPostedJobs,
   deleteJob,
   editJob,
+  getCandidatesOfJob,
 } from "../../services/APIs/APIs";
 
 const PostedJobs = () => {
@@ -33,6 +44,32 @@ const PostedJobs = () => {
   const [loading, setLoading] = useState(true);
   const { userInfo } = useAuth();
   const navigate = useNavigate();
+  const [applicationCounts, setApplicationCounts] = useState<{
+    [jobId: string]: number;
+  }>({});
+
+  const [openApplicantsDialog, setOpenApplicantsDialog] = useState(false);
+  const [selectedJobCandidates, setSelectedJobCandidates] = useState<any[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const counts: { [jobId: string]: number } = {};
+        for (const job of jobs) {
+          const candidates = await getCandidatesOfJob(job.JobId);
+          counts[job.JobId] = candidates.length; // assuming API returns an array
+        }
+        setApplicationCounts(counts);
+      } catch (error) {
+        console.error("Error fetching application counts:", error);
+      }
+    };
+
+    if (jobs.length > 0) {
+      fetchCounts();
+    }
+  }, [jobs]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -93,6 +130,17 @@ const PostedJobs = () => {
 
   const BrowsePostJob = () => {
     navigate("/employer/post");
+  };
+
+  const handleApplicants = async (jobId: number) => {
+    try {
+      const candidates = await getCandidatesOfJob(jobId);
+      setSelectedJobCandidates(candidates);
+      setSelectedJobId(jobId);
+      setOpenApplicantsDialog(true);
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+    }
   };
 
   return (
@@ -205,14 +253,21 @@ const PostedJobs = () => {
                       >
                         Preview
                       </Button>
-                      <Button
-                        size="small"
-                        sx={{ color: "secondary.main" }}
-                        startIcon={<DocumentScanner />}
-                        onClick={() => handleview(job.JobId)}
+
+                      <Badge
+                        badgeContent={applicationCounts[job.JobId] || 0}
+                        color="primary"
+                        overlap="circular"
                       >
-                        Applicants
-                      </Button>
+                        <Button
+                          size="small"
+                          sx={{ color: "secondary.main" }}
+                          startIcon={<DocumentScanner />}
+                          onClick={() => handleApplicants(job.JobId)}
+                        >
+                          Applicants
+                        </Button>
+                      </Badge>
                     </Stack>
                     <Stack direction="row" spacing={1}>
                       <Button
@@ -241,6 +296,58 @@ const PostedJobs = () => {
           })}
         </List>
       )}
+
+      <Dialog
+        open={openApplicantsDialog}
+        onClose={() => setOpenApplicantsDialog(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Applicants for Job #{selectedJobId}</DialogTitle>
+        <DialogContent dividers>
+          {selectedJobCandidates.length > 0 ? (
+            <List>
+              {selectedJobCandidates.map((candidate, index) => (
+                <ListItem key={index} divider>
+                  <ListItemAvatar>
+                    <Avatar
+                      src={candidate.ProfilePic || "/default-avatar.png"}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={candidate.ApplicantName}
+                    secondary={`Date: ${
+                      candidate.AppliedDateTime
+                        ? format(
+                            new Date(candidate.AppliedDateTime),
+                            "dd MMM yyyy, hh:mm a"
+                          )
+                        : "N/A"
+                    }`}
+                    primaryTypographyProps={{
+                      color: "text.primary",
+                      fontWeight: 500,
+                    }}
+                    secondaryTypographyProps={{ color: "text.default" }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No applicants found for this job.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setOpenApplicantsDialog(false)}
+            color="primary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

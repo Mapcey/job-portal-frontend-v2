@@ -229,14 +229,14 @@ const ManageCandidatesTab = () => {
                     variant="body2"
                     sx={{
                       display: "-webkit-box",
-                      WebkitLineClamp: 3, // show max 3 lines
+                      WebkitLineClamp: 3, // max 3 lines
                       WebkitBoxOrient: "vertical",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}
-                  >
-                    {job.Description}
-                  </Typography>
+                    component="div"
+                    dangerouslySetInnerHTML={{ __html: job.Description }}
+                  />
 
                   {/* Chips */}
                   <Box

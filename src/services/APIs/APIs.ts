@@ -173,11 +173,18 @@ export const getAllEmployerNotifications = async (id: string) => {
   return response.data;
 };
 
+// update notification employer
 export const updateEmployerNotification = async (
   id: string,
   notificationId: number
 ) => {
   await axiosInstance.put(`/seekers/${id}/notifications/${notificationId}`);
+};
+
+// get application under a job post
+export const getCandidatesOfJob = async (JobID: number) => {
+  const response = await axiosInstance.get(`jobs/${JobID}/applications`);
+  return response.data;
 };
 
 // ------------------JOB DETAILS -------------------
