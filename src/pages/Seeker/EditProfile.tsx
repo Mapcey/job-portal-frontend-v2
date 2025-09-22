@@ -17,7 +17,7 @@ import {
   FormControl,
   Alert,
 } from "@mui/material";
-import { SEEKER_DATA, Skill } from "../../types/users";
+import { SEEKER_DATA, Skill, languages } from "../../types/users";
 import {
   getSeekerData,
   updateSeeker,
@@ -31,6 +31,9 @@ import {
   updateCareer,
   deleteCareer,
   addSeekerFile,
+  createLanguage,
+  updateLanguage,
+  deleteLanguage,
 } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +57,7 @@ const EditSeekerProfile = () => {
   const [originalSkills, setOriginalSkills] = useState<Skill[]>([]);
   const [originalCareers, setOriginalCareers] = useState<any[]>([]);
   const [originalEducations, setOriginalEducations] = useState<any[]>([]);
+  const [originalLanguages, setOriginalLanguages] = useState<languages[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,6 +83,7 @@ const EditSeekerProfile = () => {
           setOriginalSkills(data.skills ?? []);
           setOriginalCareers(data.careers ?? []);
           setOriginalEducations(data.educations ?? []);
+          setOriginalLanguages(data.languages ?? []);
         } catch (error) {
           console.error("Failed to fetch seeker data:", error);
         }
@@ -315,10 +320,30 @@ const EditSeekerProfile = () => {
         ...educationsToDelete.map((e) => deleteEducation(seekerID, e.id)),
       ]);
 
+
+
+      // -------------------- Update Languages --------------------
+      const currentLanguages: languages[] = form.languages ?? [];
+      const toAddLanguages = currentLanguages.filter((l) => !l.id);
+      const toUpdateLanguages = currentLanguages.filter((l) => {
+        if (!l.id) return false;
+        const prev = originalLanguages.find((p) => p.id === l.id);
+        return !prev || JSON.stringify(prev) !== JSON.stringify(l);
+      });
+      const toDeleteLanguages = originalLanguages.filter(
+        (p) => !currentLanguages.some((l) => l.id === p.id)
+      );
+      await Promise.all([
+        ...toAddLanguages.map((l) => createLanguage(seekerID, { ...l })),
+        ...toUpdateLanguages.map((l) => updateLanguage(seekerID, l.id!, l)),
+        ...toDeleteLanguages.map((l) => deleteLanguage(seekerID, l.id)),
+      ]);
+
       // -------------------- Update Originals --------------------
       setOriginalSkills(currentSkills);
       setOriginalCareers(currentCareers);
       setOriginalEducations(currentEducations);
+      setOriginalLanguages(currentLanguages);
 
       setSuccessMsg("Profile updated successfully!");
       setTimeout(() => navigate(-1), 1500);

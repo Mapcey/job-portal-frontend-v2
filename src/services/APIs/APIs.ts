@@ -171,16 +171,48 @@ export const createSkill = async (skill: Skill & { SeekerId: number }) => {
 
 // ------------------ LANGUAGE ------------------
 export const createLanguage = async (
-  language: languages & { SeekerId: number }
+  seekerId: number,
+  language: languages
 ) => {
   try {
-    const response = await axiosInstance.post("/languages/", language);
+    const response = await axiosInstance.post(
+      `/seekers/${seekerId}/languages`,
+      language
+    );
     return response.data;
   } catch (error) {
     console.error("Error creating language:", error);
     throw error;
   }
 };
+
+export const updateLanguage = async (
+  seekerId: number,
+  languageId: number,
+  language: Partial<languages>
+) => {
+  try {
+    const response = await axiosInstance.put(
+      `/seekers/${seekerId}/languages/${languageId}`,
+      language
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating language:", error);
+    throw error;
+  }
+};
+
+
+export const deleteLanguage = async (seekerId: number, languageId: number) => {
+  try {
+    await axiosInstance.delete(`/seekers/${seekerId}/languages/${languageId}`);
+  } catch (error) {
+    console.error("Error deleting language:", error);
+    throw error;
+  }
+};
+
 
 // seeker profile data get
 export const getSeekerData = async (id: string): Promise<SEEKER_DATA> => {

@@ -50,6 +50,26 @@ const CreateSeeker: React.FC = () => {
   });
 
   useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // set your LocationX and LocationY with latitude/longitude
+        setForm((prev) => ({
+          ...prev,
+          LocationX: position.coords.latitude, // X = latitude
+          LocationY: position.coords.longitude, // Y = longitude
+        }));
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+      }
+    );
+  } else {
+    console.error("Geolocation is not supported by this browser.");
+  }
+}, []);
+
+  useEffect(() => {
     if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
   }, [userInfo]);
 
