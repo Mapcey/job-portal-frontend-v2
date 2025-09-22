@@ -6,6 +6,7 @@ import CardActionArea from "@mui/material/CardActionArea";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
 const cardData = [
   {
@@ -51,6 +52,8 @@ const cardData = [
 ];
 
 const CategorySection = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="category-section-container">
       <div className="category-section-header">
@@ -115,6 +118,9 @@ const CategorySection = () => {
             height: "48px",
             borderRadius: 2,
             whiteSpace: "nowrap",
+          }}
+          onClick={() => {
+            navigate("/jobs");
           }}
         >
           Browse All Categories

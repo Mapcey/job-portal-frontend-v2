@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Box,
   Container,
@@ -8,14 +9,23 @@ import {
   Paper,
 } from "@mui/material";
 
+import { useAuth } from "../context/AuthContext";
+
 import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import FooterSection_1 from "../components/footer/FooterSection_1";
 
 const ContactPage = () => {
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("Home", isAuthenticated);
+  });
+
   return (
     <div>
-      <Header_1 />
+      {isAuthenticated ? <Header_2 /> : <Header_1 />}
       <Breadcrumb
         title={"Contact"}
         description={"page description here"}

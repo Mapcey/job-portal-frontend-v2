@@ -110,7 +110,7 @@ const Feature = () => {
           sx={{ margin: "20" }}
           variant="contained"
           onClick={() => {
-            navigate("/seeker/create_account");
+            navigate("/seeker/profile");
           }}
         >
           Complete Profile

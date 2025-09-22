@@ -31,13 +31,13 @@ const theme = createTheme({
     },
 
     background: {
-      default: "#f5f5f5",
+      default: "#ffffffff",
       paper: "#ffffff",
     },
 
     text: {
-      primary: "#000000ff",
-      secondary: "#ffffff",
+      primary: "#141414ff",
+      secondary: "#666666",
       disabled: "#999999",
     },
 

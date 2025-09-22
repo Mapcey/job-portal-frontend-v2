@@ -27,7 +27,16 @@ const RecentJobsSection = () => {
   useEffect(() => {
     getAllJobs()
       .then((data: saved_jobs[]) => {
-        setJobs(data);
+        // Sort by date (assuming you have CreatedAt or similar field)
+        const sortedJobs = [...data].sort(
+          (a, b) =>
+            new Date(b.PostedDate).getTime() - new Date(a.PostedDate).getTime()
+        );
+
+        // Limit to first 18
+        const limitedJobs = sortedJobs.slice(0, 18);
+
+        setJobs(limitedJobs);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -70,30 +79,33 @@ const RecentJobsSection = () => {
           <Grid container spacing={3} justifyContent="center">
             {displayedJobs.map((job) => (
               <Card
-                sx={{ width: "500px", borderRadius: "10px" }}
+                sx={{
+                  width: "500px",
+                  borderRadius: "10px",
+                  transition: "0.3s", // smooth hover animation
+                  "&:hover": {
+                    backgroundColor: "#f8f8f8ff", // light gray (change to your color)
+                    boxShadow: 1, // subtle shadow
+                    cursor: "pointer",
+                  },
+                }}
                 variant="outlined"
               >
                 <CardActions sx={{ justifyContent: "right" }}>
-                  <Button
-                    size="small"
-                    onClick={() => navigate(`/jobs/details/${job.JobId}`)}
-                  >
-                    Details
-                  </Button>
                   <Button
                     variant="contained"
                     sx={{ borderRadius: "10px" }}
                     onClick={() => navigate(`/jobs/details/${job.JobId}`)}
                   >
-                    Apply
+                    More Details
                   </Button>
                 </CardActions>
                 <CardContent>
                   <Typography variant="h6">{job.JobTitle}</Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" color="text.disabled">
                     {job.JobCategory} — {job.Location}
                   </Typography>
-                  <Typography variant="body2" mt={1}>
+                  <Typography variant="body2" mt={1} color="text.secondary">
                     {job.Description
                       ? job.Description.replace(/<\/?[^>]+(>|$)/g, "").slice(
                           0,
@@ -105,31 +117,27 @@ const RecentJobsSection = () => {
                 <Stack direction="row" m={2} spacing={1}>
                   {job.SalaryRange && (
                     <Chip
-                      sx={{ bgcolor: "secondary.light" }}
                       size="small"
                       label={job.SalaryRange}
+                      variant="outlined"
                     />
                   )}
                   {job.EducationLevel && (
                     <Chip
-                      sx={{ bgcolor: "secondary.light" }}
+                      variant="outlined"
                       size="small"
                       label={job.EducationLevel}
                     />
                   )}
                   {job.Location && (
                     <Chip
-                      sx={{ bgcolor: "secondary.light" }}
+                      variant="outlined"
                       size="small"
                       label={job.Location}
                     />
                   )}
                   {job.JobType && (
-                    <Chip
-                      sx={{ bgcolor: "secondary.light" }}
-                      size="small"
-                      label={job.JobType}
-                    />
+                    <Chip variant="outlined" size="small" label={job.JobType} />
                   )}
                 </Stack>
               </Card>

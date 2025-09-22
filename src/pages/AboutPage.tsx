@@ -1,13 +1,22 @@
+import { useEffect } from "react";
 import { Box, Container, Typography, Divider } from "@mui/material";
 
 import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import FooterSection_1 from "../components/footer/FooterSection_1";
+import { useAuth } from "../context/AuthContext";
 
 const AboutPage = () => {
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("Home", isAuthenticated);
+  });
+
   return (
     <div>
-      <Header_1 />
+      {isAuthenticated ? <Header_2 /> : <Header_1 />}
       <Breadcrumb
         title={"About Us"}
         description={"this is the page description"}

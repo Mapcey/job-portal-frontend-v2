@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Box,
   Container,
@@ -9,8 +11,10 @@ import {
 } from "@mui/material";
 
 import Header_1 from "../components/header/Header_1";
+import Header_2 from "../components/header/Header_2";
 import Breadcrumb from "../components/common/Breadcrumb";
 import FooterSection_1 from "../components/footer/FooterSection_1";
+import { useAuth } from "../context/AuthContext";
 
 const packages = [
   {
@@ -45,9 +49,15 @@ const packages = [
 ];
 
 const PricingPage = () => {
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("Home", isAuthenticated);
+  });
+
   return (
     <div>
-      <Header_1 />
+      {isAuthenticated ? <Header_2 /> : <Header_1 />}
       <Breadcrumb
         title={"Pricing"}
         description={"Description about pricing pages"}
@@ -56,7 +66,7 @@ const PricingPage = () => {
       <Container sx={{ py: 8 }} maxWidth="lg">
         <Grid container spacing={4}>
           {packages.map((pkg, index) => (
-            <Grid  key={index}>
+            <Grid key={index}>
               <Card
                 sx={{
                   height: "100%",

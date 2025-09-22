@@ -2,8 +2,6 @@
 
 /* ----------- Heor section ---------- */
 .hero-section-container {
-  /* background-color: rgb(162, 184, 203); */
-  /* height: 515px; */
   display: flex;
   flex-direction: row;
 }

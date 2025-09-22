@@ -24,10 +24,16 @@
   --color-text-light: #555555;
   --color-text-white: #ffffff;
 
-  --color-bg-1: #ebebeb;
+  --color-bg-1: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #ffffff; /* pure white */
+  margin: 0;
+  padding: 0;
 }

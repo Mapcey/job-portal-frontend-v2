@@ -7,7 +7,7 @@ const HowItsWork = () => {
         <div className="how-its-work-content">
           <div className="h-w-section">
             <img
-              src="/public/icons/account.svg"
+              src="/icons/account.svg"
               alt="icon"
               className="section-icon-img"
             />
@@ -18,11 +18,7 @@ const HowItsWork = () => {
             </p>
           </div>
           <div className="h-w-section">
-            <img
-              src="/public/icons/cv.svg"
-              alt="icon"
-              className="section-icon-img"
-            />
+            <img src="/icons/cv.svg" alt="icon" className="section-icon-img" />
             <h2>Upload Your Resume</h2>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. In rutrum
@@ -31,7 +27,7 @@ const HowItsWork = () => {
           </div>
           <div className="h-w-section">
             <img
-              src="/public/icons/work.svg"
+              src="/icons/work.svg"
               alt="icon"
               className="section-icon-img"
             />
