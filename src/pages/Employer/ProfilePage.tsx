@@ -122,17 +122,18 @@ const EmployerProfilePage = () => {
         backgroundImage="/imgs/backgrounds/bg-1.jpg"
       />
 
-      <div className="seeker-profile-page-container">
+      <div className="employer-profile-page-container">
         {/* Left Side - Tabs */}
         <Box
-          className="seeker-profile-left-side"
+          className="employer-profile-left-side"
           sx={{
             width: "20%",
-            bgcolor: "white",
+            bgcolor: "secondary.light",
             borderRadius: "10px",
             padding: 2,
             margin: "50px 10px 30px 90px",
             height: "600px",
+            // border: 1,
           }}
         >
           <Tabs
@@ -178,7 +179,7 @@ const EmployerProfilePage = () => {
 
         {/* Right Side - Tab Content */}
         <Box
-          className="seeker-profile-right-side"
+          className="employer-profile-right-side"
           sx={{
             width: "60%",
             flexGrow: 1,

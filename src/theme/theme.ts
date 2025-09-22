@@ -10,12 +10,13 @@ const theme = createTheme({
 
     secondary: {
       main: "#555555",
-      light: "#c9c9c9",
+      light: "#f8f8f8ff",
       dark: "#151515",
     },
 
     error: {
       main: "#f44336",
+      dark: "#e63b2fff",
     },
 
     warning: {
@@ -28,6 +29,7 @@ const theme = createTheme({
 
     success: {
       main: "#4caf50",
+      dark: "#46a74aff",
     },
 
     background: {

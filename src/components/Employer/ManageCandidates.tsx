@@ -12,18 +12,20 @@ import {
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
-import { SelectAllRounded } from "@mui/icons-material";
+import { Done } from "@mui/icons-material";
 import { format } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
 import { getAllCandidates } from "../../services/APIs/APIs";
 import { applicationStatusUpdate } from "../../services/APIs/APIs";
 import { candidate } from "../../types/candidates";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const ManageCandidatesTab = () => {
   const { userInfo } = useAuth();
   const [appliedCandidates, setAppliedCandidates] = useState<candidate[]>([]);
   const [loading, setLoading] = useState(true);
+  const { notify } = useNotification();
 
   // Fetch applications for this employer
   useEffect(() => {
@@ -75,15 +77,16 @@ const ManageCandidatesTab = () => {
       await applicationStatusUpdate(applicationId, {
         Status: newStatus,
       });
+      notify("Candidate selected", "success");
 
       setAppliedCandidates((prev) => {
         if (newStatus === "Rejected") {
-          // Remove rejected candidate
+          // ❌ Remove rejected candidate
           return prev.filter(
             (a) => a.ApplicationId.toString() !== applicationId
           );
         } else {
-          // Update status for selected/shortlisted
+          // ✅ Update status for Reviewed / Selected (or other statuses)
           return prev.map((a) =>
             a.ApplicationId.toString() === applicationId
               ? { ...a, Status: newStatus }
@@ -110,7 +113,7 @@ const ManageCandidatesTab = () => {
         <Box
           className="saved-jobs-tab-content"
           sx={{
-            maxHeight: "600px",
+            maxHeight: "800px",
             overflowY: "auto",
             flexDirection: "column",
             gap: 2,
@@ -122,7 +125,7 @@ const ManageCandidatesTab = () => {
               variant="outlined"
               sx={{
                 position: "relative",
-                paddingTop: "20px",
+
                 marginBottom: "20px",
                 boxShadow: 2,
                 borderRadius: 2,
@@ -136,7 +139,7 @@ const ManageCandidatesTab = () => {
                   right: 5,
                   zIndex: 1,
                   backgroundColor: "error.main",
-                  opacity: 0.7,
+                  opacity: 0.8,
                   color: "white",
                   boxShadow: 1,
                   ":hover": { backgroundColor: "error.main", opacity: 1 },
@@ -157,7 +160,7 @@ const ManageCandidatesTab = () => {
                   right: 5,
                   zIndex: 1,
                   backgroundColor: "success.main",
-                  opacity: 0.7,
+                  opacity: 0.8,
                   color: "white",
                   boxShadow: 1,
                   ":hover": { backgroundColor: "success.main", opacity: 1 },
@@ -166,7 +169,7 @@ const ManageCandidatesTab = () => {
                   handleStatusUpdate(job.ApplicationId.toString(), "Selected")
                 }
               >
-                <SelectAllRounded sx={{ mr: 1 }} />
+                <Done sx={{ mr: 1 }} />
                 Select
               </Button>
 
@@ -224,20 +227,6 @@ const ManageCandidatesTab = () => {
                     </Box>
                   </Box>
 
-                  {/* Description (truncated) */}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 3, // max 3 lines
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                    component="div"
-                    dangerouslySetInnerHTML={{ __html: job.Description }}
-                  />
-
                   {/* Chips */}
                   <Box
                     sx={{
@@ -250,7 +239,7 @@ const ManageCandidatesTab = () => {
                     <Chip
                       label={job.JobCategory}
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       size="small"
                     />
                     <Chip
@@ -263,7 +252,7 @@ const ManageCandidatesTab = () => {
                           : "N/A"
                       }
                       variant="outlined"
-                      color="primary"
+                      color="secondary"
                       size="small"
                     />
                   </Box>

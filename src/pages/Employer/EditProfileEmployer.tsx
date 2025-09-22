@@ -7,6 +7,7 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { getEmployerData, putEmployerData } from "../../services/APIs/APIs";
 import { EMPLOYER_DATA } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const EditProfileEmployer = () => {
   const [formData, setFormData] = useState<EMPLOYER_DATA>({
@@ -23,6 +24,7 @@ const EditProfileEmployer = () => {
 
   const { userInfo } = useAuth();
   const navigate = useNavigate();
+  const { notify } = useNotification();
 
   // Set EmployerId from logged-in user
   useEffect(() => {
@@ -65,6 +67,7 @@ const EditProfileEmployer = () => {
     try {
       const response = await putEmployerData(formData.EmployerId, formData);
       console.log("Profile updated successfully:", response);
+      notify("Profile details saved", "success");
       navigate("/employer/profile");
     } catch (err) {
       console.error("Update failed:", err);
@@ -98,10 +101,10 @@ const EditProfileEmployer = () => {
               fullWidth
               label="Email"
               name="Email"
-              value="email*"
-              onChange={handleChange}
+              value={userInfo.Email}
               size="small"
               className="text-field-1"
+              disabled
             />
           </Box>
           <Box gap={2} display={"flex"} flexDirection={"row"} mb={3}>
@@ -117,9 +120,9 @@ const EditProfileEmployer = () => {
 
             <TextField
               fullWidth
-              label="Website"
-              name="Website"
-              value={formData.WebSite || ""}
+              label="WebSite"
+              name="WebSite"
+              value={formData.WebSite}
               onChange={handleChange}
               size="small"
               className="text-field-1"

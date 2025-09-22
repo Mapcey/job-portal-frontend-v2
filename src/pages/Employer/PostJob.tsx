@@ -13,8 +13,8 @@ import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { CREATE_JOB } from "../../types/job";
 import { sriLankaCities } from "../../assets/data/sriLankaCities";
-
 import RichTextBox from "../../components/RichTextBox";
+import { useNotification } from "../../context/NotificationsProvider";
 
 import {
   JOB_CAT,
@@ -43,6 +43,7 @@ const PostJob = () => {
   });
 
   const navigate = useNavigate();
+  const { notify } = useNotification();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,10 +58,10 @@ const PostJob = () => {
       console.log(formData);
       const response = await createNewJob(formData);
       console.log("Job created:", response);
-      alert("Job posted successfully!");
+      notify("New job posted", "success");
     } catch (err) {
       console.error(err);
-      alert("Error posting job");
+      notify("Error posting job", "error");
     }
   };
 

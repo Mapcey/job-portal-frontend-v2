@@ -16,6 +16,7 @@ import { styled } from "@mui/material/styles";
 import { EMPLOYER_DATA } from "../../types/users";
 import { putEmployerData } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const Input = styled("input")({
   display: "none",
@@ -27,8 +28,8 @@ const FormSection_1 = () => {
   const [images, setImages] = useState<File[]>([]);
   const { userInfo } = useAuth();
   const [employerID, setEmployerID] = useState(0);
-
   const navigate = useNavigate();
+  const { notify } = useNotification();
 
   useEffect(() => {
     if (userInfo && "EmployerId" in userInfo) {
@@ -57,8 +58,10 @@ const FormSection_1 = () => {
       const response = await putEmployerData(employerID, formData);
       console.log("Success:", response);
       navigate("/employer/profile/");
+      notify("Profile created", "success");
     } catch (err) {
       console.error("Update failed:", err);
+      notify("Error on profile creation", "error");
     }
   };
 
