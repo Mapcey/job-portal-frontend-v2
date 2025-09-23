@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { differenceInDays } from "date-fns";
+
 import {
   Box,
   Typography,
@@ -12,7 +14,6 @@ import {
   Chip,
   CircularProgress,
   Badge,
-  Dialog,
 } from "@mui/material";
 import {
   Delete,
@@ -20,15 +21,6 @@ import {
   RemoveRedEye,
   DocumentScanner,
 } from "@mui/icons-material";
-import { differenceInDays } from "date-fns";
-import {
-  DialogTitle,
-  DialogContent,
-  ListItemAvatar,
-  Avatar,
-  DialogActions,
-} from "@mui/material";
-import { format } from "date-fns";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
@@ -37,7 +29,9 @@ import {
   deleteJob,
   editJob,
   getCandidatesOfJob,
+  applicationStatusUpdate,
 } from "../../services/APIs/APIs";
+import ApplicantsDialog from "./ApplicationsDialog";
 
 const PostedJobs = () => {
   const [jobs, setJobs] = useState<EMP_POSTED_JOBS[]>([]);
@@ -274,17 +268,34 @@ const PostedJobs = () => {
                         size="small"
                         color="warning"
                         startIcon={<Cancel />}
-                        onClick={() => handleClose(job.JobId)}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to close this post?"
+                            )
+                          ) {
+                            handleClose(job.JobId);
+                          }
+                        }}
                         disabled={job.Status === "Closed"}
                       >
                         Close Post
                       </Button>
+
                       <Button
                         size="small"
                         color="error"
                         variant="outlined"
                         startIcon={<Delete />}
-                        onClick={() => handleDelete(job.JobId)}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this post?"
+                            )
+                          ) {
+                            handleDelete(job.JobId);
+                          }
+                        }}
                       >
                         Delete
                       </Button>
@@ -296,58 +307,31 @@ const PostedJobs = () => {
           })}
         </List>
       )}
-
-      <Dialog
+      <ApplicantsDialog
         open={openApplicantsDialog}
         onClose={() => setOpenApplicantsDialog(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>Applicants for Job #{selectedJobId}</DialogTitle>
-        <DialogContent dividers>
-          {selectedJobCandidates.length > 0 ? (
-            <List>
-              {selectedJobCandidates.map((candidate, index) => (
-                <ListItem key={index} divider>
-                  <ListItemAvatar>
-                    <Avatar
-                      src={candidate.ProfilePic || "/default-avatar.png"}
-                    />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={candidate.ApplicantName}
-                    secondary={`Date: ${
-                      candidate.AppliedDateTime
-                        ? format(
-                            new Date(candidate.AppliedDateTime),
-                            "dd MMM yyyy, hh:mm a"
-                          )
-                        : "N/A"
-                    }`}
-                    primaryTypographyProps={{
-                      color: "text.primary",
-                      fontWeight: 500,
-                    }}
-                    secondaryTypographyProps={{ color: "text.default" }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              No applicants found for this job.
-            </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenApplicantsDialog(false)}
-            color="primary"
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+        jobId={selectedJobId}
+        candidates={selectedJobCandidates}
+        onStatusChange={async (candidate, newStatus) => {
+          try {
+            // Call the API to update the status
+            await applicationStatusUpdate(candidate.ApplicationId, {
+              Status: newStatus,
+            });
+
+            // Update state locally
+            setSelectedJobCandidates((prev) =>
+              prev.map((c) =>
+                c.ApplicationId === candidate.ApplicationId
+                  ? { ...c, Status: newStatus }
+                  : c
+              )
+            );
+          } catch (error) {
+            console.error("Failed to update candidate status:", error);
+          }
+        }}
+      />
     </Box>
   );
 };

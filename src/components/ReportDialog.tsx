@@ -26,13 +26,13 @@ interface ReportDialogProps {
 export default function ReportDialog({
   open,
   onClose,
-  mode,
-  id,
-}: ReportDialogProps) {
+}: // mode,
+// id,
+ReportDialogProps) {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [userID, setUserID] = useState();
+  const [_, setUserID] = useState();
   const { userInfo } = useAuth();
 
   useEffect(() => {

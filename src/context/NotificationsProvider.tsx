@@ -42,7 +42,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
+    _event?: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason
   ) => {
     if (reason === "clickaway") return;

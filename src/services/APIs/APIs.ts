@@ -276,7 +276,7 @@ export const getAllCandidates = async (employerId: string) => {
 
 // update candidate status
 export const applicationStatusUpdate = async (
-  applicationId: string,
+  applicationId: number,
   data: { Status: string }
 ) => {
   const response = await axiosInstance.put(
