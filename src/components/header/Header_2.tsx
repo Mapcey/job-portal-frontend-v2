@@ -14,7 +14,14 @@ import {
   Menu,
   MenuItem,
   Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Divider,
 } from "@mui/material";
+import { Close } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
@@ -28,20 +35,38 @@ const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
   const { logout, userInfo, userRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
-
   const [anchorElNotification, setAnchorElNotification] =
     useState<null | HTMLElement>(null);
-
   const handleOpenNotification = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNotification(event.currentTarget);
   };
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const handleCloseNotification = () => {
     setAnchorElNotification(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setDrawerOpen(false);
+  };
+
+  const handleViewProfile = () => {
+    if (userRole == "seeker") {
+      navigate("/seeker/profile");
+      console.log(userRole);
+    } else if (userRole == "employer") {
+      navigate("/employer/profile");
+      console.log(userRole);
+    } else {
+      console.log("no user role");
+      logout();
+    }
+    setDrawerOpen(false);
   };
 
   const pages = [
@@ -121,6 +146,11 @@ const Header_2 = () => {
     console.log("is auth", isAuthenticated);
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setDrawerOpen(false);
+  };
+
   return (
     <div style={{ marginBottom: 90 }}>
       <AppBar
@@ -152,19 +182,8 @@ const Header_2 = () => {
             <Box sx={{ flexGrow: 1 }} />
 
             {/* mobile view menu */}
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: { xs: "flex", md: "none" },
-              }}
-            >
-              <Box sx={{ flexGrow: 1 }} />
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-              >
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton onClick={() => setDrawerOpen(true)}>
                 <MenuIcon />
               </IconButton>
             </Box>
@@ -218,6 +237,7 @@ const Header_2 = () => {
                   <Avatar>{getInitial()}</Avatar>
                 </IconButton>
               </Tooltip>
+
               <Menu
                 sx={{ mt: "45px" }}
                 id="menu-appbar"
@@ -249,6 +269,55 @@ const Header_2 = () => {
           </Toolbar>
         </Container>
       </AppBar>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Box sx={{ width: 250, p: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton onClick={() => setDrawerOpen(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          <List>
+            {pages.map((page) => (
+              <ListItem key={page.label} disablePadding>
+                <ListItemButton onClick={() => handleNavigate(page.path)}>
+                  <ListItemText primary={page.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mb: 2 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              onClick={handleViewProfile}
+            >
+              View Profile
+            </Button>
+          </Box>
+
+          {isAuthenticated && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                fullWidth
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </Box>
+          )}
+        </Box>
+      </Drawer>
     </div>
   );
 };

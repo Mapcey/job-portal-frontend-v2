@@ -1,49 +1,51 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
-
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Container,
+  Button,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Divider,
+} from "@mui/material";
+import { Menu, Close } from "@mui/icons-material";
 
 const pages = ["Home", "Browse Jobs", "Contact", "About"];
 
 const Header_1 = () => {
   const [elevated, setElevated] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLoginButton = () => {
     navigate("/login");
+    setDrawerOpen(false);
   };
 
   const handleSignupButton = () => {
     navigate("/signup");
+    setDrawerOpen(false);
   };
 
   const handleMenuButtons = (page: string) => {
-    if (page == "Home") {
-      navigate(`/`);
-    } else if (page == "Browse Jobs") {
-      navigate(`/jobs`);
-    } else if (page == "Contact") {
-      navigate(`/contact`);
-    } else if (page == "About") {
-      navigate(`/about`);
-    } else {
-      navigate("/notFound");
-    }
+    if (page === "Home") navigate(`/`);
+    else if (page === "Browse Jobs") navigate(`/jobs`);
+    else if (page === "Contact") navigate(`/contact`);
+    else if (page === "About") navigate(`/about`);
+    else navigate("/notFound");
+
+    setDrawerOpen(false);
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setElevated(window.scrollY > 50); // Shrink header when scrolled past 50px
-    };
-
+    const handleScroll = () => setElevated(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -61,7 +63,7 @@ const Header_1 = () => {
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              height: elevated ? 60 : 90, // Shrinks from 80 to 60px
+              height: elevated ? 60 : 90,
               transition: "all 0.3s ease",
             }}
           >
@@ -83,25 +85,14 @@ const Header_1 = () => {
             {/* space */}
             <Box sx={{ flexGrow: 1 }} />
 
-            {/* mobile view menu */}
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: { xs: "flex", md: "none" },
-              }}
-            >
-              <Box sx={{ flexGrow: 1 }} />
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-              >
-                <MenuIcon />
+            {/* mobile view menu button */}
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton onClick={() => setDrawerOpen(true)}>
+                <Menu />
               </IconButton>
             </Box>
 
-            {/* menu */}
+            {/* desktop menu */}
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
               {pages.map((page) => (
                 <Button
@@ -114,7 +105,7 @@ const Header_1 = () => {
               ))}
             </Box>
 
-            {/* login */}
+            {/* desktop login */}
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
@@ -144,11 +135,55 @@ const Header_1 = () => {
                 Sign Up
               </Button>
             </Box>
-
-            {/* login buttons */}
           </Toolbar>
         </Container>
       </AppBar>
+
+      {/* Drawer for mobile */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Box sx={{ width: 250, p: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <IconButton onClick={() => setDrawerOpen(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+
+          <List>
+            {pages.map((page) => (
+              <ListItem key={page} disablePadding>
+                <ListItemButton onClick={() => handleMenuButtons(page)}>
+                  <ListItemText primary={page} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              onClick={handleLoginButton}
+            >
+              Login
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleSignupButton}
+            >
+              Sign Up
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </div>
   );
 };
