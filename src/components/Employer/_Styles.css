@@ -93,3 +93,48 @@
     background-position: 0 0;
   }
 }
+
+.emp-fs-text-inputs-1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.emp-create-ac-form-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
+  gap: 40px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.emp-fs-profile-image-container {
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .emp-fs-text-inputs-1 {
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    margin-bottom: 10px;
+    margin-top: 20px;
+  }
+
+  .emp-create-ac-form-section {
+    display: inherit;
+    flex-direction: column;
+  }
+
+  .emp-fs-profile-image-container {
+    width: 100%;
+  }
+}

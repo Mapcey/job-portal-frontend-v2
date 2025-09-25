@@ -16,6 +16,8 @@ import {
   MenuItem,
   Box,
   ListItemIcon,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { format } from "date-fns";
 import {
@@ -74,8 +76,17 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
     return statusPriority[statusA] - statusPriority[statusB];
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      fullScreen={isMobile} // go fullscreen on mobile
+    >
       <DialogTitle>Applicants for Job #{jobId}</DialogTitle>
       <DialogContent dividers>
         {candidates.length > 0 ? (
@@ -84,7 +95,12 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
               <ListItem
                 key={index}
                 divider
-                sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                sx={{
+                  display: "flex",
+                  alignItems: isMobile ? "flex-start" : "center",
+                  flexDirection: isMobile ? "column" : "row",
+                  gap: 2,
+                }}
               >
                 {/* Avatar */}
                 <ListItemAvatar>
@@ -110,26 +126,36 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                 />
 
                 {/* Actions */}
-                <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    alignItems: "center",
+                    flexDirection: isMobile ? "column" : "row",
+                    width: isMobile ? "100%" : "auto",
+                  }}
+                >
                   <Button
+                    fullWidth={isMobile}
                     sx={{
                       borderRadius: 5,
                       color: "secondary.main",
                       borderColor: "black",
                     }}
                     variant="outlined"
-                    onClick={() => {
+                    onClick={() =>
                       window.open(
                         `/seeker_account/${candidate.SeekerId}`,
                         "_blank"
-                      );
-                    }}
+                      )
+                    }
                   >
                     View Profile
                   </Button>
 
                   <Select
                     size="small"
+                    fullWidth={isMobile}
                     value={candidate.Status || ""}
                     displayEmpty
                     onChange={(e) =>
@@ -141,7 +167,11 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                         statusOptions[selected as keyof typeof statusOptions];
                       return (
                         <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
                         >
                           {option.icon}
                           <Typography variant="body2">

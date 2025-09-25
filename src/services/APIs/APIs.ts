@@ -294,10 +294,10 @@ export const getAllEmployerNotifications = async (id: string) => {
 
 // update notification employer
 export const updateEmployerNotification = async (
-  id: string,
+  id: number,
   notificationId: number
 ) => {
-  await axiosInstance.put(`/seekers/${id}/notifications/${notificationId}`);
+  await axiosInstance.put(`/employer/${id}/notifications/${notificationId}`);
 };
 
 // get application under a job post

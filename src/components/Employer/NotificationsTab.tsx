@@ -26,32 +26,39 @@ import {
 
 const NotificationsTab = () => {
   const { userInfo } = useAuth();
-  const [seekerID, setSeekerID] = useState<number>(0);
+  const [employerID, setEmployerID] = useState<number>(0);
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [selectedNote, setSelectedNote] = useState<notification | null>(null); // For dialog
 
   // Get seeker ID from context
   useEffect(() => {
-    if (userInfo && "UserId" in userInfo) {
-      setSeekerID(userInfo.UserId);
-      console.log("SeekerID from context:", userInfo.UserId);
+    if (userInfo && "EmployerId" in userInfo) {
+      setEmployerID(userInfo.EmployerId);
+      console.log(userInfo.EmployerId);
     }
   }, [userInfo]);
 
   // Fetch notifications
   useEffect(() => {
     const fetchData = async () => {
-      if (seekerID !== 0) {
+      if (employerID !== 0) {
         try {
-          const data = await getAllEmployerNotifications(seekerID.toString());
-          setNotifications(data);
+          const data = await getAllEmployerNotifications(employerID.toString());
+
+          // 🔹 Sort newest first
+          const sorted = [...data].sort(
+            (a, b) =>
+              new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime()
+          );
+
+          setNotifications(sorted);
         } catch (error) {
           console.error("Failed to fetch notifications:", error);
         }
       }
     };
     fetchData();
-  }, [seekerID]);
+  }, [employerID]);
 
   // 🔹 Mark as read + open dialog
   const handleClick = async (note: notification) => {
@@ -69,9 +76,9 @@ const NotificationsTab = () => {
 
       try {
         // Call API to mark as read
-        if (userInfo && "UserId" in userInfo) {
+        if (userInfo && "EmployerId" in userInfo) {
           await updateEmployerNotification(
-            userInfo.UserId.toString(),
+            userInfo.EmployerId,
             note.NotificationId
           );
           console.log(`Notification ${note.NotificationId} marked as read`);
@@ -98,7 +105,7 @@ const NotificationsTab = () => {
 
       <List
         sx={{
-          maxHeight: "400px",
+          maxHeight: "600px",
           overflowY: "auto",
           bgcolor: "white",
           borderRadius: 1,
@@ -108,18 +115,18 @@ const NotificationsTab = () => {
         {notifications.map((note) => (
           <React.Fragment key={note.NotificationId}>
             <ListItem
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handleRemove(note.NotificationId);
-                  }}
-                >
-                  <DeleteIcon color="error" />
-                </IconButton>
-              }
+              // secondaryAction={
+              //   <IconButton
+              //     edge="end"
+              //     aria-label="delete"
+              //     onClick={(e) => {
+              //       e.stopPropagation();
+              //       // handleRemove(note.NotificationId);
+              //     }}
+              //   >
+              //     <DeleteIcon color="error" />
+              //   </IconButton>
+              // }
               disablePadding
             >
               <ListItemButton
