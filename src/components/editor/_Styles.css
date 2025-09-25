@@ -1,0 +1,16 @@
+.editor-p-j-form-row {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 900px) {
+  .editor-p-j-form-row {
+    margin-left: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .editor-p-j-form-row {
+    flex-direction: column;
+  }
+}

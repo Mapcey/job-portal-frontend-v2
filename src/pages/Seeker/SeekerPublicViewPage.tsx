@@ -78,26 +78,109 @@ const SeekerPublicViewPage = () => {
         sx={{
           maxWidth: "1000px",
           mx: "auto",
-          mt: 15,
+          mt: { xs: 8, sm: 15 }, // smaller top margin for mobile
           mb: 6,
-          px: 3,
+          px: { xs: 2, sm: 3 }, // reduce padding on small screens
         }}
       >
         {/* Profile Header */}
-        <Card sx={{ pt: 1, mb: 4, boxShadow: 2, borderRadius: 2 }}>
+        <Card
+          sx={{
+            pt: 1,
+            mb: 4,
+            boxShadow: 2,
+            borderRadius: 2,
+            position: "relative",
+          }}
+        >
           <CardContent>
-            <Box display="flex" alignItems="center" gap={3}>
-              <Avatar
-                // src={seeker?.ProfilePic || "/imgs/people/p2.jpg"}
-                alt={seeker?.FirstName}
-                sx={{ width: 100, height: 100 }}
-              />
+            {/* Download CV in top right */}
+            {files &&
+              files.length > 0 &&
+              (() => {
+                const getLatestByType = (regex: RegExp) =>
+                  [...files]
+                    .filter((f) => regex.test(f.file_name))
+                    .sort(
+                      (a, b) =>
+                        new Date(b.uploaded_at).getTime() -
+                        new Date(a.uploaded_at).getTime()
+                    )[0] || null;
 
+                const latestCV = getLatestByType(/\.(pdf|docx)$/i);
+
+                return (
+                  latestCV && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 16,
+                        right: 16,
+                      }}
+                    >
+                      <a
+                        href={latestCV.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          textDecoration: "none",
+                        }}
+                      >
+                        <Button variant="outlined" size="small">
+                          Download CV
+                        </Button>
+                      </a>
+                    </Box>
+                  )
+                );
+              })()}
+
+            <Box
+              display="flex"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              flexDirection={{ xs: "column", sm: "row" }}
+              gap={3}
+            >
+              {/* Image */}
+              {files &&
+                files.length > 0 &&
+                (() => {
+                  const getLatestByType = (regex: RegExp) =>
+                    [...files]
+                      .filter((f) => regex.test(f.file_name))
+                      .sort(
+                        (a, b) =>
+                          new Date(b.uploaded_at).getTime() -
+                          new Date(a.uploaded_at).getTime()
+                      )[0] || null;
+
+                  const latestImage = getLatestByType(/\.(jpg|jpeg|png)$/i);
+
+                  return (
+                    latestImage && (
+                      <Avatar
+                        src={latestImage.file_url || "/imgs/people/p2.jpg"}
+                        alt={seeker?.FirstName}
+                        sx={{ width: 90, height: 90 }}
+                      />
+                    )
+                  );
+                })()}
+
+              {/* Profile Info */}
               <Box flexGrow={1}>
-                <Typography variant="h4" fontWeight={600}>
+                <Typography
+                  variant="h5"
+                  fontWeight={600}
+                  sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }}
+                >
                   {seeker?.FirstName || ""}
                 </Typography>
-                <Typography variant="subtitle1" color="text.secondary">
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                >
                   Software Engineer
                 </Typography>
 
@@ -124,12 +207,24 @@ const SeekerPublicViewPage = () => {
               </Box>
 
               {/* Contact Info */}
-              <Box textAlign="right">
-                <Typography variant="body1" fontWeight={500}>
-                  📞 {seeker?.ContactNo}
+              <Box
+                textAlign={{ xs: "left", sm: "right" }}
+                mt={{ xs: 2, sm: 0 }}
+                width={{ xs: "100%", sm: "auto" }}
+              >
+                <Typography
+                  variant="body1"
+                  fontWeight={500}
+                  sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                >
+                  Contact Info: {seeker?.ContactNo}
                 </Typography>
-                <Typography variant="body1" fontWeight={500}>
-                  ✉️ {seeker?.Email}
+                <Typography
+                  variant="body1"
+                  fontWeight={500}
+                  sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                >
+                  {seeker?.Email}
                 </Typography>
               </Box>
             </Box>

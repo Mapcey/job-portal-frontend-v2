@@ -179,14 +179,6 @@ const PostJob = () => {
                   </MenuItem>
                 ))}
               </TextField>
-              {/* <TextField
-                label="Professional Experience"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-              /> */}
 
               <TextField
                 select
@@ -253,17 +245,6 @@ const PostJob = () => {
               </TextField>
             </div>
             <div className="p-j-form-row">
-              {/* <TextField
-                name="WorkType"
-                label="Wrok Type"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                value={formData.WorkType}
-                onChange={handleChange}
-              /> */}
 
               <TextField
                 select
@@ -321,19 +302,6 @@ const PostJob = () => {
 
         {/* section */}
         <div className="post-job-content-section-1">
-          {/* <TextField
-            name="Description"
-            id="outlined-multiline-static"
-            label="Add a Detailed Description"
-            placeholder="Add a detailed summery of yor experience."
-            multiline
-            rows={6}
-            className="text-input-3"
-            size="small"
-            sx={{ width: "100%" }}
-            value={formData.Description || ""}
-            onChange={handleChange}
-          /> */}
 
           <RichTextBox
             value={formData.Description}
