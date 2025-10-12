@@ -490,3 +490,19 @@ export const deleteCareer = async (
 ): Promise<void> => {
   await axiosInstance.delete(`/seekers/${SeekerId}/careers/${CareerId}`);
 };
+
+// create a new report
+export const createReport = async (reportData: {
+  ReportedType: string;
+  ReportedId: number;
+  ReportCategory: string;
+  Description: string;
+}) => {
+  try {
+    const response = await axiosInstance.post("/reports", reportData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating report:", error);
+    throw error;
+  }
+};

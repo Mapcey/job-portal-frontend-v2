@@ -18,6 +18,7 @@ import SeekerEditPage from "../pages/Seeker/EditProfile";
 import EditProfileEmployer from "../pages/Employer/EditProfileEmployer";
 import SeekerPublicViewPage from "../pages/Seeker/SeekerPublicViewPage";
 import UnauthorizedPage from "../pages/UnauthorizedPage";
+import AdminDashboard from "../pages/Admin/AdminDashboard";
 
 const AppRoutes = () => (
   <Routes>
@@ -31,6 +32,7 @@ const AppRoutes = () => (
     <Route path="/contact" element={<ContactPage />} />
     <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
+    <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
     {/* Protected routes */}
     <Route

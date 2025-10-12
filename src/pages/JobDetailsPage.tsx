@@ -11,7 +11,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import HistoryIcon from "@mui/icons-material/History";
 import EventNoteIcon from "@mui/icons-material/EventNote";
-
+import { createReport } from "../services/APIs/APIs";
 // FILES
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
@@ -32,12 +32,12 @@ import {
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<saved_jobs | null>(null);
-  const { isAuthenticated } = useAuth();
-  const { userInfo } = useAuth();
+  const { isAuthenticated, userInfo } = useAuth();
   const [_, setSeekerID] = useState<number>(0);
   const [savedJob, setSavedJobs] = useState<number[]>([]);
   const [__, setAppliedJobs] = useState<Set<number>>(new Set());
 
+  // state for the Report dialog
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -48,14 +48,15 @@ const JobDetailsPage = () => {
       getJobDetails(id).then((data) => {
         if (data) {
           setJob(data);
-          console.log(data);
         } else setJob(null);
       });
     }
   }, [id]);
+
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
   }, [userInfo]);
+
   const tags = {
     salary: job?.SalaryRange,
     education: job?.EducationLevel,
@@ -129,13 +130,14 @@ const JobDetailsPage = () => {
         backgroundImage="/imgs/backgrounds/bg-2.jpg"
       />
       <div className="job-details-page-content">
+        {/* --- Top section with image & chips --- */}
         <Box className="job-details-page-section-1">
           <Box display={"flex"} flexDirection={"row"}>
             <Box
               sx={{
                 width: 150,
                 height: 150,
-                borderRadius: 2, // optional, use 0 for perfect square
+                borderRadius: 2,
                 backgroundImage: 'url("/imgs/grid/developing.jpg")',
                 backgroundSize: "cover",
                 backgroundPosition: "center",
@@ -151,7 +153,6 @@ const JobDetailsPage = () => {
               flexDirection={"column"}
             >
               <Typography variant="h4">{job.JobTitle}</Typography>
-              {/* <Typography variant="h5">{job.CompanyName}</Typography> */}
               <Typography
                 mb={2}
                 display="flex"
@@ -188,6 +189,7 @@ const JobDetailsPage = () => {
           </Box>
         </Box>
 
+        {/* --- Description and sidebar --- */}
         <Box
           className="job-details-page-section-1"
           display={"flex"}
@@ -204,8 +206,8 @@ const JobDetailsPage = () => {
               sx={{
                 "& ul": { pl: 5, lineHeight: 0.2, mb: 5 },
                 "& ol": { pl: 5, lineHeight: 0.2, mb: 5 },
-                "& li": { mb: 0.1 }, // reduces spacing between list items
-                "& p": { mb: 2 }, // spacing for paragraphs
+                "& li": { mb: 0.1 },
+                "& p": { mb: 2 },
                 "& strong": { fontWeight: 600 },
                 "& em": { fontStyle: "italic" },
                 "& h1, & h2, & h3, & h4, & h5, & h6": { mt: 2, mb: 2 },
@@ -218,7 +220,9 @@ const JobDetailsPage = () => {
               />
             </Box>
           </Box>
+
           <Box flex={1}>
+            {/* Save and Apply buttons */}
             <Box>
               <Button
                 variant="outlined"
@@ -238,6 +242,19 @@ const JobDetailsPage = () => {
                 Apply Now
               </Button>
             </Box>
+
+            {/* --- Report Icon Button under Save/Apply --- */}
+            <Box mt={2}>
+              <Button
+                onClick={handleOpen}
+                sx={{ gap: 1 }}
+                color="secondary"
+                startIcon={<ReportIcon />}
+              >
+                Report Problem
+              </Button>
+            </Box>
+
             <Box mt={5}>
               <Typography mb={2} variant="h4">
                 Job Overview
@@ -247,27 +264,22 @@ const JobDetailsPage = () => {
                   <WorkIcon fontSize="small" /> <strong>Job Type:</strong>{" "}
                   {job.JobType}
                 </Typography>
-
                 <Typography mb={1} display="flex" alignItems="center" gap={1}>
                   <CategoryIcon fontSize="small" />{" "}
                   <strong>Job Category:</strong> {tags.category}
                 </Typography>
-
                 <Typography mb={1} display="flex" alignItems="center" gap={1}>
                   <HistoryIcon fontSize="small" />{" "}
                   <strong>Job Experience:</strong> {tags.experince}
                 </Typography>
-
                 <Typography mb={1} display="flex" alignItems="center" gap={1}>
                   <SchoolIcon fontSize="small" />{" "}
                   <strong>Education Level:</strong> {tags.education}
                 </Typography>
-
                 <Typography mb={1} display="flex" alignItems="center" gap={1}>
                   <LocationOnIcon fontSize="small" /> <strong>Location:</strong>{" "}
                   {tags.location}
                 </Typography>
-
                 <Typography mb={1} display="flex" alignItems="center" gap={1}>
                   <MonetizationOnIcon fontSize="small" />{" "}
                   <strong>Salary:</strong> {tags.salary}
@@ -276,19 +288,9 @@ const JobDetailsPage = () => {
             </Box>
           </Box>
         </Box>
-        <Button onClick={handleOpen} sx={{ gap: 1 }}>
-          <ReportIcon sx={{ color: "secondary.main" }} />
-          <Typography color="secondary.light" variant="body2">
-            Report Problem
-          </Typography>
-        </Button>
-        {/* feed the job id from here */}
-        <ReportDialog
-          open={open}
-          onClose={handleClose}
-          mode={"job"}
-          id={job.JobId}
-        />
+
+        {/* Report dialog with job id */}
+        <ReportDialog open={open} onClose={handleClose} mode={"employer"} id={job.JobId} />
       </div>
       <FooterSection_1 />
     </div>
