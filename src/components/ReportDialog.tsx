@@ -22,31 +22,29 @@ const categories = ["spam", "harassment", "other"];
 const ReportDialog: React.FC<ReportDialogProps> = ({
   open,
   onClose,
-  mode,
-  id,
-}) => {
-  const [category, setCategory] = useState("spam");
+}: // mode,
+// id,
+ReportDialogProps) {
+  const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [_, setUserID] = useState();
+  const { userInfo } = useAuth();
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      await createReport({
-        ReportedType: mode,
-        ReportedId: id,
-        ReportCategory: category,
-        Description: description,
-      });
-      alert("Report submitted. Thank you!");
-      setDescription("");
-      setCategory("spam");
-      onClose();
-    } catch (err) {
-      alert("Failed to submit report. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
+  }, [userInfo]);
+
+  const handleSubmit = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    console.log("Report submitted:", { reason, description });
+    setConfirmOpen(false);
+    onClose();
+    setReason("");
+    setDescription("");
   };
 
   return (

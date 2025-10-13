@@ -119,7 +119,7 @@ const SignupPage = () => {
       //setSubmitting(false);
     }
   };
-
+ 
   // const handleGoogleSignUp = async () => {
   //   await setPersistence(auth, browserLocalPersistence);
   //   const provider = new GoogleAuthProvider();

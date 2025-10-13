@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Box, Tabs, Tab, Button } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Button,
+  useMediaQuery,
+  Select,
+  MenuItem,
+  FormControl,
+  InputAdornment,
+} from "@mui/material";
 import { useSearchParams } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import { Menu } from "@mui/icons-material";
 
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
@@ -17,6 +29,9 @@ const EmployerProfilePage = () => {
   const tabFromUrl = Number(searchParams.get("tab")) || 0;
 
   const [selectedTab, setSelectedTab] = useState(tabFromUrl);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [breadcrumb, setBreadcrumb] = useState({
     title: "My Profile",
@@ -113,6 +128,12 @@ const EmployerProfilePage = () => {
     }
   };
 
+  const handleDropdownChange = (event: any) => {
+    const newValue = event.target.value;
+    setSelectedTab(newValue);
+    setSearchParams({ tab: newValue.toString() });
+  };
+
   return (
     <div>
       <Header_2 />
@@ -124,72 +145,109 @@ const EmployerProfilePage = () => {
 
       <div className="employer-profile-page-container">
         {/* Left Side - Tabs */}
-        <Box
-          className="employer-profile-left-side"
-          sx={{
-            width: "20%",
-            bgcolor: "secondary.light",
-            borderRadius: "10px",
-            padding: 2,
-            margin: "50px 10px 30px 90px",
-            height: "600px",
-            // border: 1,
-          }}
-        >
-          <Tabs
-            orientation="vertical"
-            value={selectedTab}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
+        {!isMobile && (
+          <Box
+            className="employer-profile-left-side"
+            sx={{
+              width: "20%",
+              bgcolor: "secondary.light",
+              borderRadius: "10px",
+              padding: 2,
+              margin: "50px 10px 30px 90px",
+              height: "600px",
+              // border: 1,
+            }}
           >
-            <Tab
-              label="My Profile"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="Manage Candidates"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="Posted Jobs"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="Notifications"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="Pending Approvals"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="Manage Editors"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-          </Tabs>
+            <Tabs
+              orientation="vertical"
+              value={selectedTab}
+              onChange={handleTabChange}
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab
+                label="My Profile"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Manage Candidates"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Posted Jobs"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Notifications"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Pending Approvals"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Manage Editors"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+            </Tabs>
 
-          <Button sx={{ mt: 5 }} fullWidth variant="contained">
-            Start Head Hunting
-          </Button>
-          <button className="glow-on-hover" type="button">
-            Upgrade today !
-          </button>
-        </Box>
+            <Button sx={{ mt: 5 }} fullWidth variant="contained">
+              Start Head Hunting
+            </Button>
+            <button className="glow-on-hover" type="button">
+              Upgrade today !
+            </button>
+          </Box>
+        )}
 
         {/* Right Side - Tab Content */}
+
         <Box
           className="employer-profile-right-side"
           sx={{
-            width: "60%",
+            width: { xs: "100%", md: "60%" },
             flexGrow: 1,
-            padding: 3,
+            padding: { xs: 2, md: 3 },
             backgroundColor: "white",
             borderRadius: "10px",
             minHeight: "400px",
-            margin: "50px 90px 30px 30px",
+            margin: {
+              xs: "20px auto", // center on small screens
+              md: "50px 90px 30px 30px", // original desktop margins
+            },
           }}
         >
+          {/* Dropdown (only on mobile) */}
+          {isMobile && (
+            <FormControl
+              fullWidth
+              size="small"
+              sx={{
+                marginBottom: 2,
+                width: "calc(100% - 20px)",
+                ml: "10px",
+                mr: "10px",
+              }}
+            >
+              <Select
+                value={selectedTab}
+                onChange={handleDropdownChange}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Menu sx={{ color: "text.secondary", mr: 1 }} />
+                  </InputAdornment>
+                }
+              >
+                <MenuItem value={0}>My Profile</MenuItem>
+                <MenuItem value={1}>Manage Candidates</MenuItem>
+                <MenuItem value={2}>Posted Jobs</MenuItem>
+                <MenuItem value={3}>Notifications</MenuItem>
+                <MenuItem value={4}>Pending Approvals</MenuItem>
+                <MenuItem value={5}>Manage Editors</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
           {renderTabContent()}
         </Box>
       </div>

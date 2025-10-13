@@ -69,7 +69,7 @@ const ManageCandidatesTab = () => {
 
   // ✅ Update status handler
   const handleStatusUpdate = async (
-    applicationId: string,
+    applicationId: number,
     newStatus: string
   ) => {
     try {
@@ -82,15 +82,11 @@ const ManageCandidatesTab = () => {
       setAppliedCandidates((prev) => {
         if (newStatus === "Rejected") {
           // ❌ Remove rejected candidate
-          return prev.filter(
-            (a) => a.ApplicationId.toString() !== applicationId
-          );
+          return prev.filter((a) => a.ApplicationId !== applicationId);
         } else {
           // ✅ Update status for Reviewed / Selected (or other statuses)
           return prev.map((a) =>
-            a.ApplicationId.toString() === applicationId
-              ? { ...a, Status: newStatus }
-              : a
+            a.ApplicationId === applicationId ? { ...a, Status: newStatus } : a
           );
         }
       });
@@ -145,7 +141,7 @@ const ManageCandidatesTab = () => {
                   ":hover": { backgroundColor: "error.main", opacity: 1 },
                 }}
                 onClick={() =>
-                  handleStatusUpdate(job.ApplicationId.toString(), "Rejected")
+                  handleStatusUpdate(job.ApplicationId, "Rejected")
                 }
               >
                 <PersonRemoveAlt1Icon sx={{ mr: 1 }} />
@@ -166,7 +162,7 @@ const ManageCandidatesTab = () => {
                   ":hover": { backgroundColor: "success.main", opacity: 1 },
                 }}
                 onClick={() =>
-                  handleStatusUpdate(job.ApplicationId.toString(), "Selected")
+                  handleStatusUpdate(job.ApplicationId, "Selected")
                 }
               >
                 <Done sx={{ mr: 1 }} />

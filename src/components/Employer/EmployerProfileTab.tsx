@@ -69,8 +69,8 @@ const EmployerProfileTab = () => {
     <div className="employer-profile-tab-container">
       <div className="employer-profile-tab-content">
         {/* section */}
-        <div className="create-ac-form-section">
-          <div className="fs-profile-image-container">
+        <div className="emp-create-ac-form-section">
+          <div className="emp-fs-profile-image-container">
             <Box position="relative" display="inline-block">
               <Avatar
                 className="fs-profile-image"
@@ -80,7 +80,7 @@ const EmployerProfileTab = () => {
               />
             </Box>
           </div>
-          <div className="fs-text-inputs-1">
+          <div className="emp-fs-text-inputs-1">
             <TextField
               label="Company name"
               disabled
@@ -99,7 +99,7 @@ const EmployerProfileTab = () => {
               size="small"
             />
           </div>
-          <div className="fs-text-inputs-1">
+          <div className="emp-fs-text-inputs-1">
             <TextField
               label="Phone number"
               disabled
@@ -161,7 +161,7 @@ const EmployerProfileTab = () => {
         </div>
 
         {/* section */}
-        <div className="create-ac-form-section">
+        <div className="emp-create-ac-form-section">
           <Box className="seeker-video-container" sx={{ marginBottom: 3 }}>
             <Typography variant="h6" color="secondary.main" gutterBottom>
               Cover Video

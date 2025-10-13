@@ -109,7 +109,7 @@ const RecentJobsSection = () => {
                     {job.Description
                       ? job.Description.replace(/<\/?[^>]+(>|$)/g, "").slice(
                           0,
-                          150
+                          50
                         ) + "..."
                       : ""}
                   </Typography>
@@ -122,13 +122,13 @@ const RecentJobsSection = () => {
                       variant="outlined"
                     />
                   )}
-                  {job.EducationLevel && (
+                  {/* {job.EducationLevel && (
                     <Chip
                       variant="outlined"
                       size="small"
                       label={job.EducationLevel}
                     />
-                  )}
+                  )} */}
                   {job.Location && (
                     <Chip
                       variant="outlined"

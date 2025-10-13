@@ -29,3 +29,11 @@
 .employer-profile-page-container {
   display: flex;
 }
+
+@media (max-width: 600px) {
+  .p-j-form-row {
+    flex-direction: column;
+  }
+}
+
+/* ---------------------------------- employer profile page --------------------------- */

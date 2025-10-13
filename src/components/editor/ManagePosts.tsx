@@ -14,8 +14,6 @@ import {
   Chip,
   CircularProgress,
   Badge,
-  IconButton,
-  useMediaQuery,
 } from "@mui/material";
 import {
   Delete,
@@ -32,12 +30,10 @@ import {
   editJob,
   getCandidatesOfJob,
   applicationStatusUpdate,
-  updateJobPost,
 } from "../../services/APIs/APIs";
-import ApplicantsDialog from "./ApplicationsDialog";
-import { useNotification } from "../../context/NotificationsProvider";
+import ApplicantsDialog from "../Employer/ApplicationsDialog";
 
-const PostedJobs = () => {
+const ManagePosts = () => {
   const [jobs, setJobs] = useState<EMP_POSTED_JOBS[]>([]);
   const [loading, setLoading] = useState(true);
   const { userInfo } = useAuth();
@@ -45,13 +41,10 @@ const PostedJobs = () => {
   const [applicationCounts, setApplicationCounts] = useState<{
     [jobId: string]: number;
   }>({});
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   const [openApplicantsDialog, setOpenApplicantsDialog] = useState(false);
   const [selectedJobCandidates, setSelectedJobCandidates] = useState<any[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
-
-  const { notify } = useNotification();
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -90,45 +83,28 @@ const PostedJobs = () => {
     fetchJobs();
   }, [userInfo]);
 
-  const handleClose = async (id: number, title: string) => {
-    // try {
-    //   // Find the job that needs to be updated
-    //   const jobToUpdate = jobs.find((job) => job.JobId === id);
-    //   if (!jobToUpdate) return;
-
-    //   // Create updated job object with status = Closed
-    //   const updatedJob = { ...jobToUpdate, Status: "Closed" };
-
-    //   // Call API to update the job
-    //   await editJob(id.toString(), updatedJob);
-
-    //   // Update state locally
-    //   setJobs((prevJobs) =>
-    //     prevJobs.map((job) =>
-    //       job.JobId === id ? { ...job, Status: "Closed" } : job
-    //     )
-    //   );
-
-    //   console.log(`Job ${id} closed successfully`);
-    // } catch (err) {
-    //   console.error("Failed to close job:", err);
-    // }
-
+  const handleClose = async (id: number) => {
     try {
-      // Call the API to update the status
-      await updateJobPost(id, {
-        Status: "Closed",
-      });
+      // Find the job that needs to be updated
+      const jobToUpdate = jobs.find((job) => job.JobId === id);
+      if (!jobToUpdate) return;
 
+      // Create updated job object with status = Closed
+      const updatedJob = { ...jobToUpdate, Status: "Closed" };
+
+      // Call API to update the job
+      await editJob(id.toString(), updatedJob);
+
+      // Update state locally
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
           job.JobId === id ? { ...job, Status: "Closed" } : job
         )
       );
 
-      notify(title + " closed for applications", "success");
-    } catch (error) {
-      console.error("Failed to update candidate status:", error);
+      console.log(`Job ${id} closed successfully`);
+    } catch (err) {
+      console.error("Failed to close job:", err);
     }
   };
 
@@ -172,15 +148,9 @@ const PostedJobs = () => {
           mb: 3,
         }}
       >
-        <Typography variant="h6">Manage Jobs ({jobs.length})</Typography>
-        <Button
-          variant="contained"
-          color="secondary"
-          sx={{ borderRadius: 2, textTransform: "none" }}
-          onClick={BrowsePostJob}
-        >
-          Post a New Job
-        </Button>
+        <Typography variant="h6">
+          Manage Job Openings ({jobs.length})
+        </Typography>
       </Box>
 
       {loading ? (
@@ -261,130 +231,66 @@ const PostedJobs = () => {
                   />
                   <ListItemSecondaryAction>
                     <Stack direction="row" spacing={1}>
-                      {isMobile ? (
-                        <>
-                          <IconButton
-                            onClick={() => handleview(job.JobId)}
-                            color="secondary"
-                          >
-                            <RemoveRedEye />
-                          </IconButton>
+                      <Button
+                        size="small"
+                        sx={{ color: "secondary.main" }}
+                        startIcon={<RemoveRedEye />}
+                        onClick={() => handleview(job.JobId)}
+                      >
+                        Preview
+                      </Button>
 
-                          <Badge
-                            badgeContent={applicationCounts[job.JobId] || 0}
-                            color="primary"
-                            overlap="circular"
-                          >
-                            <IconButton
-                              onClick={() => handleApplicants(job.JobId)}
-                              color="secondary"
-                            >
-                              <DocumentScanner />
-                            </IconButton>
-                          </Badge>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="small"
-                            sx={{ color: "secondary.main" }}
-                            startIcon={<RemoveRedEye />}
-                            onClick={() => handleview(job.JobId)}
-                          >
-                            Preview
-                          </Button>
-
-                          <Badge
-                            badgeContent={applicationCounts[job.JobId] || 0}
-                            color="primary"
-                            overlap="circular"
-                          >
-                            <Button
-                              size="small"
-                              sx={{ color: "secondary.main" }}
-                              startIcon={<DocumentScanner />}
-                              onClick={() => handleApplicants(job.JobId)}
-                            >
-                              Applicants
-                            </Button>
-                          </Badge>
-                        </>
-                      )}
+                      <Badge
+                        badgeContent={applicationCounts[job.JobId] || 0}
+                        color="primary"
+                        overlap="circular"
+                      >
+                        <Button
+                          size="small"
+                          sx={{ color: "secondary.main" }}
+                          startIcon={<DocumentScanner />}
+                          onClick={() => handleApplicants(job.JobId)}
+                        >
+                          Applicants
+                        </Button>
+                      </Badge>
                     </Stack>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        size="small"
+                        color="warning"
+                        startIcon={<Cancel />}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to close this post?"
+                            )
+                          ) {
+                            handleClose(job.JobId);
+                          }
+                        }}
+                        disabled={job.Status === "Closed"}
+                      >
+                        Close Post
+                      </Button>
 
-                    <Stack direction="row" spacing={1} marginBottom={4}>
-                      {isMobile ? (
-                        <>
-                          <IconButton
-                            color="warning"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to close this post?"
-                                )
-                              ) {
-                                handleClose(job.JobId, job.JobTitle);
-                              }
-                            }}
-                            disabled={job.Status === "Closed"}
-                          >
-                            <Cancel />
-                          </IconButton>
-
-                          <IconButton
-                            color="error"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to delete this post?"
-                                )
-                              ) {
-                                handleDelete(job.JobId);
-                              }
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="small"
-                            color="warning"
-                            startIcon={<Cancel />}
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to close this post?"
-                                )
-                              ) {
-                                handleClose(job.JobId, job.JobTitle);
-                              }
-                            }}
-                            disabled={job.Status === "Closed"}
-                          >
-                            Close Post
-                          </Button>
-
-                          <Button
-                            size="small"
-                            color="error"
-                            variant="outlined"
-                            startIcon={<Delete />}
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to delete this post?"
-                                )
-                              ) {
-                                handleDelete(job.JobId);
-                              }
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </>
-                      )}
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        startIcon={<Delete />}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              "Are you sure you want to delete this post?"
+                            )
+                          ) {
+                            handleDelete(job.JobId);
+                          }
+                        }}
+                      >
+                        Delete
+                      </Button>
                     </Stack>
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -422,4 +328,4 @@ const PostedJobs = () => {
   );
 };
 
-export default PostedJobs;
+export default ManagePosts;

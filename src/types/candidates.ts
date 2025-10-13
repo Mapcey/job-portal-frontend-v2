@@ -7,5 +7,6 @@ export interface candidate {
   Status: string;
   ApplicantName: string;
   AppliedDateTime: string;
+
   SeekerId: number;
 }

@@ -6,6 +6,9 @@
 @import "./pages/Seeker/_Styles.css";
 @import "./pages/Employer/_Styles.css";
 
+@import "./pages/Editor/_Styles.css";
+@import "./components/editor/_Styles.css";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

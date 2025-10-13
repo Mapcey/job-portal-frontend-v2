@@ -89,6 +89,7 @@ const PostJob = () => {
           <div className="post-job-content-section-1">
             <div className="p-j-form-row">
               <TextField
+                fullWidth
                 name="JobTitle"
                 label="Job Title"
                 variant="outlined"
@@ -102,6 +103,7 @@ const PostJob = () => {
               />
 
               <Autocomplete
+                fullWidth
                 options={sriLankaCities}
                 value={formData.Location}
                 className="text-input-3"
@@ -121,6 +123,7 @@ const PostJob = () => {
             </div>
             <div className="p-j-form-row">
               <TextField
+                fullWidth
                 select
                 name="JobCategory"
                 label="Job Category"
@@ -140,6 +143,7 @@ const PostJob = () => {
                 ))}
               </TextField>
               <TextField
+                fullWidth
                 select
                 name="JobType"
                 label="Job Type"
@@ -162,6 +166,7 @@ const PostJob = () => {
 
             <div className="p-j-form-row">
               <TextField
+                fullWidth
                 select
                 name="EducationLevel"
                 label="Education Level"
@@ -179,16 +184,9 @@ const PostJob = () => {
                   </MenuItem>
                 ))}
               </TextField>
-              {/* <TextField
-                label="Professional Experience"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-              /> */}
 
               <TextField
+                fullWidth
                 select
                 name="ProfExperience"
                 label="Professional Experience"
@@ -198,7 +196,6 @@ const PostJob = () => {
                 sx={{ mr: 5, mt: 3 }}
                 value={formData.ProfExperience}
                 onChange={handleChange}
-                fullWidth
               >
                 {[
                   "No experience",
@@ -216,6 +213,7 @@ const PostJob = () => {
             </div>
             <div className="p-j-form-row">
               <TextField
+                fullWidth
                 select
                 name="Languages"
                 label="Prefered Languages"
@@ -234,6 +232,7 @@ const PostJob = () => {
                 ))}
               </TextField>
               <TextField
+                fullWidth
                 select
                 name="SalaryRange"
                 label="Salary Rage"
@@ -253,19 +252,8 @@ const PostJob = () => {
               </TextField>
             </div>
             <div className="p-j-form-row">
-              {/* <TextField
-                name="WorkType"
-                label="Wrok Type"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                value={formData.WorkType}
-                onChange={handleChange}
-              /> */}
-
               <TextField
+                fullWidth
                 select
                 name="WorkType" // ✅ match the formData key exactly
                 label="Work Type"
@@ -304,6 +292,7 @@ const PostJob = () => {
                       sx: { mr: 5, mt: 3 },
                       required: true,
                       className: "text-input-3",
+                      fullWidth: true,
                     },
                   }}
                 />
@@ -321,20 +310,6 @@ const PostJob = () => {
 
         {/* section */}
         <div className="post-job-content-section-1">
-          {/* <TextField
-            name="Description"
-            id="outlined-multiline-static"
-            label="Add a Detailed Description"
-            placeholder="Add a detailed summery of yor experience."
-            multiline
-            rows={6}
-            className="text-input-3"
-            size="small"
-            sx={{ width: "100%" }}
-            value={formData.Description || ""}
-            onChange={handleChange}
-          /> */}
-
           <RichTextBox
             value={formData.Description}
             onChange={(val) =>
