@@ -8,6 +8,7 @@ import {
   SEEKER_DATA,
   Skill,
   seekerFiles,
+  EDITOR_DATA
 } from "../../types/users";
 import {
   saved_jobs,
@@ -269,7 +270,7 @@ export const getAllEmployer = async (id: string) => {
 // get all application for an employer
 export const getAllCandidates = async (employerId: string) => {
   const response = await axiosInstance.get(
-    `jobs/employer/${employerId}/applications`
+    `jobs/employer/${employerId}/all_applications`
   );
   return response.data;
 };
@@ -300,11 +301,42 @@ export const updateEmployerNotification = async (
   await axiosInstance.put(`/employer/${id}/notifications/${notificationId}`);
 };
 
+export const updateJobPost = async (
+  job_id: number,
+  data: any
+) => {
+  await axiosInstance.put(`/jobs/${job_id}`, data);
+};
+
 // get application under a job post
+// export const getCandidatesOfJob = async (JobID: number) => {
+//   const response = await axiosInstance.get(`jobs/employer/${JobID}/applications`);
+//   return response.data;
+// };
+
 export const getCandidatesOfJob = async (JobID: number) => {
   const response = await axiosInstance.get(`jobs/${JobID}/applications`);
   return response.data;
 };
+
+// create a new editor
+export const createNewEditor = async ( data: any) => {
+  const response = await axiosInstance.post(`/editors/`, data);
+  return response.data;
+};
+
+// get editors of a employer
+export const getEditors = async (employer_id: number) => {
+  const response = await axiosInstance.get(`editors/employers/${employer_id}/editors`);
+  return response.data;
+};
+
+// editor login
+export const editorLogin = async () => {
+  const response = await axiosInstance.post(`/editors/login`);
+  return response.data;
+};
+
 
 // ------------------JOB DETAILS -------------------
 

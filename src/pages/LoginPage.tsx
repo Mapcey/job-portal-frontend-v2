@@ -184,7 +184,15 @@ const LoginPage = () => {
           >
             Sign Up
           </Button>
+  
         </Typography>
+                  <Button
+            variant="text"
+            color="primary"
+            onClick={() => navigate("/editor_login")}
+          >
+            Editor Login
+          </Button>
       </div>
     </Container>
   );

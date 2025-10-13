@@ -35,6 +35,20 @@ export interface SEEKER_DATA {
   skills?: Skill[];
   languages?: languages[];
 }
+
+export interface EDITOR_DATA {
+  EditorId: number;
+  FirebaseUID: string;
+  EmployerId: number;
+  Email: string;
+  FirstName: string;
+  LastName: string;
+  ContactNo: string;
+  Active: true;
+  CreatedDateTime: Date;
+  CreatedBy: number;
+}
+
 export interface Career {
   id: number;
   Designation: string;
@@ -64,12 +78,12 @@ export interface Skill {
   ExpertLevel: string;
 }
 
-export interface languages{
+export interface languages {
   id: number;
   Language: string;
   ExpertLevel: string;
 }
-export interface seekerFiles{
+export interface seekerFiles {
   id: number;
   user_id: number;
   file_name: string;
@@ -77,4 +91,3 @@ export interface seekerFiles{
   uploaded_at: Date;
   file_type: string;
 }
-

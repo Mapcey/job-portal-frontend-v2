@@ -82,6 +82,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log("presist");
 
+      console.log(user);
+      
       if (user) {
         const token = await user.getIdToken();
         setFirebaseUser(user);

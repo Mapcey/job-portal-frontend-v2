@@ -144,6 +144,8 @@ const Header_2 = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
     console.log("is auth", isAuthenticated);
+    console.log("token", );
+    
   };
 
   const handleNavigate = (path: string) => {

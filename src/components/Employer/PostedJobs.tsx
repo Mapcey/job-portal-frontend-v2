@@ -32,8 +32,10 @@ import {
   editJob,
   getCandidatesOfJob,
   applicationStatusUpdate,
+  updateJobPost,
 } from "../../services/APIs/APIs";
 import ApplicantsDialog from "./ApplicationsDialog";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const PostedJobs = () => {
   const [jobs, setJobs] = useState<EMP_POSTED_JOBS[]>([]);
@@ -48,6 +50,8 @@ const PostedJobs = () => {
   const [openApplicantsDialog, setOpenApplicantsDialog] = useState(false);
   const [selectedJobCandidates, setSelectedJobCandidates] = useState<any[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+
+  const { notify } = useNotification();
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -86,28 +90,45 @@ const PostedJobs = () => {
     fetchJobs();
   }, [userInfo]);
 
-  const handleClose = async (id: number) => {
+  const handleClose = async (id: number, title: string) => {
+    // try {
+    //   // Find the job that needs to be updated
+    //   const jobToUpdate = jobs.find((job) => job.JobId === id);
+    //   if (!jobToUpdate) return;
+
+    //   // Create updated job object with status = Closed
+    //   const updatedJob = { ...jobToUpdate, Status: "Closed" };
+
+    //   // Call API to update the job
+    //   await editJob(id.toString(), updatedJob);
+
+    //   // Update state locally
+    //   setJobs((prevJobs) =>
+    //     prevJobs.map((job) =>
+    //       job.JobId === id ? { ...job, Status: "Closed" } : job
+    //     )
+    //   );
+
+    //   console.log(`Job ${id} closed successfully`);
+    // } catch (err) {
+    //   console.error("Failed to close job:", err);
+    // }
+
     try {
-      // Find the job that needs to be updated
-      const jobToUpdate = jobs.find((job) => job.JobId === id);
-      if (!jobToUpdate) return;
+      // Call the API to update the status
+      await updateJobPost(id, {
+        Status: "Closed",
+      });
 
-      // Create updated job object with status = Closed
-      const updatedJob = { ...jobToUpdate, Status: "Closed" };
-
-      // Call API to update the job
-      await editJob(id.toString(), updatedJob);
-
-      // Update state locally
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
           job.JobId === id ? { ...job, Status: "Closed" } : job
         )
       );
 
-      console.log(`Job ${id} closed successfully`);
-    } catch (err) {
-      console.error("Failed to close job:", err);
+      notify(title + " closed for applications", "success");
+    } catch (error) {
+      console.error("Failed to update candidate status:", error);
     }
   };
 
@@ -302,7 +323,7 @@ const PostedJobs = () => {
                                   "Are you sure you want to close this post?"
                                 )
                               ) {
-                                handleClose(job.JobId);
+                                handleClose(job.JobId, job.JobTitle);
                               }
                             }}
                             disabled={job.Status === "Closed"}
@@ -337,7 +358,7 @@ const PostedJobs = () => {
                                   "Are you sure you want to close this post?"
                                 )
                               ) {
-                                handleClose(job.JobId);
+                                handleClose(job.JobId, job.JobTitle);
                               }
                             }}
                             disabled={job.Status === "Closed"}
