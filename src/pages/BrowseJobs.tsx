@@ -172,10 +172,15 @@ const BrowseJobs = () => {
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
 
       {/* Breadcrumb / Hero section */}
+
       <Breadcrumb
         title="Browse Jobs"
         description="Find your dream job here"
         backgroundImage="/imgs/backgrounds/bg-5.jpeg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "Jobs" },
+        ]}
       />
 
       {/* Main layout: filters on the left, jobs on the right */}

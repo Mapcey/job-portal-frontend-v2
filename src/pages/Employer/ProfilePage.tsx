@@ -63,7 +63,7 @@ const EmployerProfilePage = () => {
     switch (selectedTab) {
       case 0:
         setBreadcrumb({
-          title: "Employer > Profile",
+          title: "Employer Profile",
           desc: "Manage your personal information and experience.",
         });
         break;
@@ -137,10 +137,16 @@ const EmployerProfilePage = () => {
   return (
     <div>
       <Header_2 />
-      <Breadcrumb
+
+
+        <Breadcrumb
         title={breadcrumb.title}
         description={breadcrumb.desc}
         backgroundImage="/imgs/backgrounds/bg-1.jpg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "Profile" },
+        ]}
       />
 
       <div className="employer-profile-page-container">

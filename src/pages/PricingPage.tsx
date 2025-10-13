@@ -58,10 +58,16 @@ const PricingPage = () => {
   return (
     <div>
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
-      <Breadcrumb
-        title={"Pricing"}
-        description={"Description about pricing pages"}
-        backgroundImage={"/imgs/backgrounds/bg-6.jpg"}
+
+
+            <Breadcrumb
+        title="Pricing"
+        description="Description about pricing pages"
+        backgroundImage="/imgs/backgrounds/bg-6.jpg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "Pricing" },
+        ]}
       />
       <Container sx={{ py: 8 }} maxWidth="lg">
         <Grid container spacing={4}>

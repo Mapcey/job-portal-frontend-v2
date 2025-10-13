@@ -339,7 +339,7 @@ const SeekerPublicViewPage = () => {
         <ReportDialog
           open={open}
           onClose={handleClose}
-          mode="seeker"
+          mode="job"
           id={seeker.UserId}
         />
       </Box>

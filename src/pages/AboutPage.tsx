@@ -17,11 +17,17 @@ const AboutPage = () => {
   return (
     <div>
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
+
       <Breadcrumb
-        title={"About Us"}
-        description={"this is the page description"}
-        backgroundImage={"imgs/backgrounds/bg-7.jpg"}
+        title="About Us"
+        description="this is the page description"
+        backgroundImage="imgs/backgrounds/bg-7.jpg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "About" },
+        ]}
       />
+      
       <Box sx={{ backgroundColor: "#fafafa", py: 8 }}>
         <Container maxWidth="lg">
           {/* Introduction */}

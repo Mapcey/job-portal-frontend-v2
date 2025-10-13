@@ -26,11 +26,17 @@ const ContactPage = () => {
   return (
     <div>
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
+
       <Breadcrumb
-        title={"Contact"}
-        description={"page description here"}
-        backgroundImage={"/imgs/backgrounds/bg-8.jpg"}
+        title="Contact"
+        description="page description here"
+        backgroundImage="/imgs/backgrounds/bg-8.jpg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "Jobs" },
+        ]}
       />
+
       <div className="contact-page-content">
         <Box sx={{ backgroundColor: "#fafafa", py: 8 }}>
           <Container maxWidth="lg">

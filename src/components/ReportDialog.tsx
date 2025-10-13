@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,6 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { createReport } from "../services/APIs/APIs";
+import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
   open: boolean;
@@ -22,14 +23,16 @@ const categories = ["spam", "harassment", "other"];
 const ReportDialog: React.FC<ReportDialogProps> = ({
   open,
   onClose,
-}: // mode,
-// id,
-ReportDialogProps) {
+   mode,
+  id,
+}) => {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [_, setUserID] = useState();
   const { userInfo } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("spam");
 
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);

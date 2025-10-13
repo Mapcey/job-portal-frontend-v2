@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Box, Tabs, Tab, Button } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Button,
+  Typography,
+  MenuItem,
+  Select,
+  useMediaQuery,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
@@ -12,13 +22,16 @@ import { useAuth } from "../../context/AuthContext";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
-
+import FooterSection_1 from "../../components/footer/FooterSection_1";
 // import Loading from "../../components/Loading";
-
+ 
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const { userInfo } = useAuth();
   const [latestVideo, setLatestVideo] = useState<any>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   // Fetch latest video file for seeker
   useEffect(() => {
     const fetchVideo = async () => {
@@ -87,86 +100,24 @@ const SeekerProfilePage = () => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 0:
-        return <SeekerProfileTab />;
-      case 1:
-        return <SavedJobsTab />;
-      case 2:
-        return <NotificationsTab />;
-      case 3:
-        return <ManageApplicationsTab />;
-      default:
-        return null;
-    }
-  };
+         return (
+        <Box>
+          <SeekerProfileTab />
 
-  return (
-    <div>
-      <Header_2 />
-      <Breadcrumb
-        title={breadcrumb.title}
-        description={breadcrumb.desc}
-        backgroundImage="/imgs/backgrounds/bg-1.jpg"
-      />
-
-      <div className="seeker-profile-page-container">
-        {/* Left Side - Tabs */}
-        <Box
-          className="seeker-profile-left-side"
-          sx={{
-            width: "20%",
-            bgcolor: "white",
-            borderRadius: "10px",
-            padding: 2,
-            margin: "50px 10px 30px 90px",
-            height: "600px",
-          }}
-        >
-          <Tabs
-            orientation="vertical"
-            value={selectedTab}
-            onChange={handleTabChange}
-            textColor="primary"
-            indicatorColor="primary"
-          >
-            <Tab
-              label="My Profile"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-              }}
-            />
-            <Tab
-              label="Saved Jobs"
-              sx={{
-                color: "secondary.main",
-                alignItems: "flex-start",
-              }}
-            />
-            <Tab
-              label="Notifications"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-            <Tab
-              label="My Applications"
-              sx={{ color: "secondary.main", alignItems: "flex-start" }}
-            />
-          </Tabs>
-
-
+          {/* Video section below profile tab */}
           <Box
             className="seeker-video-container"
             sx={{
-              marginTop: 2,
-              marginBottom: 3,
-              width: 300,        // fixed width for uniformity
-              height: 200,       // fixed height for box shape
-              borderRadius: 2,   // border radius
-              overflow: "hidden", // ensures video fits inside rounded corners
-              boxShadow: 3,       // optional shadow
+              marginTop: 4,
+              width: "100%",
+              aspectRatio: "16/9",
+              borderRadius: 2,
+              overflow: "hidden",
+              boxShadow: 4,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: "#000", // fallback background
+              backgroundColor: "#000",
             }}
           >
             {latestVideo ? (
@@ -180,48 +131,129 @@ const SeekerProfilePage = () => {
                 }}
               />
             ) : (
-              <video
-                controls
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                }}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: "center", p: 2 }}
               >
-                <source src="/videos/self-intro.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+                No video available
+              </Typography>
             )}
           </Box>
+        </Box>
+      );
+      case 1:
+        return <SavedJobsTab />;
+      case 2:
+        return <NotificationsTab />;
+      case 3:
+        return <ManageApplicationsTab />;
+      default:
+        return null;
+    }
+  };
 
+return (
+    <div>
+      <Header_2 />
+      <Breadcrumb
+        title={breadcrumb.title}
+        description={breadcrumb.desc}
+        backgroundImage="/imgs/backgrounds/bg-1.jpg"
+      />
 
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => {
-              navigate("/jobs");
+      <div
+        className="seeker-profile-page-container"
+        style={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: isMobile ? "stretch" : "flex-start",
+          padding: isMobile ? "16px" : "0",
+        }}
+      >
+        {/* Tabs or Dropdown */}
+        {isMobile ? (
+          // Mobile Dropdown
+          <Box
+            sx={{
+              width: "100%",
+              backgroundColor: "white",
+              borderRadius: "10px",
+              padding: 2,
+              marginBottom: 2,
+              // boxShadow: 2,
             }}
           >
-            Browse Jobs
-          </Button>
-        </Box>
+            <Select
+              fullWidth
+              value={selectedTab}
+              onChange={(e) => setSelectedTab(Number(e.target.value))}
+              variant="outlined"
+            >
+              <MenuItem value={0}>My Profile</MenuItem>
+              <MenuItem value={1}>Saved Jobs</MenuItem>
+              <MenuItem value={2}>Notifications</MenuItem>
+              <MenuItem value={3}>My Applications</MenuItem>
+            </Select>
+          </Box>
+        ) : (
+          // Desktop Vertical Tabs
+          <Box
+            className="seeker-profile-left-side"
+            sx={{
+              width: "20%",
+              bgcolor: "white",
+              borderRadius: "10px",
+              padding: 2,
+              margin: "50px 10px 30px 90px",
+              height: "600px",
+              boxShadow: 3,
+            }}
+          >
+            <Tabs
+              orientation="vertical"
+              value={selectedTab}
+              onChange={handleTabChange}
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab label="My Profile" sx={{ alignItems: "flex-start" }} />
+              <Tab label="Saved Jobs" sx={{ alignItems: "flex-start" }} />
+              <Tab label="Notifications" sx={{ alignItems: "flex-start" }} />
+              <Tab label="My Applications" sx={{ alignItems: "flex-start" }} />
+            </Tabs>
 
-        {/* Right Side - Tab Content */}
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mt: 4 }}
+              onClick={() => {
+                navigate("/jobs");
+              }}
+            >
+              Browse Jobs
+            </Button>
+          </Box>
+        )}
+
+        {/* Right Side Content */}
         <Box
           className="seeker-profile-right-side"
           sx={{
-            width: "60%",
+            width: isMobile ? "100%" : "60%",
             flexGrow: 1,
             padding: 3,
             backgroundColor: "white",
             borderRadius: "10px",
             minHeight: "400px",
-            margin: "50px 90px 30px 30px",
+            margin: isMobile ? "0" : "50px 90px 30px 30px",
+            boxShadow: isMobile ? 2 : 0,
           }}
         >
           {renderTabContent()}
         </Box>
       </div>
+      <FooterSection_1 />
     </div>
   );
 };

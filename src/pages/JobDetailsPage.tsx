@@ -1,7 +1,10 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 
-import { Box, Typography, Button, Chip } from "@mui/material";
+import {
+  Box, Typography, Button, Chip, Stack, Paper, useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import WorkIcon from "@mui/icons-material/Work";
@@ -11,6 +14,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import HistoryIcon from "@mui/icons-material/History";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import {  Public } from "@mui/icons-material";
 import { createReport } from "../services/APIs/APIs";
 // FILES
 import Header_1 from "../components/header/Header_1";
@@ -29,6 +33,12 @@ import {
   addSavedJob,
 } from "../services/APIs/APIs";
 
+type OverviewItemProps = {
+  icon: ReactNode;
+  label: string;
+  value?: string | number | null;
+};
+
 const JobDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const [job, setJob] = useState<saved_jobs | null>(null);
@@ -37,11 +47,16 @@ const JobDetailsPage = () => {
   const [savedJob, setSavedJobs] = useState<number[]>([]);
   const [__, setAppliedJobs] = useState<Set<number>>(new Set());
 
+
   // state for the Report dialog
   const [open, setOpen] = useState(false);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
 
   useEffect(() => {
     if (id) {
@@ -124,92 +139,142 @@ const JobDetailsPage = () => {
   return (
     <div className="job-details-page-container">
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
-      <Breadcrumb
-        title="Job Details"
-        description="Explore the details of your selected job"
-        backgroundImage="/imgs/backgrounds/bg-2.jpg"
-      />
-      <div className="job-details-page-content">
+
+<Breadcrumb
+  title="Job Details"
+  description="Explore the details of your selected job."
+  backgroundImage="/imgs/backgrounds/bg-2.jpg"
+  path={[
+    { label: "Home", href: "/" },
+    { label: "Jobs", href: "/jobs" },
+    { label: "Job Details" },
+  ]}
+/>
+
+      <Box
+        className="job-details-page-content"
+        sx={{ p: { xs: 2, sm: 4, md: 6 }, maxWidth: "1200px", mx: "auto" }}
+      >
         {/* --- Top section with image & chips --- */}
-        <Box className="job-details-page-section-1">
-          <Box display={"flex"} flexDirection={"row"}>
-            <Box
+        <Box
+          className="job-details-page-section-1"
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "center", md: "flex-start" },
+            gap: { xs: 2, md: 4 },
+            mb: 4,
+          }}
+        >
+          {/* Job Image */}
+          <Box
+            sx={{
+              width: { xs: "100%", sm: 200 },
+              height: { xs: 180, sm: 200 },
+              borderRadius: 2,
+              backgroundImage: 'url("/imgs/grid/developing.jpg")',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Job title and type */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "40%" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant={isMobile ? "h5" : "h4"} fontWeight={600}>
+              {job.JobTitle}
+            </Typography>
+
+            <Typography
+              display="flex"
+              alignItems="center"
+              gap={1}
+              variant="subtitle1"
+              color="text.secondary"
+            >
+              <EventNoteIcon fontSize="small" />
+              Expire: {expiryDate.toLocaleDateString("en-GB")}{" "}
+              {daysLeft >= 0
+                ? `(${daysLeft} day${daysLeft > 1 ? "s" : ""} left)`
+                : "(Expired)"}
+            </Typography>
+
+            <Typography variant={isMobile ? "subtitle1" : "subtitle1"}              display="flex"
+              alignItems="center"
+              gap={1} mb={2} color="text.secondary">
+               <Public fontSize="small" />
+              {job.Location}, Sri Lanka
+            </Typography>
+
+            <Chip
+              label={job.JobType}
               sx={{
-                width: 150,
-                height: 150,
-                borderRadius: 2,
-                backgroundImage: 'url("/imgs/grid/developing.jpg")',
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                marginBottom: 2,
+                width: "fit-content",
+                color: "white",
+                backgroundColor: theme.palette.primary.main,
+                fontWeight: 500,
               }}
             />
-            <Box
-              width={"400px"}
-              display={"flex"}
-              ml={2}
-              mr={10}
-              flexDirection={"column"}
-            >
-              <Typography variant="h4">{job.JobTitle}</Typography>
-              <Typography
-                mb={2}
-                display="flex"
-                alignItems="center"
-                gap={1}
-                variant="subtitle1"
-              >
-                <EventNoteIcon fontSize="small" />
-                Expire: {expiryDate.toLocaleDateString("en-GB")}{" "}
-                {daysLeft >= 0
-                  ? `(${daysLeft} day${daysLeft > 1 ? "s" : ""} left)`
-                  : "(Expired)"}
-              </Typography>
-              <Chip
-                label={job.JobType}
-                sx={{ width: "100px", color: "white" }}
-              />
-            </Box>
-            <Box width={"40%"}>
-              {Object.entries(tags).map(([key, value]) => (
+          </Box>
+
+          {/* Tags section */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "40%" },
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: { xs: "center", md: "flex-start" },
+              mt: { xs: 2, md: 0 },
+            }}
+          >
+            {Object.entries(tags)
+              .filter(([_, value]) => value && value.trim() !== "")
+              .map(([key, value]) => (
                 <Chip
                   key={key}
-                  label={`${value}`}
+                  label={value}
                   variant="outlined"
                   color="primary"
                   sx={{
                     fontSize: "12px",
-                    marginBottom: "10px",
-                    marginRight: "10px",
+                    mb: 1,
+                    mr: 1,
                   }}
                 />
               ))}
-            </Box>
           </Box>
         </Box>
 
         {/* --- Description and sidebar --- */}
         <Box
-          className="job-details-page-section-1"
-          display={"flex"}
-          flexDirection={"row"}
+          className="job-details-page-section-2"
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: { xs: 3, md: 5 },
+          }}
         >
-          <Box flex={2} mr={"20px"}>
-            <Typography mb={2} variant="h5">
+          {/* Job Description */}
+          <Box flex={2}>
+            <Typography mb={2} variant="h5" fontWeight={600}>
               Job Description
             </Typography>
+
             <Box
-              bgcolor="#ffffffff"
+              bgcolor="#fff"
               borderRadius={3}
               p={2}
               sx={{
-                "& ul": { pl: 5, lineHeight: 0.2, mb: 5 },
-                "& ol": { pl: 5, lineHeight: 0.2, mb: 5 },
-                "& li": { mb: 0.1 },
-                "& p": { mb: 2 },
+                "& ul, & ol": { pl: 3 },
+                "& li": { mb: 1 },
+                "& p": { mb: 1.5 },
                 "& strong": { fontWeight: 600 },
-                "& em": { fontStyle: "italic" },
                 "& h1, & h2, & h3, & h4, & h5, & h6": { mt: 2, mb: 2 },
               }}
             >
@@ -221,30 +286,36 @@ const JobDetailsPage = () => {
             </Box>
           </Box>
 
+          {/* --- Sidebar --- */}
           <Box flex={1}>
-            {/* Save and Apply buttons */}
-            <Box>
+            {/* Buttons */}
+            <Box
+              display="flex"
+              flexDirection={{ xs: "column", sm: "row" }}
+              gap={2}
+              mb={2}
+            >
               <Button
                 variant="outlined"
-                sx={{ width: "47%", marginRight: "5%" }}
+                fullWidth
                 onClick={handleSaveJob}
                 disabled={savedJob.includes(job.JobId)}
+                startIcon={<FavoriteIcon />}
               >
-                <FavoriteIcon />
                 {savedJob.includes(job.JobId) ? "Saved" : "Save Job"}
               </Button>
 
               <Button
                 variant="contained"
-                sx={{ width: "47%" }}
+                fullWidth
                 onClick={() => handleApply(job)}
               >
                 Apply Now
               </Button>
             </Box>
 
-            {/* --- Report Icon Button under Save/Apply --- */}
-            <Box mt={2}>
+            {/* Report button */}
+            <Box mb={4}>
               <Button
                 onClick={handleOpen}
                 sx={{ gap: 1 }}
@@ -255,46 +326,79 @@ const JobDetailsPage = () => {
               </Button>
             </Box>
 
-            <Box mt={5}>
-              <Typography mb={2} variant="h4">
+            {/* Job Overview */}
+            <Box>
+              <Typography variant="h5" fontWeight={600} mb={3}>
                 Job Overview
               </Typography>
-              <Box p={2} borderRadius={2} bgcolor={"#ffffffff"}>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <WorkIcon fontSize="small" /> <strong>Job Type:</strong>{" "}
-                  {job.JobType}
-                </Typography>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <CategoryIcon fontSize="small" />{" "}
-                  <strong>Job Category:</strong> {tags.category}
-                </Typography>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <HistoryIcon fontSize="small" />{" "}
-                  <strong>Job Experience:</strong> {tags.experince}
-                </Typography>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <SchoolIcon fontSize="small" />{" "}
-                  <strong>Education Level:</strong> {tags.education}
-                </Typography>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <LocationOnIcon fontSize="small" /> <strong>Location:</strong>{" "}
-                  {tags.location}
-                </Typography>
-                <Typography mb={1} display="flex" alignItems="center" gap={1}>
-                  <MonetizationOnIcon fontSize="small" />{" "}
-                  <strong>Salary:</strong> {tags.salary}
-                </Typography>
-              </Box>
+
+              <Paper
+                elevation={2}
+                sx={{
+                  borderRadius: 3,
+                  p: 3,
+                  backgroundColor: "#fafafa",
+                }}
+              >
+                <Stack spacing={2.5}>
+                  <OverviewItem
+                    icon={<WorkIcon color="primary" />}
+                    label="Job Type"
+                    value={job.JobType}
+                  />
+                  <OverviewItem
+                    icon={<CategoryIcon color="primary" />}
+                    label="Category"
+                    value={tags.category}
+                  />
+                  <OverviewItem
+                    icon={<HistoryIcon color="primary" />}
+                    label="Experience"
+                    value={tags.experince}
+                  />
+                  <OverviewItem
+                    icon={<SchoolIcon color="primary" />}
+                    label="Education Level"
+                    value={tags.education}
+                  />
+                  <OverviewItem
+                    icon={<LocationOnIcon color="primary" />}
+                    label="Location"
+                    value={tags.location}
+                  />
+                  <OverviewItem
+                    icon={<MonetizationOnIcon color="primary" />}
+                    label="Salary"
+                    value={tags.salary}
+                  />
+                </Stack>
+              </Paper>
             </Box>
           </Box>
         </Box>
 
-        {/* Report dialog with job id */}
-        <ReportDialog open={open} onClose={handleClose} mode={"employer"} id={job.JobId} />
-      </div>
+        {/* Report dialog */}
+        <ReportDialog
+          open={open}
+          onClose={handleClose}
+          mode="employer"
+          id={job.JobId}
+        />
+      </Box>
+
       <FooterSection_1 />
     </div>
   );
 };
+
+// Helper subcomponent for clean layout
+const OverviewItem = ({ icon, label, value }: OverviewItemProps) => (
+  <Box display="flex" alignItems="center" gap={1.5}>
+    {icon}
+    <Typography variant="body1">
+      <strong>{label}:</strong> {value || "Not specified"}
+    </Typography>
+  </Box>
+);
 
 export default JobDetailsPage;
