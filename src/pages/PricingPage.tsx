@@ -19,13 +19,14 @@ import { useAuth } from "../context/AuthContext";
 const packages = [
   {
     title: "Basic",
-    price: "$29",
-    description: "Post up to 5 jobs per month with basic support.",
-    features: ["5 Job Posts", "Basic Support", "Visible for 30 days"],
+    price: "$20/month",
+    description: "For small businesses and occasional hiring needs",
+    features: ["Post up to 2 active job listings per month", "30-day visibility per job post", "Basic applicant tracking (view & download applications only)", "Standard job listing placement (no priority in search results)", "Access to basic employer dashboard (manage jobs and applications)"
+    ],
   },
   {
     title: "Standard",
-    price: "$59",
+    price: "$45/month",
     description: "Post up to 15 jobs per month with premium support.",
     features: [
       "15 Job Posts",
@@ -36,7 +37,7 @@ const packages = [
   },
   {
     title: "Premium",
-    price: "$99",
+    price: "$70/month",
     description: "Unlimited job postings with dedicated account manager.",
     features: [
       "Unlimited Posts",
@@ -60,7 +61,7 @@ const PricingPage = () => {
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
 
 
-            <Breadcrumb
+      <Breadcrumb
         title="Pricing"
         description="Description about pricing pages"
         backgroundImage="/imgs/backgrounds/bg-6.jpg"
