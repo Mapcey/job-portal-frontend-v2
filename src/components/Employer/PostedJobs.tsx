@@ -29,7 +29,7 @@ import { EMP_POSTED_JOBS } from "../../types/job";
 import {
   getEmployerPostedJobs,
   deleteJob,
-  editJob,
+  // editJob,
   getCandidatesOfJob,
   applicationStatusUpdate,
   updateJobPost,

@@ -6,7 +6,7 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  IconButton,
+  // IconButton,
   Divider,
   Dialog,
   DialogTitle,
@@ -14,7 +14,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import { notification } from "../../types/notification";

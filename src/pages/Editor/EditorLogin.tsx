@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 
-import { editorLogin } from "../../services/APIs/APIs";
+// import { editorLogin } from "../../services/APIs/APIs";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
+  // GoogleAuthProvider,
+  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
@@ -26,7 +26,7 @@ const EditorLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [_, setError] = useState("");
 
     const navigate = useNavigate();
     const { login } = useAuth();

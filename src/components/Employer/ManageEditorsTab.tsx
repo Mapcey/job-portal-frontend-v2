@@ -18,8 +18,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { useAuth } from "../../context/AuthContext";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-import { auth } from "../../firebase/config";
+// import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
+// import { auth } from "../../firebase/config";
 // import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
 import { createNewEditor, getEditors } from "../../services/APIs/APIs";
 import { useNotification } from "../../context/NotificationsProvider";
@@ -108,20 +108,22 @@ const ManageEditorsTab = () => {
       // }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
+      console.log('test');
+      
     }
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async (editor: EDITOR_DATA) => {
-    try {
-      // const updated = await updateEditorStatus(editor.id, !editor.isActive);
-      // setEditors((prev) =>
-      //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
-      // );
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+  // const handleToggleStatus = async (editor: EDITOR_DATA) => {
+  //   try {
+  //     // const updated = await updateEditorStatus(editor.id, !editor.isActive);
+  //     // setEditors((prev) =>
+  //     //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
+  //     // );
+  //   } catch (err) {
+  //     console.error("Failed to update status:", err);
+  //   }
+  // };
 
   // Delete editor
   const handleDeleteEditor = async (editorId: number) => {
@@ -286,7 +288,7 @@ const ManageEditorsTab = () => {
                     </Typography>
                     <Switch
                       checked={editor.Active}
-                      onChange={() => handleToggleStatus(editor)}
+                      // onChange={() => handleToggleStatus(editor)}
                       color="success"
                     />
                   </Stack>

@@ -8,7 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-import { createReport } from "../services/APIs/APIs";
+// import { createReport } from "../services/APIs/APIs";
 import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
@@ -28,26 +28,34 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
 }) => {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [_, setUserID] = useState();
+  // const [_, setConfirmOpen] = useState(false);
+  // const [_, setUserID] = useState();
   const { userInfo } = useAuth();
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("spam");
 
   useEffect(() => {
-    if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
+    // if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
+    console.log('pass');
+    
   }, [userInfo]);
 
   const handleSubmit = () => {
-    setConfirmOpen(true);
+    // setConfirmOpen(true);
+    handleConfirm();
   };
 
   const handleConfirm = () => {
+    setLoading(true)
     console.log("Report submitted:", { reason, description });
-    setConfirmOpen(false);
+    // setConfirmOpen(false);
     onClose();
     setReason("");
     setDescription("");
+      setLoading(false)
+
+      console.log(id);
+      
   };
 
   return (
@@ -79,7 +87,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} >Cancel</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
