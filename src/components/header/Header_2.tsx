@@ -26,7 +26,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
 import { useAuth } from "../../context/AuthContext";
-
+import { getEmployerFiles } from "../../services/APIs/APIs";
+import { getSeekerFiles } from "../../services/APIs/APIs";
 import NotificationPopover from "./NotificationPop";
 
 const settings = ["Profile", "Edit", "Logout"];
@@ -38,6 +39,7 @@ const Header_2 = () => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [anchorElNotification, setAnchorElNotification] =
     useState<null | HTMLElement>(null);
   const handleOpenNotification = (event: React.MouseEvent<HTMLElement>) => {
@@ -140,6 +142,41 @@ const Header_2 = () => {
     return "";
   };
 
+useEffect(() => {
+  const fetchProfileImage = async () => {
+    // Check if already cached
+    const cachedImage = localStorage.getItem("profileImage");
+    if (cachedImage) {
+      setProfileImage(cachedImage);
+      return; // Skip fetching again
+    }
+
+    try {
+      let files;
+      if (userRole === "employer" && userInfo?.EmployerId) {
+        files = await getEmployerFiles(userInfo.EmployerId);
+      } else if (userRole === "seeker" && userInfo?.UserId) {
+        files = await getSeekerFiles(userInfo.UserId);
+      }
+
+      if (files) {
+        const imageFile = files.find(
+          (file: any) => file.file_type === "FileType.image"
+        );
+        if (imageFile?.file_url) {
+          setProfileImage(imageFile.file_url);
+          localStorage.setItem("profileImage", imageFile.file_url); // Cache it
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch profile image:", err);
+    }
+  };
+
+  fetchProfileImage();
+}, [userRole, userInfo]);
+
+
   const handleTest = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
@@ -182,6 +219,7 @@ const Header_2 = () => {
 
             {/* space */}
             <Box sx={{ flexGrow: 1 }} />
+
 
             {/* mobile view menu */}
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -236,7 +274,25 @@ const Header_2 = () => {
 
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>{getInitial()}</Avatar>
+                    {profileImage ? (
+                    <Avatar
+                      src={profileImage}
+                      alt="Profile"
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  ) : (
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: "secondary.main",
+                        color: "#fff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getInitial()}
+                    </Avatar>
+                  )}
                 </IconButton>
               </Tooltip>
 

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Container, TextField, Box } from "@mui/material";
+import { Button, Container, TextField, Box, Avatar } from "@mui/material";
+import { Backup } from "@mui/icons-material";
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
@@ -8,6 +9,10 @@ import { getEmployerData, putEmployerData } from "../../services/APIs/APIs";
 import { EMPLOYER_DATA } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationsProvider";
+
+import { getEmployerFiles } from "../../services/APIs/APIs";
+import { uploadNewEmployerFiles } from "../../services/APIs/APIs";
+import { updateEmployerFile } from "../../services/APIs/APIs";
 
 const EditProfileEmployer = () => {
   const [formData, setFormData] = useState<EMPLOYER_DATA>({
@@ -21,6 +26,16 @@ const EditProfileEmployer = () => {
     Overview: "",
     IsSub: false,
   });
+
+  // const [imageSrc, setImageSrc] = useState<string>("/icons/account.svg");
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("/icons/account.svg");
+  const [existingFileId, setExistingFileId] = useState<number | null>(null);
+
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { userInfo } = useAuth();
   const navigate = useNavigate();
@@ -36,22 +51,54 @@ const EditProfileEmployer = () => {
     }
   }, [userInfo]);
 
-  // Fetch employer data and set to form
+  // Fetch employer files and profile image
   useEffect(() => {
-    const fetchData = async () => {
-      if (formData.EmployerId) {
-        try {
-          const data = await getEmployerData(formData.EmployerId.toString());
-          setFormData(data); // pre-fill form with existing data
-          console.log("Employer data fetched:", data);
-        } catch (error) {
-          console.error("Failed to fetch employer data:", error);
+
+    const fetchData = async () => { 
+      if (formData.EmployerId) { 
+        try { 
+          const data = await getEmployerData(formData.EmployerId.toString()); 
+          setFormData(data); // pre-fill form with existing data 
+          console.log("Employer data fetched:", data); 
+        } catch (error) { 
+          console.error("Failed to fetch employer data:", error); 
+        } 
+      } 
+    }; 
+    fetchData();
+
+    const fetchProfileImage = async () => {
+      if (!formData.EmployerId) return;
+
+      try {
+        const files = await getEmployerFiles(formData.EmployerId);
+        const profileFile = files.find((file: any) => file.file_type === "FileType.image");
+        if (profileFile) {
+          setProfileImageUrl(profileFile.file_url);
+          setExistingFileId(profileFile.id); // save file_id for update
         }
+      } catch (err) {
+        console.error("Failed to fetch employer files:", err);
       }
     };
+    fetchProfileImage();
 
-    fetchData();
+
   }, [formData.EmployerId]);
+
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImageFile(file);
+      setProfileImageUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
 
   // Handle input changes
   const handleChange = (
@@ -65,12 +112,30 @@ const EditProfileEmployer = () => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await putEmployerData(formData.EmployerId, formData);
-      console.log("Profile updated successfully:", response);
-      notify("Profile details saved", "success");
+      // Replace old profile image if a new one is selected
+      if (profileImageFile) {
+        const formDataFile = new FormData();
+        formDataFile.append("file", profileImageFile);
+        formDataFile.append("file_type", "image");
+
+        if (existingFileId) {
+          // Update existing image
+          await updateEmployerFile(formData.EmployerId, existingFileId, formDataFile)
+        } else {
+          // No existing file, upload new
+          await uploadNewEmployerFiles(formData.EmployerId, formDataFile);
+        }
+      }
+
+      localStorage.removeItem("profileImage");
+
+      // Update profile details
+      await putEmployerData(formData.EmployerId, formData);
+      notify("Profile updated successfully", "success");
       navigate("/employer/profile");
     } catch (err) {
-      console.error("Update failed:", err);
+      console.error("Failed to update profile:", err);
+      notify("Failed to update profile", "error");
     }
   };
 
@@ -87,6 +152,29 @@ const EditProfileEmployer = () => {
       />
       <Container sx={{ mt: 4, mb: 4 }}>
         <div>
+          {/* Profile Image */}
+          <Box display="flex" alignItems="center" mb={3}>
+            <Avatar
+              src={profileImageUrl}
+              alt="Profile"
+              sx={{ width: 120, height: 120, mr: 2 }}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileSelect}
+            />
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleUploadClick}
+              startIcon={<Backup />}
+            >
+              Change Photo
+            </Button>
+          </Box>
           <Box gap={2} display={"flex"} flexDirection={"row"} mb={3}>
             <TextField
               fullWidth

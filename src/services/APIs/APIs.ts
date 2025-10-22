@@ -369,6 +369,46 @@ export const editorLogin = async () => {
   return response.data;
 };
 
+// employer new files upload
+export const uploadNewEmployerFiles = async (employerId: number, formData: FormData) => {
+  const response = await axiosInstance.post(
+    `/employer_files/${employerId}/files`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+export const getEmployerFiles = async (employerId: number) => {
+  const response = await axiosInstance.get(`/employer_files/${employerId}/files`);
+  return response.data;
+};
+
+// Update existing employer file
+export const updateEmployerFile = async (
+  employerId: number,
+  fileId: number,
+  formData: FormData
+) => {
+  const response = await axiosInstance.put(
+    `/employer_files/${employerId}/files/${fileId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+
+
+
 
 // ------------------JOB DETAILS -------------------
 

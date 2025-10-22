@@ -9,6 +9,7 @@ import {
   Grid,
   Card,
   CardMedia,
+  CircularProgress
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 
@@ -16,6 +17,7 @@ import { EMPLOYER_DATA } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 import { getEmployerData } from "../../services/APIs/APIs";
 import EditIcon from "@mui/icons-material/Edit";
+import { getEmployerFiles } from "../../services/APIs/APIs";
 
 const EmployerProfileTab = () => {
   const photos = [
@@ -27,12 +29,14 @@ const EmployerProfileTab = () => {
     "/imgs/grid/legal.jpg",
   ];
 
-  const [imageSrc] = useState("/imgs/companies/c1.png"); // add setImage later
+  const [imageSrc, setImageSrc] = useState("");
+  // const [files, setFiles] = useState([]);
 
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   const [employerID, setEmployerID] = useState(0);
   const [user, setUser] = useState<EMPLOYER_DATA | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (userInfo && "EmployerId" in userInfo) {
@@ -41,21 +45,40 @@ const EmployerProfileTab = () => {
     }
   }, [userInfo]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (employerID !== 0) {
-        try {
-          const data = await getEmployerData(employerID.toString());
-          setUser(data);
-          console.log("Employer data fetched:", data);
-        } catch (error) {
-          console.error("Failed to fetch employer data:", error);
-        }
-      }
-    };
+useEffect(() => {
 
-    fetchData();
-  }, [employerID]);
+  const fetchData = async () => {
+    if (employerID === 0) return;
+    
+
+    try {
+      // Fetch employer info
+      const data = await getEmployerData(employerID.toString());
+      setUser(data);
+
+      // Fetch employer files
+      const fileData = await getEmployerFiles(employerID);
+
+      // Find profile image
+      const profileImage = fileData.find(
+        (file: any) => file.file_type === "FileType.image"
+      );
+
+      if (profileImage && profileImage.file_url) {
+        setImageSrc(profileImage.file_url);
+      }
+
+      console.log("Employer data:", data);
+      console.log("Employer files:", fileData);
+    } catch (error) {
+      console.error("Failed to fetch employer data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [employerID]);
 
   const BrowsePostJob = () => {
     navigate("/employer/post");
@@ -66,7 +89,12 @@ const EmployerProfileTab = () => {
   };
 
   return (
-    <div className="employer-profile-tab-container">
+        <div className="employer-profile-tab-container">
+    {loading ?(
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <CircularProgress />
+        </Box>
+    ): (
       <div className="employer-profile-tab-content">
         {/* section */}
         <div className="emp-create-ac-form-section">
@@ -119,7 +147,7 @@ const EmployerProfileTab = () => {
                   color: "white",
                   transition: "all 0.2s ease-in-out",
                   "&:hover": {
-                    bgcolor: "secondary.dark",
+                    bgcolor: "white",
                     boxShadow: 6,
                     scale: 1.1,
                   },
@@ -215,6 +243,9 @@ const EmployerProfileTab = () => {
           </Button>
         </div>
       </div>
+    )}
+
+
     </div>
   );
 };

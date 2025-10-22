@@ -74,6 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setIsAuthenticated(false);
     signOut(auth);
+    localStorage.removeItem("profileImage");
     console.log("logout function - OK");
   };
 

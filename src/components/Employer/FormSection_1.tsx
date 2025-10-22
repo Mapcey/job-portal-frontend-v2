@@ -3,29 +3,24 @@ import { useNavigate } from "react-router-dom";
 
 import {
   Box,
-  Typography,
-  Grid,
   TextField,
   Avatar,
   Button,
   IconButton,
 } from "@mui/material";
-import { Backup, PlayCircle, UploadFile, Delete } from "@mui/icons-material";
+import { Backup } from "@mui/icons-material";
 
-import { styled } from "@mui/material/styles";
 import { EMPLOYER_DATA } from "../../types/users";
 import { putEmployerData } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationsProvider";
-
-const Input = styled("input")({
-  display: "none",
-});
+import { uploadNewEmployerFiles } from "../../services/APIs/APIs";
 
 const FormSection_1 = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
-  const [images, setImages] = useState<File[]>([]);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+
   const { userInfo } = useAuth();
   const [employerID, setEmployerID] = useState(0);
   const navigate = useNavigate();
@@ -50,43 +45,68 @@ const FormSection_1 = () => {
     IsSub: false,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log(userInfo.EmployerId);
-
-    e.preventDefault();
-    try {
-      const response = await putEmployerData(employerID, formData);
-      console.log("Success:", response);
-      navigate("/employer/profile/");
-      notify("Profile created", "success");
-    } catch (err) {
-      console.error("Update failed:", err);
-      notify("Error on profile creation", "error");
-    }
+  // ---------------------- VALIDATION ----------------------
+  const validateImage = (file: File) => {
+    const validFormats = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validFormats.includes(file.type)) return "Image must be JPG or PNG.";
+    if (file.size > 5 * 1024 * 1024) return "Image must be ≤ 5 MB.";
+    return null;
   };
 
-  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      setImages((prev) => [...prev, ...fileArray]);
-    }
-  };
-
-  const handleRemove = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
-
+  // ---------------------- FILE HANDLERS ----------------------
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImageSrc(imageUrl);
+    if (!file) return;
+
+    const error = validateImage(file);
+    if (error) {
+      notify(error, "error");
+      return;
     }
+
+    setProfileImage(file);
+    setImageSrc(URL.createObjectURL(file));
   };
 
   const handleClick = () => {
     fileInputRef.current?.click();
+  };
+
+  // ---------------------- SUBMIT ----------------------
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      if (!employerID) {
+        notify("Employer ID not found", "error");
+        return;
+      }
+
+      // If profile image selected, upload it via backend API
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append("file", profileImage);
+        formData.append("file_type", "image");
+
+        try {
+          const res = await uploadNewEmployerFiles(employerID, formData);
+          console.log("File uploaded successfully:", res);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          notify("Image upload failed", "error");
+        }
+      }
+
+      // Then update employer details
+      const response = await putEmployerData(employerID, formData);
+      console.log("Profile updated:", response);
+
+      notify("Profile updated successfully", "success");
+      navigate("/employer/profile/");
+    } catch (err) {
+      console.error("Error updating employer:", err);
+      notify("Error updating employer profile", "error");
+    }
   };
 
   return (
@@ -130,6 +150,7 @@ const FormSection_1 = () => {
             style={{ display: "none" }}
           />
         </div>
+
         <div className="fs-text-inputs-1">
           <TextField
             label="Company Name"
@@ -154,6 +175,7 @@ const FormSection_1 = () => {
             }
           />
         </div>
+
         <div className="fs-text-inputs-1">
           <TextField
             label="Phone number"
@@ -186,226 +208,8 @@ const FormSection_1 = () => {
         </div>
       </div>
 
-      {/* section */}
-      <div className="create-ac-form-section">
-        <div className="fs-text-inputs-2">
-          <Typography mt={2} variant="h5" color="secondary.main">
-            Intro Video
-          </Typography>
-
-          <Box className="form-area">
-            <div className="form-area-content">
-              <h4>Impress employers and Stand out !</h4>
-              <PlayCircle />
-              <Button
-                variant="contained"
-                color="primary"
-                className="search-button"
-                sx={{
-                  borderRadius: 2,
-                  padding: "10px 50px",
-                }}
-              >
-                Upgrade
-              </Button>
-            </div>
-          </Box>
-        </div>
-        <div className="fs-text-inputs-2">
-          <Typography mt={2} variant="h5" color="secondary.main">
-            Images
-          </Typography>
-
-          <label htmlFor="upload-button">
-            <Input
-              accept="image/*"
-              id="upload-button"
-              multiple
-              type="file"
-              onChange={handleUpload}
-            />
-            <Button
-              sx={{ width: "100%" }}
-              variant="outlined"
-              component="span"
-              startIcon={<UploadFile />}
-            >
-              Upload Images
-            </Button>
-          </label>
-
-          {/* Image preview grid */}
-          <Grid container spacing={2} mt={2}>
-            {images.map((file, index) => (
-              <Grid key={index}>
-                <Box
-                  sx={{
-                    position: "relative",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt={`upload-${index}`}
-                    style={{ width: "100%", height: 100, objectFit: "cover" }}
-                  />
-                  <IconButton
-                    onClick={() => handleRemove(index)}
-                    sx={{
-                      position: "absolute",
-                      top: 4,
-                      right: 4,
-                      backgroundColor: "rgba(0,0,0,0.5)",
-                      color: "#fff",
-                      "&:hover": { backgroundColor: "rgba(0,0,0,0.8)" },
-                    }}
-                    size="small"
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </div>
-      </div>
-
-      <div className="create-ac-form-section-2">
-        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Add Editors</h3>
-      </div>
-
-      {/* section */}
-      <div className="create-ac-form-section">
-        <div className="fs-text-inputs-1">
-          <TextField
-            label="Add Email Address"
-            variant="outlined"
-            placeholder="Add your full name"
-            className="text-input-1"
-            size="small"
-          />
-
-          <TextField
-            label="Create Password"
-            variant="outlined"
-            placeholder="Add your home address"
-            className="text-input-1"
-            size="small"
-          />
-
-          <TextField
-            label="Conform Password"
-            variant="outlined"
-            placeholder="Add your home address"
-            className="text-input-1"
-            size="small"
-          />
-        </div>
-        <div className="fs-text-inputs-1">
-          <Box className="form-area-1">
-            <div className="form-area-content">
-              <h4>Need More Editors?</h4>
-              <Button
-                variant="contained"
-                color="primary"
-                className="search-button"
-                sx={{
-                  borderRadius: 2,
-                  padding: "10px 50px",
-                }}
-              >
-                Upgrade
-              </Button>
-            </div>
-          </Box>
-        </div>
-      </div>
-
-      <div className="create-ac-form-section-2">
-        <Button
-          variant="contained"
-          color="secondary"
-          className="create-ac-form-button-2"
-          sx={{
-            borderRadius: 2,
-            padding: "10px 80px",
-          }}
-        >
-          Add
-        </Button>
-      </div>
-
-      <div className="create-ac-form-section-2">
-        <h3 style={{ marginBottom: "0", paddingTop: "20" }}>Education</h3>
-      </div>
-
-      {/* section */}
-      <div className="create-ac-form-section">
-        <div className="fs-text-inputs-1">
-          <TextField
-            label="Institution name"
-            variant="outlined"
-            placeholder="Add your full name"
-            className="text-input-1"
-            size="small"
-          />
-
-          <TextField
-            label="From"
-            variant="outlined"
-            placeholder="Add your home address"
-            className="text-input-1"
-            size="small"
-          />
-        </div>
-        <div className="fs-text-inputs-1">
-          <TextField
-            label="Field of study"
-            variant="outlined"
-            placeholder="Add a valid phone number"
-            className="text-input-1"
-            size="small"
-          />
-
-          <TextField
-            label="To"
-            variant="outlined"
-            placeholder="Add your email address"
-            className="text-input-1"
-            size="small"
-          />
-        </div>
-      </div>
-
-      <div className="create-ac-form-section-2">
-        <Button
-          variant="contained"
-          color="secondary"
-          className="create-ac-form-button-2"
-          sx={{
-            borderRadius: 2,
-            padding: "10px 80px",
-          }}
-        >
-          Add
-        </Button>
-      </div>
-
       {/* section bottom */}
       <div className="create-ac-form-section">
-        {/* <Button
-          variant="contained"
-          color="secondary"
-          className="search-button"
-          sx={{
-            borderRadius: 2,
-            padding: "10px 50px",
-          }}-
-        >
-          Save
-        </Button> */}
         <Button
           variant="contained"
           color="secondary"
