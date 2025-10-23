@@ -352,8 +352,8 @@ export const getCandidatesOfJob = async (JobID: number) => {
 };
 
 // create a new editor
-export const createNewEditor = async ( data: any) => {
-  const response = await axiosInstance.post(`/editors/`, data);
+export const createNewEditor = async (employer_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/employers/${employer_id}/editors`, data);
   return response.data;
 };
 
@@ -383,6 +383,7 @@ export const uploadNewEmployerFiles = async (employerId: number, formData: FormD
   return response.data;
 };
 
+//get employer files
 export const getEmployerFiles = async (employerId: number) => {
   const response = await axiosInstance.get(`/employer_files/${employerId}/files`);
   return response.data;
@@ -392,7 +393,8 @@ export const getEmployerFiles = async (employerId: number) => {
 export const updateEmployerFile = async (
   employerId: number,
   fileId: number,
-  formData: FormData
+  formData: FormData,
+  onUploadProgress?: (progressEvent: any) => void
 ) => {
   const response = await axiosInstance.put(
     `/employer_files/${employerId}/files/${fileId}`,
@@ -401,12 +403,18 @@ export const updateEmployerFile = async (
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      onUploadProgress, // 👈 track upload progress here
     }
   );
   return response.data;
 };
 
 
+// delete employer files
+export const deleteEmployerFiles = async (employerId: number, file_id: number) => {
+  const response = await axiosInstance.delete(`/employer_files/${employerId}/files/${file_id}`);
+  return response.data;
+};
 
 
 

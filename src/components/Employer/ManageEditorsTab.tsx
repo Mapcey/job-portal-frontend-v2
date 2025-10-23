@@ -93,7 +93,7 @@ const ManageEditorsTab = () => {
         Password: password,
       };
 
-      const response = await createNewEditor( userPayload);
+      const response = await createNewEditor(userInfo.EmployerID, userPayload);
       console.log(response);
       
       notify("Account Created", "success");
@@ -108,6 +108,8 @@ const ManageEditorsTab = () => {
       // }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
+      console.log('ok');
+      
     }
   };
 
