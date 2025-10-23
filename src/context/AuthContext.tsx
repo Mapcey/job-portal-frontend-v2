@@ -7,7 +7,7 @@ import {
 } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { userLogin } from "../services/APIs/APIs";
+import { userLogin, editorLogin } from "../services/APIs/APIs";
 
 // --- Types ---
 interface AuthContextType {
@@ -20,6 +20,7 @@ interface AuthContextType {
   loading: boolean;
   userInfo: any;
   setUserRoleAndInfo: (role: string, info: any) => void;
+  loginEditor: (token: string) => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<string | null>(null);
+  const [loginMethod, setLoginMethod] = useState("");
 
   const setUserRoleAndInfo = (role: string, info: any) => {
     setUserRole(role);
@@ -40,9 +42,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (token: string): Promise<string> => {
+    console.log("test 1 ---------------");
     setToken(token);
+    setLoginMethod("method1");
     try {
+      console.log("test 1 ---------------");
       const response = await userLogin(); // backend API
+
       if (response) {
         const role = response.role;
         const userData =
@@ -68,6 +74,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return "null";
   };
 
+  const loginEditor = async (token: string): Promise<string> => {
+    setToken(token);
+    setLoginMethod("method2");
+    try {
+      const response = await editorLogin();
+      if (response) {
+        setUserRole("editor");
+        const editorID = response.EditorId;
+        const userData = response.editor;
+        setUserInfo(userData);
+        console.log("info set: ", userData);
+        setIsAuthenticated(true);
+        return editorID;
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      logout();
+      return "null";
+    }
+    setLoading(false);
+    return "null";
+  };
+
   const logout = () => {
     setToken(null);
     setFirebaseUser(null);
@@ -84,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("presist");
 
       console.log(user);
-      
+
       if (user) {
         const token = await user.getIdToken();
         setFirebaseUser(user);
@@ -93,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const isNewUser =
           user.metadata.creationTime === user.metadata.lastSignInTime;
+
         if (isNewUser) {
           console.log("New user just signed up — skip userLogin");
           setLoading(false); // Still update UI state
@@ -100,14 +130,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         try {
-          const response = await userLogin(); // backend API
-          if (response) {
-            const role = response.role;
-            const userData =
-              role === "seeker" ? response.seeker : response.employer;
-            setUserRole(role);
-            setUserInfo(userData);
-            setIsAuthenticated(true);
+          if (loginMethod === "method2") {
+            const response = await editorLogin();
+            if (response) {
+              setUserRole("editor");
+              setUserInfo(response.editor);
+              setIsAuthenticated(true);
+            }
+          } else if (loginMethod === "user") {
+            const response = await userLogin(); // backend API
+
+            if (response) {
+              const role = response.role;
+              const userData =
+                role === "seeker" ? response.seeker : response.employer;
+              setUserRole(role);
+              setUserInfo(userData);
+              setIsAuthenticated(true);
+            }
           }
         } catch (err) {
           console.error("Failed to fetch user info on auth state change:", err);
@@ -135,6 +175,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         userInfo,
         setUserRoleAndInfo,
+        loginEditor,
       }}
     >
       {children}

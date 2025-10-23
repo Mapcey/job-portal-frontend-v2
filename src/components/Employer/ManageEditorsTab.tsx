@@ -18,18 +18,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { useAuth } from "../../context/AuthContext";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-import { auth } from "../../firebase/config";
-// import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
 import { createNewEditor, getEditors } from "../../services/APIs/APIs";
 import { useNotification } from "../../context/NotificationsProvider";
 import { EDITOR_DATA } from "../../types/users";
-
-// interface Editor {
-//   id: string;
-//   email: string;
-//   isActive: boolean;
-// }
 
 const ManageEditorsTab = () => {
   const { userInfo } = useAuth();
@@ -50,23 +41,22 @@ const ManageEditorsTab = () => {
 
   const { notify } = useNotification();
 
+  const fetchEditors = async () => {
+    if (!userInfo) return;
+    setLoading(true);
+    try {
+      const data = await getEditors(userInfo.EmployerId);
+      setEditors(data);
+    } catch (err) {
+      console.error("Failed to fetch editors:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch editors on mount
   useEffect(() => {
-    const fetchEditors = async () => {
-      if (!userInfo) return;
-      setLoading(true);
-      try {
-        const data = await getEditors(userInfo.EmployerId);
-        setEditors(data);
-      } catch (err) {
-        console.error("Failed to fetch editors:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEditors();
-
-    setEditors;
   }, [userInfo]);
 
   // Create new editor
@@ -76,10 +66,12 @@ const ManageEditorsTab = () => {
 
     if (!email || !password || !confirmPassword) {
       setError("Email/ Password required");
+      notify("Email/ Password required", "error");
       return;
     }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      notify("Passwords do not match", "error");
       return;
     }
 
@@ -93,37 +85,32 @@ const ManageEditorsTab = () => {
         Password: password,
       };
 
-      const response = await createNewEditor(userInfo.EmployerID, userPayload);
+      const response = await createNewEditor(userInfo.EmployerId, userPayload);
       console.log(response);
-      
+
+       fetchEditors();
+
       notify("Account Created", "success");
     } catch (err: any) {
       console.error("Signup failed:", err);
       notify("Account Create faile", "error");
-      // const user = auth.currentUser;
-      // if (user) {
-      //   await deleteUser(user).catch((deleteErr) =>
-      //     console.warn("Failed to delete Firebase user:", deleteErr)
-      //   );
-      // }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
-      console.log('ok');
-      
+      console.log("ok");
     }
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async (editor: EDITOR_DATA) => {
-    try {
-      // const updated = await updateEditorStatus(editor.id, !editor.isActive);
-      // setEditors((prev) =>
-      //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
-      // );
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+  // const handleToggleStatus = async (editor: EDITOR_DATA) => {
+  //   try {
+  //     const updated = await updateEditor(editor.id, !editor.isActive);
+  //     setEditors((prev) =>
+  //       prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
+  //     );
+  //   } catch (err) {
+  //     console.error("Failed to update status:", err);
+  //   }
+  // };
 
   // Delete editor
   const handleDeleteEditor = async (editorId: number) => {
@@ -225,18 +212,17 @@ const ManageEditorsTab = () => {
       </Typography>
       {loading ? (
         <Typography>Loading editors...</Typography>
-) : editors.length === 0 ? (
-  <Box
-    sx={{
-      textAlign: "center",
-      mt: 5,
-      color: "text.secondary",
-      fontStyle: "italic",
-    }}
-  >
-    <Typography variant="body1">No editors created yet.</Typography>
-  </Box>
-
+      ) : editors.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: "center",
+            mt: 5,
+            color: "text.secondary",
+            fontStyle: "italic",
+          }}
+        >
+          <Typography variant="body1">No editors created yet.</Typography>
+        </Box>
       ) : (
         <Grid container spacing={2}>
           {editors.map((editor) => (
@@ -288,7 +274,7 @@ const ManageEditorsTab = () => {
                     </Typography>
                     <Switch
                       checked={editor.Active}
-                      onChange={() => handleToggleStatus(editor)}
+                      // onChange={() => handleToggleStatus(editor)}
                       color="success"
                     />
                   </Stack>

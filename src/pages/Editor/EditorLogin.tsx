@@ -10,11 +10,10 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 
-import { editorLogin } from "../../services/APIs/APIs";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
+  // GoogleAuthProvider,
+  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
@@ -26,44 +25,35 @@ const EditorLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
-    const navigate = useNavigate();
-    const { login } = useAuth();
+  const navigate = useNavigate();
+  const { loginEditor } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-      try {
+    setError(""); // clear previous error
+
+    try {
       await setPersistence(auth, browserLocalPersistence);
 
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
-      console.log(token);
 
-      const success = await login(token); // Wait for backend validation
+      const role = await loginEditor(token); // backend validation
 
-      console.log("login function - OK");
+       navigate("/editor");
 
-      if (success) {
-        console.log(success);
+       console.log(role);
+       
 
-        if (success == "employer") {
-          navigate("/employer/profile/");
-        } else if (success == "seeker") {
-          navigate("/seeker/profile/");
-          console.log(token);
-        }
-      } else {
-        setError("Authentication failed. Please try again.");
-      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred during login");
+    } finally {
+      setLoading(false); // ensure loading is reset
     }
+     setLoading(false); 
   };
 
   return (

@@ -64,6 +64,9 @@ const Header_2 = () => {
     } else if (userRole == "employer") {
       navigate("/employer/profile");
       console.log(userRole);
+    } else if (userRole == "editor") {
+      navigate("/editor");
+      console.log(userRole);
     } else {
       console.log("no user role");
       logout();
@@ -96,6 +99,11 @@ const Header_2 = () => {
     setAnchorElUser(null);
   };
 
+  const filteredMenuItems =
+  userRole === "editor"
+    ? settings.filter((item) => item !== "Edit") // or any setting you want to hide
+    : settings;
+
   const handleMenuItemClick = (setting: string) => {
     handleCloseUserMenu();
 
@@ -108,6 +116,9 @@ const Header_2 = () => {
         console.log(userRole);
       } else if (userRole == "employer") {
         navigate("/employer/profile");
+        console.log(userRole);
+      } else if (userRole == "editor") {
+        navigate("/editor");
         console.log(userRole);
       } else {
         console.log("no user role");
@@ -142,47 +153,45 @@ const Header_2 = () => {
     return "";
   };
 
-useEffect(() => {
-  const fetchProfileImage = async () => {
-    // Check if already cached
-    const cachedImage = localStorage.getItem("profileImage");
-    if (cachedImage) {
-      setProfileImage(cachedImage);
-      return; // Skip fetching again
-    }
-
-    try {
-      let files;
-      if (userRole === "employer" && userInfo?.EmployerId) {
-        files = await getEmployerFiles(userInfo.EmployerId);
-      } else if (userRole === "seeker" && userInfo?.UserId) {
-        files = await getSeekerFiles(userInfo.UserId);
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      // Check if already cached
+      const cachedImage = localStorage.getItem("profileImage");
+      if (cachedImage) {
+        setProfileImage(cachedImage);
+        return; // Skip fetching again
       }
 
-      if (files) {
-        const imageFile = files.find(
-          (file: any) => file.file_type === "FileType.image"
-        );
-        if (imageFile?.file_url) {
-          setProfileImage(imageFile.file_url);
-          localStorage.setItem("profileImage", imageFile.file_url); // Cache it
+      try {
+        let files;
+        if (userRole === "employer" && userInfo?.EmployerId) {
+          files = await getEmployerFiles(userInfo.EmployerId);
+        } else if (userRole === "seeker" && userInfo?.UserId) {
+          files = await getSeekerFiles(userInfo.UserId);
         }
+
+        if (files) {
+          const imageFile = files.find(
+            (file: any) => file.file_type === "FileType.image"
+          );
+          if (imageFile?.file_url) {
+            setProfileImage(imageFile.file_url);
+            localStorage.setItem("profileImage", imageFile.file_url); // Cache it
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile image:", err);
       }
-    } catch (err) {
-      console.error("Failed to fetch profile image:", err);
-    }
-  };
+    };
 
-  fetchProfileImage();
-}, [userRole, userInfo]);
-
+    fetchProfileImage();
+  }, [userRole, userInfo]);
 
   const handleTest = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
     console.log("is auth", isAuthenticated);
-    console.log("token", );
-    
+    console.log("token");
   };
 
   const handleNavigate = (path: string) => {
@@ -219,7 +228,6 @@ useEffect(() => {
 
             {/* space */}
             <Box sx={{ flexGrow: 1 }} />
-
 
             {/* mobile view menu */}
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -274,7 +282,7 @@ useEffect(() => {
 
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    {profileImage ? (
+                  {profileImage ? (
                     <Avatar
                       src={profileImage}
                       alt="Profile"
@@ -312,7 +320,7 @@ useEffect(() => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
+                {filteredMenuItems.map((setting) => (
                   <MenuItem
                     key={setting}
                     onClick={() => handleMenuItemClick(setting)}

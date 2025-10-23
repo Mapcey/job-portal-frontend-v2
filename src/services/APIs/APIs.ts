@@ -351,24 +351,6 @@ export const getCandidatesOfJob = async (JobID: number) => {
   return response.data;
 };
 
-// create a new editor
-export const createNewEditor = async (employer_id: string, data: any) => {
-  const response = await axiosInstance.post(`/editors/employers/${employer_id}/editors`, data);
-  return response.data;
-};
-
-// get editors of a employer
-export const getEditors = async (employer_id: number) => {
-  const response = await axiosInstance.get(`editors/employers/${employer_id}/editors`);
-  return response.data;
-};
-
-// editor login
-export const editorLogin = async () => {
-  const response = await axiosInstance.post(`/editors/login`);
-  return response.data;
-};
-
 // employer new files upload
 export const uploadNewEmployerFiles = async (employerId: number, formData: FormData) => {
   const response = await axiosInstance.post(
@@ -409,12 +391,31 @@ export const updateEmployerFile = async (
   return response.data;
 };
 
-
 // delete employer files
 export const deleteEmployerFiles = async (employerId: number, file_id: number) => {
   const response = await axiosInstance.delete(`/employer_files/${employerId}/files/${file_id}`);
   return response.data;
 };
+
+// -----------------------EDITORS--------------------------
+// create a new editor
+export const createNewEditor = async (employer_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/employers/${employer_id}/editors`, data);
+  return response.data;
+};
+
+// get editors of a employer
+export const getEditors = async (employer_id: number) => {
+  const response = await axiosInstance.get(`editors/employers/${employer_id}/editors`);
+  return response.data;
+};
+
+// editor login
+export const editorLogin = async () => {
+  const response = await axiosInstance.post(`/editors/login`);
+  return response.data;
+};
+
 
 
 

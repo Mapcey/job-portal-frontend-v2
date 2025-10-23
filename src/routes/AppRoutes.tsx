@@ -34,7 +34,7 @@ const AppRoutes = () => (
     <Route path="/contact" element={<ContactPage />} />
     <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
-    <Route path="/editor" element={<EditorProfilePage />} />
+
     <Route path="/editor_login" element={<EditorLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
@@ -103,6 +103,15 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["employer", "seeker"]}>
           <SeekerPublicViewPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/editor"
+      element={
+        <ProtectedRoute allowedRoles={["editor"]}>
+          <EditorProfilePage />
         </ProtectedRoute>
       }
     />
