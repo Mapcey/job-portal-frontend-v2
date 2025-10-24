@@ -115,18 +115,18 @@ const NotificationsTab = () => {
         {notifications.map((note) => (
           <React.Fragment key={note.NotificationId}>
             <ListItem
-              // secondaryAction={
-              //   <IconButton
-              //     edge="end"
-              //     aria-label="delete"
-              //     onClick={(e) => {
-              //       e.stopPropagation();
-              //       // handleRemove(note.NotificationId);
-              //     }}
-              //   >
-              //     <DeleteIcon color="error" />
-              //   </IconButton>
-              // }
+              secondaryAction={
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // handleRemove(note.NotificationId);
+                  }}
+                >
+                  <DeleteIcon color="error" />
+                </IconButton>
+              }
               disablePadding
             >
               <ListItemButton

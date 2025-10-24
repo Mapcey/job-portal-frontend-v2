@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<string | null>(null);
-  const [loginMethod, setLoginMethod] = useState("");
+  const [isEditorLogin, setIsEditorLogin] = useState(false);
 
   const setUserRoleAndInfo = (role: string, info: any) => {
     setUserRole(role);
@@ -42,11 +42,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (token: string): Promise<string> => {
-    console.log("test 1 ---------------");
     setToken(token);
-    setLoginMethod("method1");
+    setIsEditorLogin(false);
     try {
-      console.log("test 1 ---------------");
       const response = await userLogin(); // backend API
 
       if (response) {
@@ -56,7 +54,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setUserRole(role);
         console.log("role set :", role);
-
         setUserInfo(userData);
         console.log("info set: ", userData);
         setIsAuthenticated(true);
@@ -76,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginEditor = async (token: string): Promise<string> => {
     setToken(token);
-    setLoginMethod("method2");
+    setIsEditorLogin(true);
     try {
       const response = await editorLogin();
       if (response) {
@@ -102,8 +99,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setFirebaseUser(null);
     setUserRole(null);
     setIsAuthenticated(false);
-    signOut(auth);
     localStorage.removeItem("profileImage");
+    signOut(auth);
     console.log("logout function - OK");
   };
 
@@ -122,32 +119,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const isNewUser =
           user.metadata.creationTime === user.metadata.lastSignInTime;
-
         if (isNewUser) {
           console.log("New user just signed up — skip userLogin");
           setLoading(false); // Still update UI state
           return;
         }
 
-        try {
-          if (loginMethod === "method2") {
-            const response = await editorLogin();
-            if (response) {
-              setUserRole("editor");
-              setUserInfo(response.editor);
-              setIsAuthenticated(true);
-            }
-          } else if (loginMethod === "user") {
-            const response = await userLogin(); // backend API
+        if (isEditorLogin) {
+          console.log("Editor session - skipping backend persist fetch");
+          setLoading(false);
+          return;
+        }
 
-            if (response) {
-              const role = response.role;
-              const userData =
-                role === "seeker" ? response.seeker : response.employer;
-              setUserRole(role);
-              setUserInfo(userData);
-              setIsAuthenticated(true);
-            }
+        try {
+          const response = await userLogin(); // backend API
+          if (response) {
+            const role = response.role;
+            const userData =
+              role === "seeker" ? response.seeker : response.employer;
+            setUserRole(role);
+            setUserInfo(userData);
+            setIsAuthenticated(true);
           }
         } catch (err) {
           console.error("Failed to fetch user info on auth state change:", err);

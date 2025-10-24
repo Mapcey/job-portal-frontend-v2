@@ -45,6 +45,8 @@ const PostJob = () => {
   const navigate = useNavigate();
   const { notify } = useNotification();
 
+  const [editorKey, setEditorKey] = useState(0);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -59,6 +61,24 @@ const PostJob = () => {
       const response = await createNewJob(formData);
       console.log("Job created:", response);
       notify("New job posted", "success");
+
+      setFormData({
+      JobTitle: "",
+      Location: "",
+      JobCategory: "",
+      JobType: "",
+      WorkType: "",
+      EducationLevel: "",
+      ProfExperience: "",
+      Languages: "",
+      SalaryRange: "",
+      ExpiryDate: "",
+      Description: "",
+      Status: "Active",
+    });
+
+    setEditorKey((prev) => prev + 1);
+
     } catch (err) {
       console.error(err);
       notify("Error posting job", "error");
@@ -311,6 +331,7 @@ const PostJob = () => {
         {/* section */}
         <div className="post-job-content-section-1">
           <RichTextBox
+          key={editorKey}
             value={formData.Description}
             onChange={(val) =>
               setFormData((prev) => ({ ...prev, Description: val }))

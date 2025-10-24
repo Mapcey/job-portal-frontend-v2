@@ -26,7 +26,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
 import { useAuth } from "../../context/AuthContext";
-import { getEmployerFiles } from "../../services/APIs/APIs";
+import {
+  getAllEmployerNotifications,
+  getEmployerFiles,
+  getSeekerNotifications,
+} from "../../services/APIs/APIs";
 import { getSeekerFiles } from "../../services/APIs/APIs";
 import NotificationPopover from "./NotificationPop";
 
@@ -42,11 +46,32 @@ const Header_2 = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [anchorElNotification, setAnchorElNotification] =
     useState<null | HTMLElement>(null);
-  const handleOpenNotification = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNotification(event.currentTarget);
-  };
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+  const handleOpenNotification = async (
+    event: React.MouseEvent<HTMLElement>
+  ) => {
+    setAnchorElNotification(event.currentTarget);
+    setLoadingNotifications(true);
+
+    try {
+      if (userRole === "employer") {
+        const res = await getAllEmployerNotifications(userInfo.EmployerId);
+        setNotifications(Array.isArray(res) ? res : []);
+      } else if (userRole === "seeker") {
+        const res = await getSeekerNotifications(userInfo.UserId);
+        setNotifications(Array.isArray(res) ? res : []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    }
+
+    setLoadingNotifications(false);
+  };
 
   const handleCloseNotification = () => {
     setAnchorElNotification(null);
@@ -99,11 +124,6 @@ const Header_2 = () => {
     setAnchorElUser(null);
   };
 
-  const filteredMenuItems =
-  userRole === "editor"
-    ? settings.filter((item) => item !== "Edit") // or any setting you want to hide
-    : settings;
-
   const handleMenuItemClick = (setting: string) => {
     handleCloseUserMenu();
 
@@ -116,9 +136,6 @@ const Header_2 = () => {
         console.log(userRole);
       } else if (userRole == "employer") {
         navigate("/employer/profile");
-        console.log(userRole);
-      } else if (userRole == "editor") {
-        navigate("/editor");
         console.log(userRole);
       } else {
         console.log("no user role");
@@ -278,6 +295,8 @@ const Header_2 = () => {
                 anchorEl={anchorElNotification}
                 open={Boolean(anchorElNotification)}
                 onClose={handleCloseNotification}
+                notifications={notifications}
+                loading={loadingNotifications}
               />
 
               <Tooltip title="Open settings">
@@ -320,7 +339,7 @@ const Header_2 = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {filteredMenuItems.map((setting) => (
+                {settings.map((setting) => (
                   <MenuItem
                     key={setting}
                     onClick={() => handleMenuItemClick(setting)}

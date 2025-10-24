@@ -416,8 +416,17 @@ export const editorLogin = async () => {
   return response.data;
 };
 
+// delete editor
+export const deleteEditor = async (editor_id:number) => {
+  const response = await axiosInstance.delete(`/editors/${editor_id}`);
+  return response.data;
+};
 
-
+//update editor
+export const updateEditor = async (editor_id:number, data:any) => {
+  const response = await axiosInstance.put(`/editors/${editor_id}`, data);
+  return response.data;
+};
 
 // ------------------JOB DETAILS -------------------
 
