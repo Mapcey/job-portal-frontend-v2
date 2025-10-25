@@ -12,14 +12,13 @@ import { LockOutlined } from "@mui/icons-material";
 
 import {
   signInWithEmailAndPassword,
-  // GoogleAuthProvider,
-  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const EditorLogin: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -30,30 +29,37 @@ const EditorLogin: React.FC = () => {
   const navigate = useNavigate();
   const { loginEditor } = useAuth();
 
+  const { notify } = useNotification();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // clear previous error
+    setError("");
 
     try {
       await setPersistence(auth, browserLocalPersistence);
-
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const token = await userCredential.user.getIdToken();
 
-      const role = await loginEditor(token); // backend validation
+      const result = await loginEditor(token);
 
-       navigate("/editor");
+      console.log(result);
 
-       console.log(role);
-       
+      if (result === "inactive") {
+        notify("Inactive Account", "error");
+        return; // Stop navigation
+      }
 
+      navigate("/editor");
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during login");
+      setError(err.message || "Unexpected login error");
     } finally {
-      setLoading(false); // ensure loading is reset
+      setLoading(false);
     }
-     setLoading(false); 
   };
 
   return (
@@ -136,7 +142,6 @@ const EditorLogin: React.FC = () => {
               )}
             </Button>
           </form>
-
         </CardContent>
       </Card>
     </Box>

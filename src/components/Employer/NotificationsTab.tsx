@@ -97,6 +97,10 @@ const NotificationsTab = () => {
     }
   };
 
+  const handleRemove = (id: number) => {
+    console.log(id);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
@@ -121,7 +125,7 @@ const NotificationsTab = () => {
                   aria-label="delete"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // handleRemove(note.NotificationId);
+                    handleRemove(note.NotificationId);
                   }}
                 >
                   <DeleteIcon color="error" />

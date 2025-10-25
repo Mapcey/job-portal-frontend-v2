@@ -79,7 +79,13 @@ const PostedJobs = () => {
       try {
         setLoading(true);
         const response = await getEmployerPostedJobs(userInfo.EmployerId);
-        setJobs(response); // API returns array of jobs
+        console.log(response);
+        
+        const filteredJobs = response.filter(
+          (job: any) => job.Status !== "Pending"
+        );
+
+        setJobs(filteredJobs);
       } catch (err) {
         console.error("Failed to fetch posted jobs:", err);
       } finally {
@@ -91,29 +97,6 @@ const PostedJobs = () => {
   }, [userInfo]);
 
   const handleClose = async (id: number, title: string) => {
-    // try {
-    //   // Find the job that needs to be updated
-    //   const jobToUpdate = jobs.find((job) => job.JobId === id);
-    //   if (!jobToUpdate) return;
-
-    //   // Create updated job object with status = Closed
-    //   const updatedJob = { ...jobToUpdate, Status: "Closed" };
-
-    //   // Call API to update the job
-    //   await editJob(id.toString(), updatedJob);
-
-    //   // Update state locally
-    //   setJobs((prevJobs) =>
-    //     prevJobs.map((job) =>
-    //       job.JobId === id ? { ...job, Status: "Closed" } : job
-    //     )
-    //   );
-
-    //   console.log(`Job ${id} closed successfully`);
-    // } catch (err) {
-    //   console.error("Failed to close job:", err);
-    // }
-
     try {
       // Call the API to update the status
       await updateJobPost(id, {

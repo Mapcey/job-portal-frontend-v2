@@ -38,7 +38,7 @@ const settings = ["Profile", "Edit", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, userInfo, userRole, isAuthenticated } = useAuth();
+  const { logout, userInfo, userRole, isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
@@ -124,33 +124,30 @@ const Header_2 = () => {
     setAnchorElUser(null);
   };
 
-  const handleMenuItemClick = (setting: string) => {
+    const settings =
+    userRole === "editor"
+      ? ["Profile", "Logout"] // ✅ Only these for editor
+      : ["Profile", "Edit", "Logout"]; // ✅ Others get all three
+      
+const handleMenuItemClick = (setting: string) => {
     handleCloseUserMenu();
 
     if (setting === "Logout") {
       logout();
       navigate("/login");
     } else if (setting === "Profile") {
-      if (userRole == "seeker") {
+      if (userRole === "seeker") {
         navigate("/seeker/profile");
-        console.log(userRole);
-      } else if (userRole == "employer") {
+      } else if (userRole === "employer") {
         navigate("/employer/profile");
-        console.log(userRole);
-      } else {
-        console.log("no user role");
-        logout();
-        navigate("/login");
+      } else if (userRole === "editor") {
+        navigate("/editor"); // ✅ Optional route if available
       }
     } else if (setting === "Edit") {
-      if (userRole == "seeker") {
+      if (userRole === "seeker") {
         navigate("/seeker/profile/edit");
-      } else if (userRole == "employer") {
+      } else if (userRole === "employer") {
         navigate("/employer/edit_profile");
-      } else {
-        console.log("no user role");
-        logout();
-        navigate("/login");
       }
     }
   };
@@ -208,7 +205,7 @@ const Header_2 = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
     console.log("is auth", isAuthenticated);
-    console.log("token");
+    console.log("token", token);
   };
 
   const handleNavigate = (path: string) => {

@@ -428,6 +428,12 @@ export const updateEditor = async (editor_id:number, data:any) => {
   return response.data;
 };
 
+// post a new job - editor
+export const newJobPostEditor = async (editor_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/${editor_id}/job_posts`, data);
+  return response.data;
+};
+
 // ------------------JOB DETAILS -------------------
 
 // job details by id
@@ -476,12 +482,12 @@ export const markNotificationAsRead = async (
   );
 };
 
-/*export const deleteNotifications = async (
-  seekerId: string,
-  jobId: number
-): Promise<void> => {
-  await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
-};*/
+// export const deleteNotifications = async (
+//   seekerId: string,
+//   jobId: number
+// ): Promise<void> => {
+//   await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
+// };
 
 //-------------Skills Management for Seeker------------------
 

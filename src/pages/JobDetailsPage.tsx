@@ -47,7 +47,6 @@ const JobDetailsPage = () => {
   const [savedJob, setSavedJobs] = useState<number[]>([]);
   const [__, setAppliedJobs] = useState<Set<number>>(new Set());
 
-
   // state for the Report dialog
   const [open, setOpen] = useState(false);
 

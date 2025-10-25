@@ -8,6 +8,7 @@ import {
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../firebase/config";
 import { userLogin, editorLogin } from "../services/APIs/APIs";
+// import { useNotification } from "./NotificationsProvider";
 
 // --- Types ---
 interface AuthContextType {
@@ -34,6 +35,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<string | null>(null);
   const [isEditorLogin, setIsEditorLogin] = useState(false);
+
+  // const {notify} = useNotification();
 
   const setUserRoleAndInfo = (role: string, info: any) => {
     setUserRole(role);
@@ -74,14 +77,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginEditor = async (token: string): Promise<string> => {
     setToken(token);
     setIsEditorLogin(true);
+    localStorage.setItem("editorLogin", "true");
+
     try {
       const response = await editorLogin();
+
       if (response) {
-        setUserRole("editor");
         const editorID = response.EditorId;
         const userData = response.editor;
+        const isActive = userData.Active;
+
+        if (!isActive) {
+          logout();
+          return "inactive";
+        }
+
+        setUserRole("editor");
         setUserInfo(userData);
         console.log("info set: ", userData);
+
         setIsAuthenticated(true);
         return editorID;
       }
@@ -100,6 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUserRole(null);
     setIsAuthenticated(false);
     localStorage.removeItem("profileImage");
+    localStorage.removeItem("editorLogin");
     signOut(auth);
     console.log("logout function - OK");
   };
@@ -125,8 +140,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        if (isEditorLogin) {
-          console.log("Editor session - skipping backend persist fetch");
+        const editorPersist = localStorage.getItem("editorLogin") === "true";
+
+        if (editorPersist) {
+          console.log("Editor session - skip backend fetch");
+          setUserRole("editor");
+          setIsAuthenticated(true);
           setLoading(false);
           return;
         }
