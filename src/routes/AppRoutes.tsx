@@ -21,6 +21,7 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import { EditorProfilePage } from "../pages/Editor/EditorProfilePage";
 import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
+import HeadHuntingPage from "../pages/Editor/HeadHuntPage";
 
 const AppRoutes = () => (
   <Routes>
@@ -37,6 +38,8 @@ const AppRoutes = () => (
 
     <Route path="/editor_login" element={<EditorLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+    <Route path="/head_hunt" element={<HeadHuntingPage />} />
 
     {/* Protected routes */}
     <Route

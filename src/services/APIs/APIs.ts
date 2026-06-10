@@ -113,6 +113,11 @@ export const signupSeeker = async (data: { ContactNo: string }) => {
   return response.data;
 };
 
+export const getAllSeekers = async () => {
+  const response = await axiosInstance.get(`/employers/`);
+  return response.data;
+};
+
 // ------------------ SEEKER MAIN ------------------
 export const createSeeker = async (
   data: Omit<

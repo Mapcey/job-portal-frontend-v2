@@ -57,9 +57,11 @@ export const JOB_TYPES = [
 export const EDU_LEVELS = [
   "O/L",
   "A/L",
+  "Certificate",
   "Diploma",
-  "Degree",
+  "Bachelors",
   "Masters",
+  "MPhi",
   "PhD",
 ] as const;
 
