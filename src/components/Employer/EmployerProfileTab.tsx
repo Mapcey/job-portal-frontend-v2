@@ -61,11 +61,11 @@ const EmployerProfileTab = () => {
 
         // Find profile image
         const profileImage = fileData.find(
-          (file: any) => file.file_type === "FileType.image"
+          (file: any) => file.FileCategory === "FileType.image",
         );
 
-        if (profileImage && profileImage.file_url) {
-          setImageSrc(profileImage.file_url);
+        if (profileImage && profileImage.FileUrl) {
+          setImageSrc(profileImage.FileUrl);
         }
 
         console.log("Employer data:", data);
@@ -83,11 +83,11 @@ const EmployerProfileTab = () => {
         // 🔹 Fetch employer files (reuse existing endpoint)
         const files = await getEmployerFiles(employerID);
         const videoFile = files.find(
-          (file: any) => file.file_type === "FileType.video"
+          (file: any) => file.FileCategory === "FileType.video",
         );
 
-        if (videoFile && videoFile.file_url) {
-          setVideoUrl(videoFile.file_url);
+        if (videoFile && videoFile.FileUrl) {
+          setVideoUrl(videoFile.FileUrl);
         } else {
           setVideoUrl(null);
         }
