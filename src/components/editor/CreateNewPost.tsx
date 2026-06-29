@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
@@ -43,7 +43,7 @@ const CreateNewPost = () => {
     Status: "Pending",
   });
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { notify } = useNotification();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

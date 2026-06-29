@@ -2,7 +2,13 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState, ReactNode } from "react";
 
 import {
-  Box, Typography, Button, Chip, Stack, Paper, useMediaQuery,
+  Box,
+  Typography,
+  Button,
+  Chip,
+  Stack,
+  Paper,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import ReportIcon from "@mui/icons-material/Report";
@@ -14,8 +20,8 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import HistoryIcon from "@mui/icons-material/History";
 import EventNoteIcon from "@mui/icons-material/EventNote";
-import {  Public } from "@mui/icons-material";
-import { createReport } from "../services/APIs/APIs";
+import { Public } from "@mui/icons-material";
+// import { createReport } from "../services/APIs/APIs";
 // FILES
 import Header_1 from "../components/header/Header_1";
 import Header_2 from "../components/header/Header_2";
@@ -47,7 +53,6 @@ const JobDetailsPage = () => {
   const [savedJob, setSavedJobs] = useState<number[]>([]);
   const [__, setAppliedJobs] = useState<Set<number>>(new Set());
 
-
   // state for the Report dialog
   const [open, setOpen] = useState(false);
 
@@ -56,7 +61,6 @@ const JobDetailsPage = () => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
 
   useEffect(() => {
     if (id) {
@@ -140,16 +144,16 @@ const JobDetailsPage = () => {
     <div className="job-details-page-container">
       {isAuthenticated ? <Header_2 /> : <Header_1 />}
 
-<Breadcrumb
-  title="Job Details"
-  description="Explore the details of your selected job."
-  backgroundImage="/imgs/backgrounds/bg-2.jpg"
-  path={[
-    { label: "Home", href: "/" },
-    { label: "Jobs", href: "/jobs" },
-    { label: "Job Details" },
-  ]}
-/>
+      <Breadcrumb
+        title="Job Details"
+        description="Explore the details of your selected job."
+        backgroundImage="/imgs/backgrounds/bg-2.jpg"
+        path={[
+          { label: "Home", href: "/" },
+          { label: "Jobs", href: "/jobs" },
+          { label: "Job Details" },
+        ]}
+      />
 
       <Box
         className="job-details-page-content"
@@ -205,10 +209,15 @@ const JobDetailsPage = () => {
                 : "(Expired)"}
             </Typography>
 
-            <Typography variant={isMobile ? "subtitle1" : "subtitle1"}              display="flex"
+            <Typography
+              variant={isMobile ? "subtitle1" : "subtitle1"}
+              display="flex"
               alignItems="center"
-              gap={1} mb={2} color="text.secondary">
-               <Public fontSize="small" />
+              gap={1}
+              mb={2}
+              color="text.secondary"
+            >
+              <Public fontSize="small" />
               {job.Location}, Sri Lanka
             </Typography>
 

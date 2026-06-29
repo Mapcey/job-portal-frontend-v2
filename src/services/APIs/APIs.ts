@@ -8,7 +8,7 @@ import {
   SEEKER_DATA,
   Skill,
   seekerFiles,
-  EDITOR_DATA
+  // EDITOR_DATA
 } from "../../types/users";
 import {
   saved_jobs,

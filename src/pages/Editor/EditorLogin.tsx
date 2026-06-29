@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 
-import { editorLogin } from "../../services/APIs/APIs";
+// import { editorLogin } from "../../services/APIs/APIs";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
+  // GoogleAuthProvider,
+  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
@@ -26,21 +26,21 @@ const EditorLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+  // const [error, setError] = useState("");
 
-    const navigate = useNavigate();
-    const { login } = useAuth();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-      try {
+    try {
       await setPersistence(auth, browserLocalPersistence);
 
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const token = await userCredential.user.getIdToken();
       console.log(token);
@@ -59,10 +59,12 @@ const EditorLogin: React.FC = () => {
           console.log(token);
         }
       } else {
-        setError("Authentication failed. Please try again.");
+        // setError("Authentication failed. Please try again.");
+        console.log("test");
       }
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during login");
+      // setError(err.message || "An unexpected error occurred during login");
+      console.log("test");
     }
   };
 
@@ -146,7 +148,6 @@ const EditorLogin: React.FC = () => {
               )}
             </Button>
           </form>
-
         </CardContent>
       </Card>
     </Box>

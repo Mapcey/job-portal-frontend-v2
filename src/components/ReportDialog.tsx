@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 // import { createReport } from "../services/APIs/APIs";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
   open: boolean;
@@ -28,18 +28,18 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
 }) => {
   // const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  const [_, setConfirmOpen] = useState(false);
-  const [_, setUserID] = useState();
-  const { userInfo } = useAuth();
-  const [loading, _] = useState(false);
+  // const [confirmOpen, setConfirmOpen] = useState(false);
+  // const [_, setUserID] = useState();
+  // const { userInfo } = useAuth();
+  // const [loading, setLoading_] = useState(false);
   const [category, setCategory] = useState("spam");
 
-  useEffect(() => {
-    if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
-  }, [userInfo]);
+  // useEffect(() => {
+  //   if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
+  // }, [userInfo]);
 
   const handleSubmit = () => {
-    setConfirmOpen(true);
+    // setConfirmOpen(true);
   };
 
   // const handleConfirm = () => {
@@ -84,9 +84,9 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
           onClick={handleSubmit}
           variant="contained"
           color="primary"
-          disabled={loading}
+          // disabled={loading}
         >
-          {loading ? "Submitting…" : "Submit"}
+          {/* {loading ? "Submitting…" : "Submit"} */}
         </Button>
       </DialogActions>
     </Dialog>
