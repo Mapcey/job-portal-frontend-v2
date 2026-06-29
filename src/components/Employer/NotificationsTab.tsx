@@ -6,7 +6,7 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  IconButton,
+  // IconButton,
   Divider,
   Dialog,
   DialogTitle,
@@ -14,7 +14,7 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import { notification } from "../../types/notification";
@@ -48,7 +48,7 @@ const NotificationsTab = () => {
           // 🔹 Sort newest first
           const sorted = [...data].sort(
             (a, b) =>
-              new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime()
+              new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime(),
           );
 
           setNotifications(sorted);
@@ -70,8 +70,8 @@ const NotificationsTab = () => {
         prev.map((n) =>
           n.NotificationId === note.NotificationId
             ? { ...n, Status: "Read" }
-            : n
-        )
+            : n,
+        ),
       );
 
       try {
@@ -79,7 +79,7 @@ const NotificationsTab = () => {
         if (userInfo && "EmployerId" in userInfo) {
           await updateEmployerNotification(
             userInfo.EmployerId,
-            note.NotificationId
+            note.NotificationId,
           );
           console.log(`Notification ${note.NotificationId} marked as read`);
         }
@@ -90,8 +90,8 @@ const NotificationsTab = () => {
           prev.map((n) =>
             n.NotificationId === note.NotificationId
               ? { ...n, Status: "Unread" }
-              : n
-          )
+              : n,
+          ),
         );
       }
     }

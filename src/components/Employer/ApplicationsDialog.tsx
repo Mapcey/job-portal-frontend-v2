@@ -15,7 +15,7 @@ import {
   Select,
   MenuItem,
   Box,
-  ListItemIcon,
+  // ListItemIcon,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -114,7 +114,7 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                     candidate.AppliedDateTime
                       ? format(
                           new Date(candidate.AppliedDateTime),
-                          "dd MMM yyyy, hh:mm a"
+                          "dd MMM yyyy, hh:mm a",
                         )
                       : "N/A"
                   }`}
@@ -146,7 +146,7 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                     onClick={() =>
                       window.open(
                         `/seeker_account/${candidate.SeekerId}`,
-                        "_blank"
+                        "_blank",
                       )
                     }
                   >
@@ -195,7 +195,7 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                             <Typography variant="body2">{label}</Typography>
                           </Box>
                         </MenuItem>
-                      )
+                      ),
                     )}
                   </Select>
                 </Box>

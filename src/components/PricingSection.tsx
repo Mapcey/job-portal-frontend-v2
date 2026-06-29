@@ -49,13 +49,7 @@ const PricingSection = () => {
         <Box sx={{ marginTop: 5 }}>
           <Grid container spacing={4} justifyContent="center">
             {pricingPlans.map((plan, index) => (
-              <Grid
-                item
-                key={plan.title || index}
-                xs={12} // full width on mobile
-                sm={6} // two per row on small tablets
-                md={4} // three per row on medium+ screens
-              >
+              <Grid key={plan.title || index}>
                 <Card
                   elevation={plan.highlighted ? 8 : 2}
                   sx={{

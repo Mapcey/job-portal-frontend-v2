@@ -29,7 +29,7 @@ import { EMP_POSTED_JOBS } from "../../types/job";
 import {
   getEmployerPostedJobs,
   deleteJob,
-  editJob,
+  // editJob,
   getCandidatesOfJob,
   applicationStatusUpdate,
   updateJobPost,
@@ -122,8 +122,8 @@ const PostedJobs = () => {
 
       setJobs((prevJobs) =>
         prevJobs.map((job) =>
-          job.JobId === id ? { ...job, Status: "Closed" } : job
-        )
+          job.JobId === id ? { ...job, Status: "Closed" } : job,
+        ),
       );
 
       notify(title + " closed for applications", "success");
@@ -320,7 +320,7 @@ const PostedJobs = () => {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  "Are you sure you want to close this post?"
+                                  "Are you sure you want to close this post?",
                                 )
                               ) {
                                 handleClose(job.JobId, job.JobTitle);
@@ -336,7 +336,7 @@ const PostedJobs = () => {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  "Are you sure you want to delete this post?"
+                                  "Are you sure you want to delete this post?",
                                 )
                               ) {
                                 handleDelete(job.JobId);
@@ -355,7 +355,7 @@ const PostedJobs = () => {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  "Are you sure you want to close this post?"
+                                  "Are you sure you want to close this post?",
                                 )
                               ) {
                                 handleClose(job.JobId, job.JobTitle);
@@ -374,7 +374,7 @@ const PostedJobs = () => {
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  "Are you sure you want to delete this post?"
+                                  "Are you sure you want to delete this post?",
                                 )
                               ) {
                                 handleDelete(job.JobId);
@@ -410,8 +410,8 @@ const PostedJobs = () => {
               prev.map((c) =>
                 c.ApplicationId === candidate.ApplicationId
                   ? { ...c, Status: newStatus }
-                  : c
-              )
+                  : c,
+              ),
             );
           } catch (error) {
             console.error("Failed to update candidate status:", error);

@@ -8,7 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-import { createReport } from "../services/APIs/APIs";
+// import { createReport } from "../services/APIs/APIs";
 import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
@@ -23,15 +23,15 @@ const categories = ["spam", "harassment", "other"];
 const ReportDialog: React.FC<ReportDialogProps> = ({
   open,
   onClose,
-   mode,
-  id,
+  mode,
+  // id,
 }) => {
-  const [reason, setReason] = useState("");
+  // const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [_, setConfirmOpen] = useState(false);
   const [_, setUserID] = useState();
   const { userInfo } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, _] = useState(false);
   const [category, setCategory] = useState("spam");
 
   useEffect(() => {
@@ -42,13 +42,13 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
     setConfirmOpen(true);
   };
 
-  const handleConfirm = () => {
-    console.log("Report submitted:", { reason, description });
-    setConfirmOpen(false);
-    onClose();
-    setReason("");
-    setDescription("");
-  };
+  // const handleConfirm = () => {
+  //   console.log("Report submitted:", { reason, description });
+  //   setConfirmOpen(false);
+  //   onClose();
+  //   setReason("");
+  //   setDescription("");
+  // };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

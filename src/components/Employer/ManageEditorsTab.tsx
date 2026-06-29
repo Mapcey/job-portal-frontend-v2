@@ -18,8 +18,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { useAuth } from "../../context/AuthContext";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-import { auth } from "../../firebase/config";
+// import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
+// import { auth } from "../../firebase/config";
 // import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
 import { createNewEditor, getEditors } from "../../services/APIs/APIs";
 import { useNotification } from "../../context/NotificationsProvider";
@@ -93,9 +93,9 @@ const ManageEditorsTab = () => {
         Password: password,
       };
 
-      const response = await createNewEditor( userPayload);
+      const response = await createNewEditor(userPayload);
       console.log(response);
-      
+
       notify("Account Created", "success");
     } catch (err: any) {
       console.error("Signup failed:", err);
@@ -108,20 +108,23 @@ const ManageEditorsTab = () => {
       // }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
+      console.log("test");
     }
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async (editor: EDITOR_DATA) => {
-    try {
-      // const updated = await updateEditorStatus(editor.id, !editor.isActive);
-      // setEditors((prev) =>
-      //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
-      // );
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+  const handleToggleStatus = async () =>
+    // editor: EDITOR_DATA
+    {
+      try {
+        // const updated = await updateEditorStatus(editor.id, !editor.isActive);
+        // setEditors((prev) =>
+        //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
+        // );
+      } catch (err) {
+        console.error("Failed to update status:", err);
+      }
+    };
 
   // Delete editor
   const handleDeleteEditor = async (editorId: number) => {
@@ -223,18 +226,17 @@ const ManageEditorsTab = () => {
       </Typography>
       {loading ? (
         <Typography>Loading editors...</Typography>
-) : editors.length === 0 ? (
-  <Box
-    sx={{
-      textAlign: "center",
-      mt: 5,
-      color: "text.secondary",
-      fontStyle: "italic",
-    }}
-  >
-    <Typography variant="body1">No editors created yet.</Typography>
-  </Box>
-
+      ) : editors.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: "center",
+            mt: 5,
+            color: "text.secondary",
+            fontStyle: "italic",
+          }}
+        >
+          <Typography variant="body1">No editors created yet.</Typography>
+        </Box>
       ) : (
         <Grid container spacing={2}>
           {editors.map((editor) => (
@@ -286,7 +288,7 @@ const ManageEditorsTab = () => {
                     </Typography>
                     <Switch
                       checked={editor.Active}
-                      onChange={() => handleToggleStatus(editor)}
+                      onChange={() => handleToggleStatus()}
                       color="success"
                     />
                   </Stack>
