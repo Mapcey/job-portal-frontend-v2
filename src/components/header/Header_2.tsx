@@ -44,7 +44,7 @@ const Header_2 = () => {
   const { logout, userInfo, userRole, isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
+    null,
   );
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [anchorElNotification, setAnchorElNotification] =
@@ -56,7 +56,7 @@ const Header_2 = () => {
   const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   const handleOpenNotification = async (
-    event: React.MouseEvent<HTMLElement>
+    event: React.MouseEvent<HTMLElement>,
   ) => {
     setAnchorElNotification(event.currentTarget);
     setLoadingNotifications(true);
@@ -128,13 +128,6 @@ const Header_2 = () => {
   };
 
   const handleMenuItemClick = async (setting: string) => {
-
-    const settings =
-    userRole === "editor"
-      ? ["Profile", "Logout"] // ✅ Only these for editor
-      : ["Profile", "Edit", "Logout"]; // ✅ Others get all three
-      
-const handleMenuItemClick = (setting: string) => {
     handleCloseUserMenu();
 
     if (setting === "Logout") {
@@ -162,7 +155,7 @@ const handleMenuItemClick = (setting: string) => {
   const handleDeactivate = async () => {
     handleCloseUserMenu();
     const confirm = window.confirm(
-      "Are you sure you want to deactivate your account? This will permanently delete your Firebase account."
+      "Are you sure you want to deactivate your account? This will permanently delete your Firebase account.",
     );
     if (!confirm) return;
 
@@ -182,7 +175,7 @@ const handleMenuItemClick = (setting: string) => {
       console.error("Failed to deactivate account:", err);
       if (err.code === "auth/requires-recent-login") {
         window.alert(
-          "Please re-authenticate and try again (you must sign in again before deleting your account)."
+          "Please re-authenticate and try again (you must sign in again before deleting your account).",
         );
       } else {
         window.alert(err.message || "Failed to deactivate account.");
@@ -224,7 +217,7 @@ const handleMenuItemClick = (setting: string) => {
 
         if (files) {
           const imageFile = files.find(
-            (file: any) => file.file_type === "FileType.image"
+            (file: any) => file.file_type === "FileType.image",
           );
           if (imageFile?.file_url) {
             setProfileImage(imageFile.file_url);
