@@ -4,32 +4,31 @@ import {
   Typography,
   TextField,
   Button,
-  Card,
-  CardContent,
-  CardActions,
-  Grid,
   IconButton,
   Switch,
   Tooltip,
   Stack,
   Avatar,
+  Table,
+  TableHead,
+  TableCell,
+  TableRow,
+  TableBody,
+  TableContainer,
+  Paper,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { useAuth } from "../../context/AuthContext";
-// import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-// import { auth } from "../../firebase/config";
-// import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
-import { createNewEditor, getEditors } from "../../services/APIs/APIs";
+import {
+  createNewEditor,
+  getEditors,
+  deleteEditor,
+  updateEditor,
+} from "../../services/APIs/APIs";
 import { useNotification } from "../../context/NotificationsProvider";
 import { EDITOR_DATA } from "../../types/users";
-
-// interface Editor {
-//   id: string;
-//   email: string;
-//   isActive: boolean;
-// }
 
 const ManageEditorsTab = () => {
   const { userInfo } = useAuth();
@@ -50,23 +49,23 @@ const ManageEditorsTab = () => {
 
   const { notify } = useNotification();
 
+  const fetchEditors = async () => {
+    if (!userInfo) return;
+    setLoading(true);
+    try {
+      const data = await getEditors(userInfo.EmployerId);
+      setEditors(data);
+      console.log(data);
+    } catch (err) {
+      console.error("Failed to fetch editors:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch editors on mount
   useEffect(() => {
-    const fetchEditors = async () => {
-      if (!userInfo) return;
-      setLoading(true);
-      try {
-        const data = await getEditors(userInfo.EmployerId);
-        setEditors(data);
-      } catch (err) {
-        console.error("Failed to fetch editors:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchEditors();
-
-    setEditors;
   }, [userInfo]);
 
   // Create new editor
@@ -76,10 +75,12 @@ const ManageEditorsTab = () => {
 
     if (!email || !password || !confirmPassword) {
       setError("Email/ Password required");
+      notify("Email/ Password required", "error");
       return;
     }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      notify("Passwords do not match", "error");
       return;
     }
 
@@ -93,43 +94,48 @@ const ManageEditorsTab = () => {
         Password: password,
       };
 
-      const response = await createNewEditor(userPayload);
+      const response = await createNewEditor(userInfo.EmployerId, userPayload);
       console.log(response);
 
-      notify("Account Created", "success");
+      fetchEditors();
+
+      notify("Editor Account Created", "success");
     } catch (err: any) {
       console.error("Signup failed:", err);
       notify("Account Create faile", "error");
-      // const user = auth.currentUser;
-      // if (user) {
-      //   await deleteUser(user).catch((deleteErr) =>
-      //     console.warn("Failed to delete Firebase user:", deleteErr)
-      //   );
-      // }
       setError(err.message || "An unexpected error occurred during signup");
     } finally {
-      console.log("test");
+      console.log("ok");
     }
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async () =>
-    // editor: EDITOR_DATA
-    {
-      try {
-        // const updated = await updateEditorStatus(editor.id, !editor.isActive);
-        // setEditors((prev) =>
-        //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
-        // );
-      } catch (err) {
-        console.error("Failed to update status:", err);
+  const handleToggleStatus = async (editor: EDITOR_DATA) => {
+    try {
+      const updated = await updateEditor(editor.EditorId, {
+        Active: !editor.Active,
+      });
+
+      setEditors((prev) =>
+        prev.map((e) =>
+          e.EditorId === editor.EditorId ? { ...e, Active: updated.Active } : e,
+        ),
+      );
+
+      if (!editor.Active) {
+        notify(`Editor '${editor.FirstName}' Activeted now`, "info");
+      } else if (editor.Active) {
+        notify(`Editor '${editor.FirstName}' Deactiveted now`, "info");
       }
-    };
+    } catch (err) {
+      console.error("Failed to update status:", err);
+    }
+  };
 
   // Delete editor
   const handleDeleteEditor = async (editorId: number) => {
     try {
-      // await deleteEditor(editorId);
+      await deleteEditor(9);
       setEditors((prev) => prev.filter((e) => e.EditorId !== editorId));
     } catch (err) {
       console.error("Failed to delete editor:", err);
@@ -238,34 +244,50 @@ const ManageEditorsTab = () => {
           <Typography variant="body1">No editors created yet.</Typography>
         </Box>
       ) : (
-        <Grid container spacing={2}>
-          {editors.map((editor) => (
-            <Grid key={editor.EditorId}>
-              <Card
-                sx={{
-                  // p: 2,
-                  borderRadius: 3,
-                  boxShadow: 3,
-                  transition: "0.3s",
-                  "&:hover": { boxShadow: 6, transform: "translateY(-2px)" },
-                }}
-              >
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar
-                      sx={{
-                        bgcolor: editor.Active ? "success.main" : "grey.400",
-                      }}
-                    >
-                      <PersonIcon />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle1" fontWeight="600">
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: 3, boxShadow: 3 }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell sx={{ display: { xs: "none", sm: "table-cell" } }}>
+                  Email
+                </TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="center">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {editors.map((editor) => (
+                <TableRow key={editor.EditorId}>
+                  <TableCell>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {/* Avatar hidden on mobile */}
+                      <Avatar
+                        sx={{
+                          display: { xs: "none", sm: "flex" },
+                          bgcolor: editor.Active ? "success.main" : "grey.400",
+                        }}
+                      >
+                        <PersonIcon />
+                      </Avatar>
+
+                      <Typography>
                         {editor.FirstName} {editor.LastName}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {editor.Email}
-                      </Typography>
+                    </Stack>
+                  </TableCell>
+
+                  {/* Email hidden on mobile */}
+                  <TableCell sx={{ display: { xs: "none", sm: "table-cell" } }}>
+                    <Typography variant="body2">{editor.Email}</Typography>
+                  </TableCell>
+
+                  <TableCell>
+                    <Stack direction="row" spacing={1} alignItems="center">
                       <Typography
                         variant="caption"
                         sx={{
@@ -277,34 +299,30 @@ const ManageEditorsTab = () => {
                       >
                         {editor.Active ? "Active" : "Inactive"}
                       </Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
 
-                <CardActions sx={{ justifyContent: "space-between", px: 2 }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary">
-                      Status
-                    </Typography>
-                    <Switch
-                      checked={editor.Active}
-                      onChange={() => handleToggleStatus()}
-                      color="success"
-                    />
-                  </Stack>
-                  <Tooltip title="Delete Editor">
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDeleteEditor(editor.EditorId)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      <Switch
+                        checked={editor.Active}
+                        onChange={() => handleToggleStatus(editor)}
+                        color="success"
+                      />
+                    </Stack>
+                  </TableCell>
+
+                  <TableCell align="center">
+                    <Tooltip title="Delete Editor">
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDeleteEditor(editor.EditorId)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Box>
   );

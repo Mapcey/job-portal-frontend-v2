@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -28,6 +28,10 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    localStorage.removeItem("editorLogin");
+  }, );
 
   const { login } = useAuth();
 
@@ -82,6 +86,11 @@ const LoginPage = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const browseEditorLogin = () => {
+     localStorage.setItem("editorLogin", "true");
+    navigate('/editor_login')
+  }
 
   return (
     <Container>
@@ -189,7 +198,7 @@ const LoginPage = () => {
                   <Button
             variant="text"
             color="primary"
-            onClick={() => navigate("/editor_login")}
+            onClick={browseEditorLogin}
           >
             Editor Login
           </Button>

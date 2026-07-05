@@ -23,9 +23,10 @@ import {
 } from "../../types/jobOptions";
 import { CREATE_JOB } from "../../types/job";
 import { useNotification } from "../../context/NotificationsProvider";
-import { createNewJob } from "../../services/APIs/APIs";
+import { newJobPostEditor } from "../../services/APIs/APIs";
 import { sriLankaCities } from "../../assets/data/sriLankaCities";
-import RichTextBox from "../../components/RichTextBox";
+import RichTextBox from "../../components/RichTextBox"
+import { useAuth } from "../../context/AuthContext";
 
 const CreateNewPost = () => {
   const [formData, setFormData] = useState<CREATE_JOB>({
@@ -45,6 +46,7 @@ const CreateNewPost = () => {
 
   // const navigate = useNavigate();
   const { notify } = useNotification();
+  const { userInfo } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,7 +59,7 @@ const CreateNewPost = () => {
   const handleSubmit = async () => {
     try {
       console.log(formData);
-      const response = await createNewJob(formData);
+      const response = await newJobPostEditor(userInfo.EditorId, formData);
       console.log("Job created:", response);
       notify("New job posted", "success");
     } catch (err) {

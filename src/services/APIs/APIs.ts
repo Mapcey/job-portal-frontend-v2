@@ -113,6 +113,11 @@ export const signupSeeker = async (data: { ContactNo: string }) => {
   return response.data;
 };
 
+export const getAllSeekers = async () => {
+  const response = await axiosInstance.get(`/employers/`);
+  return response.data;
+};
+
 // ------------------ SEEKER MAIN ------------------
 export const createSeeker = async (
   data: Omit<
@@ -351,9 +356,56 @@ export const getCandidatesOfJob = async (JobID: number) => {
   return response.data;
 };
 
+// employer new files upload
+export const uploadNewEmployerFiles = async (employerId: number, formData: FormData) => {
+  const response = await axiosInstance.post(
+    `/employer_files/${employerId}/files`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+//get employer files
+export const getEmployerFiles = async (employerId: number) => {
+  const response = await axiosInstance.get(`/employer_files/${employerId}/files`);
+  return response.data;
+};
+
+// Update existing employer file
+export const updateEmployerFile = async (
+  employerId: number,
+  fileId: number,
+  formData: FormData,
+  onUploadProgress?: (progressEvent: any) => void
+) => {
+  const response = await axiosInstance.put(
+    `/employer_files/${employerId}/files/${fileId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress, // 👈 track upload progress here
+    }
+  );
+  return response.data;
+};
+
+// delete employer files
+export const deleteEmployerFiles = async (employerId: number, file_id: number) => {
+  const response = await axiosInstance.delete(`/employer_files/${employerId}/files/${file_id}`);
+  return response.data;
+};
+
+// -----------------------EDITORS--------------------------
 // create a new editor
-export const createNewEditor = async ( data: any) => {
-  const response = await axiosInstance.post(`/editors/`, data);
+export const createNewEditor = async (employer_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/employers/${employer_id}/editors`, data);
   return response.data;
 };
 
@@ -369,6 +421,23 @@ export const editorLogin = async () => {
   return response.data;
 };
 
+// delete editor
+export const deleteEditor = async (editor_id:number) => {
+  const response = await axiosInstance.delete(`/editors/${editor_id}`);
+  return response.data;
+};
+
+//update editor
+export const updateEditor = async (editor_id:number, data:any) => {
+  const response = await axiosInstance.put(`/editors/${editor_id}`, data);
+  return response.data;
+};
+
+// post a new job - editor
+export const newJobPostEditor = async (editor_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/${editor_id}/job_posts`, data);
+  return response.data;
+};
 
 // ------------------JOB DETAILS -------------------
 
@@ -418,12 +487,12 @@ export const markNotificationAsRead = async (
   );
 };
 
-/*export const deleteNotifications = async (
-  seekerId: string,
-  jobId: number
-): Promise<void> => {
-  await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
-};*/
+// export const deleteNotifications = async (
+//   seekerId: string,
+//   jobId: number
+// ): Promise<void> => {
+//   await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
+// };
 
 //-------------Skills Management for Seeker------------------
 
