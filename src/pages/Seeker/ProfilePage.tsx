@@ -22,6 +22,7 @@ import { useAuth } from "../../context/AuthContext";
 import SavedJobsTab from "../../components/Seeker/SavedJobsTab";
 import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
+import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 // import Loading from "../../components/Loading";
  
@@ -36,20 +37,30 @@ const SeekerProfilePage = () => {
   useEffect(() => {
     const fetchVideo = async () => {
       if (userInfo && userInfo.UserId) {
+        
+          console.log('1');
         try {
           const filesData = await getSeekerFiles(userInfo.UserId.toString());
+          console.log('2');
           const filesArr = Array.isArray(filesData) ? filesData : [filesData];
-          const videoFiles = filesArr.filter(f => f.file_name.match(/\.mp4$/i));
+          console.log('3', filesArr);
+          const videoFiles = filesArr.filter(
+            (f) => typeof f.file_name === "string" && /\.mp4$/i.test(f.file_name)
+          );
+          console.log('4', videoFiles);
           if (videoFiles.length > 0) {
             const latest = videoFiles.sort(
-              (a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+              (a, b) =>
+                new Date(b.uploaded_at).getTime() -
+                new Date(a.uploaded_at).getTime()
             )[0];
             setLatestVideo(latest);
           } else {
             setLatestVideo(null);
           }
         } catch (error) {
-          console.log('null video');
+          console.error('null video', error);
+          setLatestVideo(null);
         }
       }
     };
@@ -76,17 +87,23 @@ const SeekerProfilePage = () => {
         break;
       case 1:
         setBreadcrumb({
+          title: "Subscriptions",
+          desc: "Manage your subscription status and payslips.",
+        });
+        break;
+      case 2:
+        setBreadcrumb({
           title: "Saved Jobs",
           desc: "Jobs you saved for later viewing.",
         });
         break;
-      case 2:
+      case 3:
         setBreadcrumb({
           title: "Notifications",
           desc: "Check your updates and alerts here.",
         });
         break;
-      case 3:
+      case 4:
         setBreadcrumb({
           title: "Manage Applications",
           desc: "Check your applications here.",
@@ -100,9 +117,9 @@ const SeekerProfilePage = () => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 0:
-         return (
-        <Box>
-          <SeekerProfileTab />
+        return (
+          <Box>
+            <SeekerProfileTab />
 
           {/* Video section below profile tab */}
           <Box
@@ -143,10 +160,12 @@ const SeekerProfilePage = () => {
         </Box>
       );
       case 1:
-        return <SavedJobsTab />;
+        return <SubscriptionStatusTab />;
       case 2:
-        return <NotificationsTab />;
+        return <SavedJobsTab />;
       case 3:
+        return <NotificationsTab />;
+      case 4:
         return <ManageApplicationsTab />;
       default:
         return null;
@@ -191,9 +210,10 @@ return (
               variant="outlined"
             >
               <MenuItem value={0}>My Profile</MenuItem>
-              <MenuItem value={1}>Saved Jobs</MenuItem>
-              <MenuItem value={2}>Notifications</MenuItem>
-              <MenuItem value={3}>My Applications</MenuItem>
+              <MenuItem value={1}>Subscriptions</MenuItem>
+              <MenuItem value={2}>Saved Jobs</MenuItem>
+              <MenuItem value={3}>Notifications</MenuItem>
+              <MenuItem value={4}>My Applications</MenuItem>
             </Select>
           </Box>
         ) : (
@@ -218,6 +238,7 @@ return (
               indicatorColor="primary"
             >
               <Tab label="My Profile" sx={{ alignItems: "flex-start" }} />
+              <Tab label="Subscriptions" sx={{ alignItems: "flex-start" }} />
               <Tab label="Saved Jobs" sx={{ alignItems: "flex-start" }} />
               <Tab label="Notifications" sx={{ alignItems: "flex-start" }} />
               <Tab label="My Applications" sx={{ alignItems: "flex-start" }} />
@@ -232,6 +253,16 @@ return (
               }}
             >
               Browse Jobs
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mt: 4 }}
+              onClick={() => {
+                //navigate("/jobs");
+              }}
+            >
+              Allow head hunting
             </Button>
           </Box>
         )}

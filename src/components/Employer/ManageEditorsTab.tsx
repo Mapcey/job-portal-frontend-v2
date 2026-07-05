@@ -18,8 +18,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PersonIcon from "@mui/icons-material/Person";
 
 import { useAuth } from "../../context/AuthContext";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
-import { auth } from "../../firebase/config";
+//import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
+//import { auth } from "../../firebase/config";
 // import { getEditors, createEditor, updateEditorStatus, deleteEditor } from "../../services/APIs/APIs";
 import { createNewEditor, getEditors } from "../../services/APIs/APIs";
 import { useNotification } from "../../context/NotificationsProvider";
@@ -112,11 +112,11 @@ const ManageEditorsTab = () => {
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async (editor: EDITOR_DATA) => {
+  const handleToggleStatus = async (_editor: EDITOR_DATA) => {
     try {
-      // const updated = await updateEditorStatus(editor.id, !editor.isActive);
+      // const updated = await updateEditorStatus(_editor.id, !_editor.isActive);
       // setEditors((prev) =>
-      //   prev.map((e) => (e.id === editor.id ? { ...e, isActive: updated.isActive } : e))
+      //   prev.map((e) => (e.id === _editor.id ? { ...e, isActive: updated.isActive } : e))
       // );
     } catch (err) {
       console.error("Failed to update status:", err);

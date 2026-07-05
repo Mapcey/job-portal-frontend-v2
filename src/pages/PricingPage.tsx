@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Box,
@@ -50,7 +51,8 @@ const packages = [
 ];
 
 const PricingPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, userRole } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("Home", isAuthenticated);
@@ -128,6 +130,11 @@ const PricingPage = () => {
                       textTransform: "none",
                       px: 4,
                       py: 1.5,
+                    }}
+                    onClick={() => {
+                      // route depending on role; ProtectedRoute will handle authentication
+                      const targetRole = userRole === "employer" ? "employer" : "seeker";
+                      navigate(`/${targetRole}/subscription-upload?plan=${encodeURIComponent(pkg.title)}`);
                     }}
                   >
                     Choose Plan

@@ -70,6 +70,12 @@ const SeekerPublicViewPage = () => {
     return <Typography variant="h6">Seeker profile not found</Typography>;
   }
 
+  const displayRole = seeker?.JobType || seeker?.WorkType || "Software Engineer";
+  const displayWorkMode = seeker?.JobType2 || seeker?.WorkType || "";
+  const salaryLabel = seeker?.MinSalary != null || seeker?.MaxSalary != null
+    ? `Salary: ${seeker?.MinSalary ?? "-"} - ${seeker?.MaxSalary ?? "-"}${seeker?.Currency ? ` ${seeker.Currency}` : ""}`
+    : "Salary not specified";
+
   return (
     <Box>
       <Header_2 />
@@ -181,7 +187,7 @@ const SeekerPublicViewPage = () => {
                   color="text.secondary"
                   sx={{ fontSize: { xs: "0.9rem", sm: "1rem" } }}
                 >
-                  Software Engineer
+                  {displayRole}
                 </Typography>
 
                 <Box mt={2} display="flex" gap={1} flexWrap="wrap">
@@ -195,14 +201,9 @@ const SeekerPublicViewPage = () => {
                       seeker?.ProfessionalExperience || 0
                     } yrs`}
                   />
-                  <Chip variant="outlined" label={seeker?.JobType || ""} />
-                  <Chip variant="outlined" label={seeker?.JobType2 || ""} />
-                  {seeker?.MinSalary && (
-                    <Chip
-                      variant="outlined"
-                      label={`Min Salary: ${seeker.MinSalary}`}
-                    />
-                  )}
+                  <Chip variant="outlined" label={displayRole} />
+                  {displayWorkMode && <Chip variant="outlined" label={displayWorkMode} />}
+                  <Chip variant="outlined" label={salaryLabel} />
                 </Box>
               </Box>
 

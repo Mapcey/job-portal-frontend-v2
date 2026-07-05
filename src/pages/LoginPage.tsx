@@ -31,6 +31,28 @@ const LoginPage = () => {
 
   const { login } = useAuth();
 
+  const firebaseErrorMessage = (err: any) => {
+    const code = err?.code || "";
+    switch (code) {
+      case "auth/invalid-credential":
+        return "Invalid authentication credential. Please try signing in again.";
+      case "auth/user-not-found":
+        return "No account found for this email. Please sign up first.";
+      case "auth/wrong-password":
+        return "Incorrect password. Use 'Forgot password' to reset it.";
+      case "auth/too-many-requests":
+        return "Too many attempts. Please wait and try again later.";
+      case "auth/popup-closed-by-user":
+        return "Sign-in popup was closed before completing. Please try again.";
+      case "auth/popup-blocked":
+        return "Sign-in popup was blocked by your browser. Allow popups and try again.";
+      case "auth/cancelled-popup-request":
+        return "Sign-in was cancelled. Please try again.";
+      default:
+        return err?.message || "An unexpected authentication error occurred.";
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -61,7 +83,7 @@ const LoginPage = () => {
         setError("Authentication failed. Please try again.");
       }
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during login");
+      setError(firebaseErrorMessage(err));
     }
   };
 
@@ -70,12 +92,20 @@ const LoginPage = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       console.log("Google Sign-In successful:", result.user);
-      navigate("/seeker/profile");
+
+      // After Firebase sign-in, obtain token and call backend login to set app state
+      const token = await result.user.getIdToken();
+      try {
+        const role = await login(token);
+        if (role === "employer") navigate("/employer/profile");
+        else navigate("/seeker/profile");
+      } catch (innerErr: any) {
+        console.error("Backend login failed after Google sign-in:", innerErr);
+        setError(innerErr?.message || "Signed in with Google but failed to complete app login.");
+      }
     } catch (err: any) {
       console.error("Error during Google Sign-In:", err);
-      setError(
-        err.message || "An unexpected error occurred during Google Sign-In"
-      );
+      setError(firebaseErrorMessage(err));
     }
   };
 
@@ -163,18 +193,6 @@ const LoginPage = () => {
             Login
           </Button>
         </Box>
-        <Typography variant="body2" sx={{ margin: "10px 0" }}>
-          Or
-        </Typography>
-        <Button
-          variant="outlined"
-          color="primary"
-          fullWidth
-          sx={{ padding: "10px 0", borderRadius: 2 }}
-          onClick={handleGoogleSignIn}
-        >
-          Sign in with Google
-        </Button>
         <Typography variant="body2" sx={{ marginTop: 2 }}>
           Don't have an account?{" "}
           <Button

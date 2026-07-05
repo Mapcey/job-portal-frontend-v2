@@ -43,7 +43,7 @@ const CreateNewPost = () => {
     Status: "Pending",
   });
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { notify } = useNotification();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

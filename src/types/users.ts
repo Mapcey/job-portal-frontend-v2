@@ -27,6 +27,7 @@ export interface SEEKER_DATA {
   PayPeriod?: string | "null";
   JobType: string;
   JobType2: string;
+  WorkType?: string;
   SocialLinks: string;
   Summary: string;
   IsSubscribed: boolean;

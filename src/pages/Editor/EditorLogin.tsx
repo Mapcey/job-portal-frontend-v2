@@ -10,11 +10,8 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 
-import { editorLogin } from "../../services/APIs/APIs";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";

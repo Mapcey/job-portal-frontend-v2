@@ -9,10 +9,12 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Alert,
 } from "@mui/material";
 import { updateSeeker } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { currencies } from "../../data/currencies";
 
 const jobTypes = [
   "Full-time",
@@ -32,6 +34,7 @@ const CreateSeeker: React.FC = () => {
   const { userInfo } = useAuth(); // ✅ hook inside component
   const [seekerID, setSeekerID] = useState<number>(0);
   const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [form, setForm] = useState({
     FirstName: "",
     LastName: "",
@@ -40,6 +43,7 @@ const CreateSeeker: React.FC = () => {
     LocationY: 0,
     Address: "",
     Email: "",
+    Currency: "",
     ProfessionalExperience: 0,
     DateOfBirth: "",
     JobType: "",
@@ -73,20 +77,32 @@ const CreateSeeker: React.FC = () => {
     if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
   }, [userInfo]);
 
+  useEffect(() => {
+    if (userInfo?.Email) {
+      setForm((prev) => ({ ...prev, Email: userInfo.Email }));
+    }
+  }, [userInfo?.Email]);
+
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
     try {
-      // For updateSeeker, you need a SeekerId. Replace 1 with actual ID if available.
-      await updateSeeker(seekerID, {
+      const payload = {
         ...form,
-        Email: form.Email,
-        DateOfBirth: new Date(form.DateOfBirth),
-      });
-      alert("Seeker profile updated successfully!");
-      setTimeout(() => navigate(-1), 1500);
+        Email: userInfo?.Email || form.Email,
+        Currency: form.Currency || undefined,
+        LocationX: Number(form.LocationX || 0),
+        LocationY: Number(form.LocationY || 0),
+        ProfessionalExperience: Number(form.ProfessionalExperience || 0),
+        DateOfBirth: form.DateOfBirth ? new Date(form.DateOfBirth) : undefined,
+        IsSubscribed: Boolean(form.IsSubscribed),
+      };
+
+      await updateSeeker(seekerID, payload);
+      setSuccessMessage("Profile updated successfully! Please login again.");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       alert("Failed to update seeker");
       console.error(error);
@@ -104,6 +120,12 @@ const CreateSeeker: React.FC = () => {
         boxShadow: 3,
       }}
     >
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 3 }}>
+          {successMessage}
+        </Alert>
+      )}
+
       <Typography variant="h5" mb={3} fontWeight={600}>
         Create Profile
       </Typography>
@@ -139,7 +161,7 @@ const CreateSeeker: React.FC = () => {
           fullWidth
           label="Email"
           placeholder="Enter email"
-          value={userInfo.Email}
+          value={form.Email || userInfo?.Email || ""}
           disabled
         />
       </Box>
@@ -199,37 +221,23 @@ const CreateSeeker: React.FC = () => {
         sx={{ mb: 2 }}
       />
 
-      {/* Job Type / Job Type 2 */}
-      <Box display="flex" gap={2} mb={2}>
-        <Autocomplete
-          fullWidth
-          options={jobTypes}
-          value={form.JobType}
-          onChange={(_, newValue) => handleChange("JobType", newValue || "")}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Job Type"
-              placeholder="Select job type"
-            />
-          )}
-        />
-        <FormControl fullWidth>
-          <InputLabel id="job-mode-label">Work Mode</InputLabel>
-          <Select
-            labelId="job-mode-label"
-            value={form.JobType2 || ""}
-            name="JobType2"
-            onChange={(e) => setForm({ ...form, JobType2: e.target.value })}
-          >
-            {jobModeOptions.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
+      {/* Currency */}
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel id="currency-label">Currency</InputLabel>
+        <Select
+          labelId="currency-label"
+          value={form.Currency || ""}
+          name="Currency"
+          label="Currency"
+          onChange={(e) => handleChange("Currency", e.target.value)}
+        >
+          {currencies.map((c) => (
+            <MenuItem key={c.code} value={c.code}>
+              {c.code} - {c.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       {/* Social Links */}
       <TextField
