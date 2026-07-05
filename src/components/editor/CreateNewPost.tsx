@@ -25,7 +25,7 @@ import { CREATE_JOB } from "../../types/job";
 import { useNotification } from "../../context/NotificationsProvider";
 import { newJobPostEditor } from "../../services/APIs/APIs";
 import { sriLankaCities } from "../../assets/data/sriLankaCities";
-import RichTextBox from "../../components/RichTextBox"
+import RichTextBox from "../../components/RichTextBox";
 import { useAuth } from "../../context/AuthContext";
 
 const CreateNewPost = () => {

@@ -23,6 +23,7 @@ import NotificationsTab from "../../components/Employer/NotificationsTab";
 import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 import ManageEditorsTab from "../../components/Employer/ManageEditorsTab";
+import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
 
 const EmployerProfilePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +70,12 @@ const EmployerProfilePage = () => {
         break;
       case 1:
         setBreadcrumb({
+          title: "Subscriptions",
+          desc: "Manage your subscription status and payslips.",
+        });
+        break;
+      case 1:
+        setBreadcrumb({
           title: "Manage Candidates",
           desc: "Jobs you saved for later viewing.",
         });
@@ -107,12 +114,14 @@ const EmployerProfilePage = () => {
       case 0:
         return <EmployerProfileTab />;
       case 1:
-        return <ManageCandidatesTab />;
+        return <SubscriptionStatusTab role="employer" />;
       case 2:
-        return <PostedJobs />;
+        return <ManageCandidatesTab />;
       case 3:
-        return <NotificationsTab />;
+        return <PostedJobs />;
       case 4:
+        return <NotificationsTab />;
+      case 5:
         return (
           <PendingApprovalsTab
             pendingJobs={pendingJobs}
@@ -121,7 +130,7 @@ const EmployerProfilePage = () => {
             onDelete={(id) => console.log("Deleted:", id)}
           />
         );
-      case 5:
+      case 6:
         return <ManageEditorsTab />;
       default:
         return null;
@@ -173,6 +182,10 @@ const EmployerProfilePage = () => {
             >
               <Tab
                 label="My Profile"
+                sx={{ color: "secondary.main", alignItems: "flex-start" }}
+              />
+              <Tab
+                label="Subscriptions"
                 sx={{ color: "secondary.main", alignItems: "flex-start" }}
               />
               <Tab
@@ -245,11 +258,12 @@ const EmployerProfilePage = () => {
                 }
               >
                 <MenuItem value={0}>My Profile</MenuItem>
-                <MenuItem value={1}>Manage Candidates</MenuItem>
-                <MenuItem value={2}>Posted Jobs</MenuItem>
-                <MenuItem value={3}>Notifications</MenuItem>
-                <MenuItem value={4}>Pending Approvals</MenuItem>
-                <MenuItem value={5}>Manage Editors</MenuItem>
+                <MenuItem value={1}>Subscriptions</MenuItem>
+                <MenuItem value={2}>Manage Candidates</MenuItem>
+                <MenuItem value={3}>Posted Jobs</MenuItem>
+                <MenuItem value={4}>Notifications</MenuItem>
+                <MenuItem value={5}>Pending Approvals</MenuItem>
+                <MenuItem value={6}>Manage Editors</MenuItem>
               </Select>
             </FormControl>
           )}

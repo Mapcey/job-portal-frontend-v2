@@ -110,7 +110,7 @@ const ManageEditorsTab = () => {
   };
 
   // Activate/Deactivate editor
-  const handleToggleStatus = async (editor: EDITOR_DATA) => {
+  const handleToggleStatus = async (_editor: EDITOR_DATA) => {
     try {
       const updated = await updateEditor(editor.EditorId, {
         Active: !editor.Active,

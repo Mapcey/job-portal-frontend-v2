@@ -1,8 +1,21 @@
 import axios from "axios";
 import { auth } from "../firebase/config";
 
+const normalizeApiHost = (url?: string) => {
+  if (!url) return undefined;
+  return url.replace(/\/api2?\/?$/, "");
+};
+
+const getApiBaseUrl = () => {
+  return (
+    normalizeApiHost(import.meta.env.VITE_API_BASE_URL) ||
+    normalizeApiHost(import.meta.env.VITE_API_URL) ||
+    "http://46.62.192.148"
+  );
+};
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   headers: {
     "Content-Type": "application/json",
   },

@@ -21,6 +21,8 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import { EditorProfilePage } from "../pages/Editor/EditorProfilePage";
 import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
+import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
+import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
 import HeadHuntingPage from "../pages/Editor/HeadHuntPage";
 
 const AppRoutes = () => (
@@ -59,10 +61,27 @@ const AppRoutes = () => (
       }
     />
     <Route
+      path="/seeker/subscription-upload"
+      element={
+        <ProtectedRoute allowedRoles={["seeker"]}>
+          <SeekerSubscriptionUpload />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path="/employer/profile"
       element={
         <ProtectedRoute allowedRoles={["employer"]}>
           <EmployerProfilePage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/employer/subscription-upload"
+      element={
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <EmployerSubscriptionUpload />
         </ProtectedRoute>
       }
     />

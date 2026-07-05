@@ -26,6 +26,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
 import { useAuth } from "../../context/AuthContext";
+import { deleteUser } from "firebase/auth";
+import { auth } from "../../firebase/config";
+
 import {
   getAllEmployerNotifications,
   getEmployerFiles,
@@ -34,7 +37,7 @@ import {
 import { getSeekerFiles } from "../../services/APIs/APIs";
 import NotificationPopover from "./NotificationPop";
 
-const settings = ["Profile", "Edit", "Logout"];
+const settings = ["Profile", "Edit", "Deactivate", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
@@ -124,6 +127,8 @@ const Header_2 = () => {
     setAnchorElUser(null);
   };
 
+  const handleMenuItemClick = async (setting: string) => {
+
     const settings =
     userRole === "editor"
       ? ["Profile", "Logout"] // ✅ Only these for editor
@@ -148,6 +153,39 @@ const handleMenuItemClick = (setting: string) => {
         navigate("/seeker/profile/edit");
       } else if (userRole === "employer") {
         navigate("/employer/edit_profile");
+      }
+    } else if (setting === "Deactivate") {
+      await handleDeactivate();
+    }
+  };
+
+  const handleDeactivate = async () => {
+    handleCloseUserMenu();
+    const confirm = window.confirm(
+      "Are you sure you want to deactivate your account? This will permanently delete your Firebase account."
+    );
+    if (!confirm) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+      window.alert("No authenticated user found. Please log in again.");
+      return;
+    }
+
+    try {
+      await deleteUser(user);
+      // After successful deletion, clear local auth state and navigate home
+      logout();
+      navigate("/");
+      window.alert("Account deactivated successfully.");
+    } catch (err: any) {
+      console.error("Failed to deactivate account:", err);
+      if (err.code === "auth/requires-recent-login") {
+        window.alert(
+          "Please re-authenticate and try again (you must sign in again before deleting your account)."
+        );
+      } else {
+        window.alert(err.message || "Failed to deactivate account.");
       }
     }
   };

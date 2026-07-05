@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+// DownloadIcon removed (unused)
 import { getSeekerData, getSeekerFiles } from "../../services/APIs/APIs";
 import { SEEKER_DATA, seekerFiles } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
@@ -19,6 +20,14 @@ const SeekerProfileTab = () => {
   const [seekerID, setSeekerID] = useState(0);
   const [user, setUser] = useState<SEEKER_DATA | null>(null);
   const [files, setFiles] = useState<seekerFiles[] | null>(null);
+
+  const getLatestByType = (regex: RegExp) =>
+    (files && [...files].filter((f) => regex.test(f.file_name)).sort(
+      (a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime()
+    )[0]) || null;
+
+  const latestImage = getLatestByType(/\.(jpg|jpeg|png)$/i);
+  const latestCV = getLatestByType(/\.(pdf|docx)$/i);
 
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) {
@@ -67,6 +76,8 @@ const SeekerProfileTab = () => {
     </Paper>
   );
 
+  const fullName = [user?.FirstName, user?.LastName].filter(Boolean).join(" ");
+
   return (
     <div className="seeker-profile-tab-container">
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
@@ -83,67 +94,100 @@ const SeekerProfileTab = () => {
         {/* Profile Photo + CV */}
         <SectionBox>
           {files && files.length > 0 && (() => {
-            const getLatestByType = (regex: RegExp) =>
-              ([...files]
-                .filter((f) => regex.test(f.file_name))
-                .sort(
-                  (a, b) =>
-                    new Date(b.uploaded_at).getTime() -
-                    new Date(a.uploaded_at).getTime()
-                )[0] || null);
-
-            const latestImage = getLatestByType(/\.(jpg|jpeg|png)$/i);
-            const latestCV = getLatestByType(/\.(pdf|docx)$/i);
-
             return (
-              <Box sx={{ display: "flex", gap: 2 }}>
-                {latestImage && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 3,
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Box
+                  component={latestImage ? "a" : "div"}
+                  href={latestImage?.file_url ?? undefined}
+                  target={latestImage ? "_blank" : undefined}
+                  rel={latestImage ? "noopener noreferrer" : undefined}
                   sx={{
-                    width: 200,
-                    height: 200,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    boxShadow: 2,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#f0f0f0",
-                    border: "4px solid #1976d2" // <— add border here
+                    position: "relative",
+                    width: 220,
+                    height: 220,
+                    borderRadius: 4,
+                    background: "linear-gradient(135deg, rgba(25,118,210,0.2), rgba(13, 109, 217, 0.05))",
+                    p: 1,
+                    boxShadow: "0 18px 40px rgba(25, 118, 210, 0.15)",
+                    textDecoration: "none",
+                    cursor: latestImage ? "pointer" : "default",
+                    '&:hover .profile-image-overlay': {
+                      opacity: latestImage ? 1 : 0,
+                    },
                   }}
                 >
-                  <img
-                    src={latestImage.file_url}
-                    alt="Profile"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </Box>
-              )}
-
-                {latestCV && (
                   <Box
                     sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      boxShadow: 1,
-                      backgroundColor: "#fafafa",
-                      alignSelf: "center",
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: 3,
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "1px solid rgba(25, 118, 210, 0.12)",
                     }}
                   >
-                    <a
-                      href={latestCV.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ textDecoration: "none", color: "#d18024ff" }}
-                    >
-                      Download CV
-                    </a>
+                    {latestImage ? (
+                      <img
+                        src={latestImage.file_url}
+                        alt="Profile"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "text.secondary", textAlign: "center", px: 2 }}
+                      >
+                        No profile photo uploaded
+                      </Typography>
+                    )}
                   </Box>
-                )}
+                  {latestImage && (
+                    <Box
+                      className="profile-image-overlay"
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        bgcolor: "rgba(13, 109, 217, 0.24)",
+                        color: "#fff",
+                        opacity: 0,
+                        transition: "opacity 0.2s ease",
+                        fontWeight: 700,
+                        letterSpacing: 0.5,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      View Photo
+                    </Box>
+                  )}
+                </Box>
+
+                <Box
+                  sx={{
+                    flex: 1,
+                    minWidth: 260,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1.5,
+                  }}
+                >
+                </Box>
               </Box>
             );
           })()}
@@ -153,8 +197,8 @@ const SeekerProfileTab = () => {
         <SectionBox>
           <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
             <Box>
-              <Typography variant="h4">{user?.FirstName + " "+ user?.LastName || ""}</Typography>
-              <Typography variant="subtitle1">Software Engineer</Typography>
+              <Typography variant="h4">{fullName || "Your Name"}</Typography>
+              <Typography variant="subtitle1">{user?.JobType || "Software Engineer"}</Typography>
             </Box>
             <Box>
               <Typography variant="h6">Phone No</Typography>
@@ -174,7 +218,7 @@ const SeekerProfileTab = () => {
               variant="outlined"
             />
             <Chip label={user?.JobType || ""} variant="outlined" />
-            <Chip label={user?.JobType2 || ""} variant="outlined" />
+            <Chip label={user?.WorkType || ""} variant="outlined" />
           </Box>
           <Box sx={{ display: "flex", mt: 1, gap: 1, flexWrap: "wrap" }}>
             <Chip
@@ -212,6 +256,37 @@ const SeekerProfileTab = () => {
           </Box>
         </SectionBox>
 
+        
+
+        {/* CV Section (moved above Social links) */}
+        <SectionBox title="Documents">
+          {latestCV ? (
+            <Typography
+              component="a"
+              href={latestCV.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 1,
+                color: "primary.main",
+                fontWeight: 600,
+                textDecoration: "none",
+                borderBottom: "1px solid",
+                borderColor: "primary.main",
+                width: "fit-content",
+              }}
+            >
+              View
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No CV uploaded yet.
+            </Typography>
+          )}
+        </SectionBox>
+
         {/* Social Links */}
         <SectionBox title="Social links">
           <Typography variant="subtitle1">
@@ -238,8 +313,8 @@ const SeekerProfileTab = () => {
         {/* Career History */}
         <SectionBox title="Career History">
           {user?.careers && user.careers.length > 0 ? (
-            user.careers.map((career) => (
-              <Box key={career.id} mb={2}>
+            user.careers.map((career, index) => (
+              <Box key={career.id ?? `career-${index}`} mb={2}>
                 <Typography variant="h6">{career.Designation}</Typography>
                 <Typography variant="subtitle2">{career.CompanyName}</Typography>
                 <Typography variant="body2">
@@ -256,8 +331,8 @@ const SeekerProfileTab = () => {
         {/* Education */}
         <SectionBox title="Education">
           {user?.educations && user.educations.length > 0 ? (
-            user.educations.map((edu) => (
-              <Box key={edu.id} mb={2}>
+            user.educations.map((edu, index) => (
+              <Box key={edu.id ?? `education-${index}`} mb={2}>
                 <Typography variant="h6">{edu.InstituteName}</Typography>
                 <Typography variant="subtitle2">{edu.FieldOfStudy}</Typography>
                 <Typography variant="body2">
@@ -277,9 +352,9 @@ const SeekerProfileTab = () => {
         <SectionBox title="Skills">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {user?.skills && user.skills.length > 0 ? (
-              user.skills.map((skill) => (
+              user.skills.map((skill, index) => (
                 <Chip
-                  key={skill.id}
+                  key={skill.id ?? `skill-${index}`}
                   label={`${skill.Skill} (${skill.ExpertLevel})`}
                   variant="outlined"
                 />
@@ -293,9 +368,9 @@ const SeekerProfileTab = () => {
           </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {user?.languages && user.languages.length > 0 ? (
-              user.languages.map((lang) => (
+              user.languages.map((lang, index) => (
                 <Chip
-                  key={lang.id}
+                  key={lang.id ?? `language-${index}`}
                   label={`${lang.Language} (${lang.ExpertLevel})`}
                   variant="outlined"
                 />
