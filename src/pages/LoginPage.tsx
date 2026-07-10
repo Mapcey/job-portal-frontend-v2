@@ -11,8 +11,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
+  // GoogleAuthProvider,
+  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
@@ -31,7 +31,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     localStorage.removeItem("editorLogin");
-  }, );
+  });
 
   const { login } = useAuth();
 
@@ -66,7 +66,7 @@ const LoginPage = () => {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const token = await userCredential.user.getIdToken();
       console.log(token);
@@ -91,36 +91,36 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Google Sign-In successful:", result.user);
+  // const handleGoogleSignIn = async () => {
+  //   const provider = new GoogleAuthProvider();
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     console.log("Google Sign-In successful:", result.user);
 
-      // After Firebase sign-in, obtain token and call backend login to set app state
-      const token = await result.user.getIdToken();
-      try {
-        const role = await login(token);
-        if (role === "employer") navigate("/employer/profile");
-        else navigate("/seeker/profile");
-      } catch (innerErr: any) {
-        console.error("Backend login failed after Google sign-in:", innerErr);
-        setError(innerErr?.message || "Signed in with Google but failed to complete app login.");
-      }
-    } catch (err: any) {
-      console.error("Error during Google Sign-In:", err);
-      setError(firebaseErrorMessage(err));
-    }
-  };
+  //     // After Firebase sign-in, obtain token and call backend login to set app state
+  //     const token = await result.user.getIdToken();
+  //     try {
+  //       const role = await login(token);
+  //       if (role === "employer") navigate("/employer/profile");
+  //       else navigate("/seeker/profile");
+  //     } catch (innerErr: any) {
+  //       console.error("Backend login failed after Google sign-in:", innerErr);
+  //       setError(innerErr?.message || "Signed in with Google but failed to complete app login.");
+  //     }
+  //   } catch (err: any) {
+  //     console.error("Error during Google Sign-In:", err);
+  //     setError(firebaseErrorMessage(err));
+  //   }
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const browseEditorLogin = () => {
-     localStorage.setItem("editorLogin", "true");
-    navigate('/editor_login')
-  }
+    localStorage.setItem("editorLogin", "true");
+    navigate("/editor_login");
+  };
 
   return (
     <Container>
@@ -211,15 +211,10 @@ const LoginPage = () => {
           >
             Sign Up
           </Button>
-  
         </Typography>
-                  <Button
-            variant="text"
-            color="primary"
-            onClick={browseEditorLogin}
-          >
-            Editor Login
-          </Button>
+        <Button variant="text" color="primary" onClick={browseEditorLogin}>
+          Editor Login
+        </Button>
       </div>
     </Container>
   );

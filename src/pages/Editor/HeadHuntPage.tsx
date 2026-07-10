@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Grid,
@@ -13,7 +13,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
-import { getAllSeekers, getAll } from "../../services/APIs/APIs";
+import { getAllSeekers } from "../../services/APIs/APIs";
 import SeekerCard from "../../components/headhunt/SeekerCard";
 import SeekerFilterPanel from "../../components/headhunt/SeekerFilterPanel";
 
@@ -37,7 +37,7 @@ const HeadHuntPage = () => {
     const fetchSeekers = async () => {
       try {
         setLoading(true);
-        const data = await getAllSeekers(filters);
+        const data = await getAllSeekers();
         setSeekers(data);
       } catch (err) {
         console.error("Failed to load seekers", err);
@@ -83,7 +83,6 @@ const HeadHuntPage = () => {
           {/* Filter Panel - Desktop */}
           {!isMobile && (
             <Grid
-              item
               sx={{
                 width: 280, // fixed sidebar width
                 flexShrink: 0, // prevent shrinking
@@ -95,7 +94,6 @@ const HeadHuntPage = () => {
 
           {/* Seekers List */}
           <Grid
-            item
             sx={{
               flexGrow: 1, // take remaining width
             }}
@@ -109,7 +107,7 @@ const HeadHuntPage = () => {
             ) : (
               <Grid container spacing={2}>
                 {seekers.map((seeker) => (
-                  <Grid item xs={12} sm={6} md={4} key={seeker.id}>
+                  <Grid key={seeker.id}>
                     <SeekerCard seeker={seeker} />
                   </Grid>
                 ))}

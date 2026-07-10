@@ -4,7 +4,7 @@ import {
   TextField,
   Button,
   Typography,
-  Autocomplete,
+  // Autocomplete,
   Select,
   MenuItem,
   InputLabel,
@@ -16,19 +16,19 @@ import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { currencies } from "../../data/currencies";
 
-const jobTypes = [
-  "Full-time",
-  "Part-time",
-  "Internship",
-  "Contract",
-  "Freelance",
-  "Remote",
-];
-const jobModeOptions = [
-  { value: "On-site", label: "On-site" },
-  { value: "Remote", label: "Remote" },
-  { value: "Hybrid", label: "Hybrid" },
-];
+// const jobTypes = [
+//   "Full-time",
+//   "Part-time",
+//   "Internship",
+//   "Contract",
+//   "Freelance",
+//   "Remote",
+// ];
+// const jobModeOptions = [
+//   { value: "On-site", label: "On-site" },
+//   { value: "Remote", label: "Remote" },
+//   { value: "Hybrid", label: "Hybrid" },
+// ];
 
 const CreateSeeker: React.FC = () => {
   const { userInfo } = useAuth(); // ✅ hook inside component
@@ -54,24 +54,24 @@ const CreateSeeker: React.FC = () => {
   });
 
   useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        // set your LocationX and LocationY with latitude/longitude
-        setForm((prev) => ({
-          ...prev,
-          LocationX: position.coords.latitude, // X = latitude
-          LocationY: position.coords.longitude, // Y = longitude
-        }));
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-  }
-}, []);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // set your LocationX and LocationY with latitude/longitude
+          setForm((prev) => ({
+            ...prev,
+            LocationX: position.coords.latitude, // X = latitude
+            LocationY: position.coords.longitude, // Y = longitude
+          }));
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        },
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
 
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);

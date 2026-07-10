@@ -8,7 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-// import { createReport } from "../services/APIs/APIs";
+import { createReport } from "../services/APIs/APIs";
 // import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
@@ -24,11 +24,11 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   open,
   onClose,
   mode,
-  // id,
+  id,
 }) => {
   const [description, setDescription] = useState("");
-  const [_, setUserID] = useState();
-  const { userInfo } = useAuth();
+  // const [_, setUserID] = useState();
+  // const { userInfo } = useAuth();
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("spam");
 

@@ -23,7 +23,7 @@ import NotificationsTab from "../../components/Employer/NotificationsTab";
 import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 import ManageEditorsTab from "../../components/Employer/ManageEditorsTab";
-import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
+// import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
 
 const EmployerProfilePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -44,21 +44,6 @@ const EmployerProfilePage = () => {
     setSearchParams({ tab: newValue.toString() }); // 🔑 update URL without reload
   };
 
-  const pendingJobs = [
-    {
-      id: 101,
-      title: "React Developer (Remote)",
-      editor: "Jane Doe",
-      submittedAt: "2025-05-03 10:15 AM",
-    },
-    {
-      id: 102,
-      title: "Marketing Executive",
-      editor: "John Smith",
-      submittedAt: "2025-05-04 08:42 AM",
-    },
-  ];
-
   // Update breadcrumb on tab change
   useEffect(() => {
     switch (selectedTab) {
@@ -72,12 +57,6 @@ const EmployerProfilePage = () => {
         setBreadcrumb({
           title: "Subscriptions",
           desc: "Manage your subscription status and payslips.",
-        });
-        break;
-      case 1:
-        setBreadcrumb({
-          title: "Manage Candidates",
-          desc: "Jobs you saved for later viewing.",
         });
         break;
       case 2:
@@ -113,24 +92,16 @@ const EmployerProfilePage = () => {
     switch (selectedTab) {
       case 0:
         return <EmployerProfileTab />;
+
       case 1:
-        return <SubscriptionStatusTab role="employer" />;
-      case 2:
         return <ManageCandidatesTab />;
-      case 3:
+      case 2:
         return <PostedJobs />;
-      case 4:
+      case 3:
         return <NotificationsTab />;
+      case 4:
+        return <PendingApprovalsTab />;
       case 5:
-        return (
-          <PendingApprovalsTab
-            pendingJobs={pendingJobs}
-            onApprove={(id) => console.log("Approved:", id)}
-            onView={(id) => console.log("View job:", id)}
-            onDelete={(id) => console.log("Deleted:", id)}
-          />
-        );
-      case 6:
         return <ManageEditorsTab />;
       default:
         return null;
@@ -147,15 +118,11 @@ const EmployerProfilePage = () => {
     <div>
       <Header_2 />
 
-
-        <Breadcrumb
+      <Breadcrumb
         title={breadcrumb.title}
         description={breadcrumb.desc}
         backgroundImage="/imgs/backgrounds/bg-1.jpg"
-        path={[
-          { label: "Home", href: "/" },
-          { label: "Profile" },
-        ]}
+        path={[{ label: "Home", href: "/" }, { label: "Profile" }]}
       />
 
       <div className="employer-profile-page-container">

@@ -31,6 +31,8 @@ const EditorLogin: React.FC = () => {
 
   const { notify } = useNotification();
 
+  console.log(error);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

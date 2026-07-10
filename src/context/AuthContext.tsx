@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isEditorLogin, setIsEditorLogin] = useState(false);
 
   // const {notify} = useNotification();
+  console.log(isEditorLogin);
 
   const setUserRoleAndInfo = (role: string, info: any) => {
     setUserRole(role);
