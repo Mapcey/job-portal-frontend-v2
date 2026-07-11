@@ -15,7 +15,11 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { Visibility, CheckCircle, Delete } from "@mui/icons-material";
-import { getEmployerPostedJobs, updateJobPost, deleteJob } from "../../services/APIs/APIs";
+import {
+  getEmployerPostedJobs,
+  updateJobPost,
+  deleteJob,
+} from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext"; // your auth hook
 import { useNotification } from "../../context/NotificationsProvider";
 
@@ -47,7 +51,7 @@ const PendingApprovalsTab = () => {
           .sort(
             (a, b) =>
               new Date(b.submittedAt).getTime() -
-              new Date(a.submittedAt).getTime()
+              new Date(a.submittedAt).getTime(),
           );
 
         setPendingJobs(pending);
@@ -68,7 +72,7 @@ const PendingApprovalsTab = () => {
   const handleApprove = async (id: number, title: string) => {
     try {
       await updateJobPost(id, { Status: "Active" });
-      
+
       setPendingJobs((jobs) => jobs.filter((job) => job.id !== id)); // ✅ Remove from UI
       notify(`${title} approved successfully ✅`, "success");
     } catch (error) {
@@ -79,7 +83,7 @@ const PendingApprovalsTab = () => {
   const handleDelete = async (id: number) => {
     try {
       await deleteJob(id.toString());
-      
+
       setPendingJobs((jobs) => jobs.filter((job) => job.id !== id)); // ✅ Remove from UI
       notify("Job deleted successfully 🗑", "success");
     } catch (err) {
@@ -94,9 +98,23 @@ const PendingApprovalsTab = () => {
       </Typography>
 
       {loading ? (
-        <CircularProgress />
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
       ) : pendingJobs.length === 0 ? (
-        <Typography>No pending jobs ✅</Typography>
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 6,
+            border: "1px dashed",
+            borderColor: "grey.400",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body1" color="lightgray">
+            No jobs for approval from editors yet.
+          </Typography>
+        </Box>
       ) : (
         <List>
           {pendingJobs.map((job) => (

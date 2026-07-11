@@ -37,7 +37,7 @@ const ManageCandidatesTab = () => {
         const data = await getAllCandidates(userInfo.EmployerId.toString());
         // ✅ filter out rejected applications
         setAppliedCandidates(
-          data.filter((a: candidate) => a.Status !== "Rejected")
+          data.filter((a: candidate) => a.Status !== "Rejected"),
         );
       } catch (error) {
         console.error("Failed to fetch applications:", error);
@@ -70,7 +70,7 @@ const ManageCandidatesTab = () => {
   // ✅ Update status handler
   const handleStatusUpdate = async (
     applicationId: number,
-    newStatus: string
+    newStatus: string,
   ) => {
     try {
       // Update status in backend
@@ -86,7 +86,7 @@ const ManageCandidatesTab = () => {
         } else {
           // ✅ Update status for Reviewed / Selected (or other statuses)
           return prev.map((a) =>
-            a.ApplicationId === applicationId ? { ...a, Status: newStatus } : a
+            a.ApplicationId === applicationId ? { ...a, Status: newStatus } : a,
           );
         }
       });
@@ -104,6 +104,20 @@ const ManageCandidatesTab = () => {
       {loading ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <CircularProgress />
+        </Box>
+      ) : appliedCandidates.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 6,
+            border: "1px dashed",
+            borderColor: "grey.400",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body1" color="lightgray">
+            No Applied Candidates yet.
+          </Typography>
         </Box>
       ) : (
         <Box
@@ -243,7 +257,7 @@ const ManageCandidatesTab = () => {
                         job.AppliedDateTime
                           ? format(
                               new Date(job.AppliedDateTime),
-                              "dd MMM yyyy, hh:mm a"
+                              "dd MMM yyyy, hh:mm a",
                             )
                           : "N/A"
                       }

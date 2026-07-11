@@ -20,15 +20,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { getEmployerFiles } from "../../services/APIs/APIs";
 
 const EmployerProfileTab = () => {
-  // const photos = [
-  //   "/imgs/grid/design.jpg",
-  //   "/imgs/grid/developing.jpg",
-  //   "/imgs/grid/education.jpg",
-  //   "/imgs/grid/finance.jpg",
-  //   "/imgs/grid/health.jpg",
-  //   "/imgs/grid/legal.jpg",
-  // ];
-
   const [imageSrc, setImageSrc] = useState("");
   // const [files, setFiles] = useState([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
