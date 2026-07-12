@@ -10,61 +10,57 @@ import {
 } from "@mui/material";
 import { LockOutlined } from "@mui/icons-material";
 
-// import { editorLogin } from "../../services/APIs/APIs";
 import {
   signInWithEmailAndPassword,
-  // GoogleAuthProvider,
-  // signInWithPopup,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../../context/NotificationsProvider";
 
 const EditorLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { loginEditor } = useAuth();
+
+  const { notify } = useNotification();
+
+  console.log(error);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
+
     try {
       await setPersistence(auth, browserLocalPersistence);
-
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password,
       );
       const token = await userCredential.user.getIdToken();
-      console.log(token);
 
-      const success = await login(token); // Wait for backend validation
+      const result = await loginEditor(token);
 
-      console.log("login function - OK");
+      console.log(result);
 
-      if (success) {
-        console.log(success);
-
-        if (success == "employer") {
-          navigate("/employer/profile/");
-        } else if (success == "seeker") {
-          navigate("/seeker/profile/");
-          console.log(token);
-        }
-      } else {
-        // setError("Authentication failed. Please try again.");
-        console.log("test");
+      if (result === "inactive") {
+        notify("Inactive Account", "error");
+        return; // Stop navigation
       }
+
+      navigate("/editor");
     } catch (err: any) {
-      // setError(err.message || "An unexpected error occurred during login");
-      console.log("test");
+      setError(err.message || "Unexpected login error");
+    } finally {
+      setLoading(false);
     }
   };
 

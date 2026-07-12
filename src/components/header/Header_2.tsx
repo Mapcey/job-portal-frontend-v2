@@ -26,25 +26,55 @@ import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MailIcon from "@mui/icons-material/Mail";
 import { useAuth } from "../../context/AuthContext";
+import { deleteUser } from "firebase/auth";
+import { auth } from "../../firebase/config";
 
+import {
+  getAllEmployerNotifications,
+  getEmployerFiles,
+  getSeekerNotifications,
+} from "../../services/APIs/APIs";
+import { getSeekerFiles } from "../../services/APIs/APIs";
 import NotificationPopover from "./NotificationPop";
 
-const settings = ["Profile", "Edit", "Logout"];
+const settings = ["Profile", "Edit", "Deactivate", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, userInfo, userRole, isAuthenticated } = useAuth();
+  const { logout, userInfo, userRole, isAuthenticated, token } = useAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
-    null
+    null,
   );
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [anchorElNotification, setAnchorElNotification] =
     useState<null | HTMLElement>(null);
-  const handleOpenNotification = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNotification(event.currentTarget);
-  };
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+  const handleOpenNotification = async (
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
+    setAnchorElNotification(event.currentTarget);
+    setLoadingNotifications(true);
+
+    try {
+      if (userRole === "employer") {
+        const res = await getAllEmployerNotifications(userInfo.EmployerId);
+        setNotifications(Array.isArray(res) ? res : []);
+      } else if (userRole === "seeker") {
+        const res = await getSeekerNotifications(userInfo.UserId);
+        setNotifications(Array.isArray(res) ? res : []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    }
+
+    setLoadingNotifications(false);
+  };
 
   const handleCloseNotification = () => {
     setAnchorElNotification(null);
@@ -61,6 +91,9 @@ const Header_2 = () => {
       console.log(userRole);
     } else if (userRole == "employer") {
       navigate("/employer/profile");
+      console.log(userRole);
+    } else if (userRole == "editor") {
+      navigate("/editor");
       console.log(userRole);
     } else {
       console.log("no user role");
@@ -94,33 +127,58 @@ const Header_2 = () => {
     setAnchorElUser(null);
   };
 
-  const handleMenuItemClick = (setting: string) => {
+  const handleMenuItemClick = async (setting: string) => {
     handleCloseUserMenu();
 
     if (setting === "Logout") {
       logout();
       navigate("/login");
     } else if (setting === "Profile") {
-      if (userRole == "seeker") {
+      if (userRole === "seeker") {
         navigate("/seeker/profile");
-        console.log(userRole);
-      } else if (userRole == "employer") {
+      } else if (userRole === "employer") {
         navigate("/employer/profile");
-        console.log(userRole);
-      } else {
-        console.log("no user role");
-        logout();
-        navigate("/login");
+      } else if (userRole === "editor") {
+        navigate("/editor"); // ✅ Optional route if available
       }
     } else if (setting === "Edit") {
-      if (userRole == "seeker") {
+      if (userRole === "seeker") {
         navigate("/seeker/profile/edit");
-      } else if (userRole == "employer") {
+      } else if (userRole === "employer") {
         navigate("/employer/edit_profile");
+      }
+    } else if (setting === "Deactivate") {
+      await handleDeactivate();
+    }
+  };
+
+  const handleDeactivate = async () => {
+    handleCloseUserMenu();
+    const confirm = window.confirm(
+      "Are you sure you want to deactivate your account? This will permanently delete your Firebase account.",
+    );
+    if (!confirm) return;
+
+    const user = auth.currentUser;
+    if (!user) {
+      window.alert("No authenticated user found. Please log in again.");
+      return;
+    }
+
+    try {
+      await deleteUser(user);
+      // After successful deletion, clear local auth state and navigate home
+      logout();
+      navigate("/");
+      window.alert("Account deactivated successfully.");
+    } catch (err: any) {
+      console.error("Failed to deactivate account:", err);
+      if (err.code === "auth/requires-recent-login") {
+        window.alert(
+          "Please re-authenticate and try again (you must sign in again before deleting your account).",
+        );
       } else {
-        console.log("no user role");
-        logout();
-        navigate("/login");
+        window.alert(err.message || "Failed to deactivate account.");
       }
     }
   };
@@ -140,12 +198,45 @@ const Header_2 = () => {
     return "";
   };
 
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      // Check if already cached
+      const cachedImage = localStorage.getItem("profileImage");
+      if (cachedImage) {
+        setProfileImage(cachedImage);
+        return; // Skip fetching again
+      }
+
+      try {
+        let files;
+        if (userRole === "employer" && userInfo?.EmployerId) {
+          files = await getEmployerFiles(userInfo.EmployerId);
+        } else if (userRole === "seeker" && userInfo?.UserId) {
+          files = await getSeekerFiles(userInfo.UserId);
+        }
+
+        if (files) {
+          const imageFile = files.find(
+            (file: any) => file.file_type === "FileType.image",
+          );
+          if (imageFile?.file_url) {
+            setProfileImage(imageFile.file_url);
+            localStorage.setItem("profileImage", imageFile.file_url); // Cache it
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile image:", err);
+      }
+    };
+
+    fetchProfileImage();
+  }, [userRole, userInfo]);
+
   const handleTest = () => {
     console.log("info: ", userInfo);
     console.log("role: ", userRole);
     console.log("is auth", isAuthenticated);
-    console.log("token", );
-    
+    console.log("token", token);
   };
 
   const handleNavigate = (path: string) => {
@@ -232,11 +323,31 @@ const Header_2 = () => {
                 anchorEl={anchorElNotification}
                 open={Boolean(anchorElNotification)}
                 onClose={handleCloseNotification}
+                notifications={notifications}
+                loading={loadingNotifications}
               />
 
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar>{getInitial()}</Avatar>
+                  {profileImage ? (
+                    <Avatar
+                      src={profileImage}
+                      alt="Profile"
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  ) : (
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: "secondary.main",
+                        color: "#fff",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {getInitial()}
+                    </Avatar>
+                  )}
                 </IconButton>
               </Tooltip>
 

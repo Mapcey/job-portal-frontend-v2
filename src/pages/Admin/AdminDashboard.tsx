@@ -8,11 +8,15 @@ import {
   Button,
   Divider,
   TextField,
+  Tabs,
+  Tab,
+  MenuItem,
 } from "@mui/material";
 import { Report, People, Work, School } from "@mui/icons-material";
 
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import axiosInstance from "../../services/axiosInstance";
+import SubscriptionSection from "./SubscriptionSection";
 
 const formatEnum = (value: string) => {
   if (!value) return "";
@@ -28,7 +32,13 @@ const AdminDashboard = () => {
     totalJobs: 0,
   });
   const [reports, setReports] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [activeTab, setActiveTab] = useState(0);
   const [resolvingId, setResolvingId] = useState<number | null>(null);
   const [notes, setNotes] = useState<{ [key: number]: string }>({});
 
@@ -50,6 +60,16 @@ const AdminDashboard = () => {
       const res = await axiosInstance.get("/reports");
     console.log("Reports fetched:", res.data);
       setReports(res.data || []);
+
+      // Fetch subscriptions
+      try {
+        const subRes = await axiosInstance.get("/admin/payments");
+        console.log("Payments fetched:", subRes.data);
+        setSubscriptions(subRes.data || []);
+      } catch (e) {
+        console.warn("Failed to fetch payments.", e);
+        setSubscriptions([]);
+      }
     } catch (err) {
       console.error("Failed to fetch admin data:", err);
     } finally {
@@ -103,7 +123,30 @@ const AdminDashboard = () => {
   const sortedReports = [...reports].sort(
     (a, b) => new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime()
   );
-  const visibleReports = showAll ? sortedReports : sortedReports.slice(0, 3);
+
+  const statusOptions = Array.from(
+    new Set(reports.map((r) => r.Status).filter(Boolean))
+  );
+  const typeOptions = Array.from(
+    new Set(reports.map((r) => r.ReportedType).filter(Boolean))
+  );
+
+  const filteredReports = sortedReports.filter((report) => {
+    if (statusFilter !== "all" && report.Status !== statusFilter) return false;
+    if (typeFilter !== "all" && report.ReportedType !== typeFilter) return false;
+    const reportDate = new Date(report.DateTime);
+    if (fromDate) {
+      const from = new Date(fromDate + "T00:00:00");
+      if (reportDate < from) return false;
+    }
+    if (toDate) {
+      const to = new Date(toDate + "T23:59:59");
+      if (reportDate > to) return false;
+    }
+    return true;
+  });
+
+  const visibleReports = showAll ? filteredReports : filteredReports.slice(0, 3);
 
   const renderActionButtons = (report: any) => {
     const status = formatEnum(report.Status); // pending, under_review, resolved, dismissed
@@ -194,53 +237,150 @@ const AdminDashboard = () => {
           </Box>
         </Box>
 
-        {/* Reports Section */}
+        {/* Tabs for Reports and Subscriptions */}
         <Box mt={5}>
-          <Typography variant="h5" mb={2}>
-            Reports
-          </Typography>
-          <Box sx={{ border: "1px solid #eee", borderRadius: "8px", p: 2 }}>
-            {visibleReports.length > 0 ? (
-              visibleReports.map((report) => (
-                <Box key={report.ReportId} mb={3} sx={{ borderBottom: "1px solid #f0f0f0", pb: 2 }}>
-                  <Typography variant="subtitle1">
-                    Report #{report.ReportId} –{" "}
-                    <Chip label={formatEnum(report.ReportCategory)} size="small" color="warning" />
-                  </Typography>
-                  <Typography variant="body2" mt={0.5}>
-                    Reported {formatEnum(report.ReportedType)} ID {report.ReportedId} by {formatEnum(report.ReporterType)} ID {report.ReporterId}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {new Date(report.DateTime).toLocaleString()} | Status: <b>{formatEnum(report.Status)}</b>
-                  </Typography>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={activeTab}
+              onChange={(_event, newValue) => setActiveTab(newValue)}
+              aria-label="management tabs"
+            >
+              <Tab label="Reports" id="tab-0" aria-controls="tabpanel-0" />
+              <Tab label="Subscriptions" id="tab-1" aria-controls="tabpanel-1" />
+            </Tabs>
+          </Box>
 
-                  {/* Action buttons */}
-                  {renderActionButtons(report)}
+          {/* Reports Tab Panel */}
+          <Box
+            role="tabpanel"
+            hidden={activeTab !== 0}
+            id="tabpanel-0"
+            aria-labelledby="tab-0"
+            sx={{ pt: 3 }}
+          >
+            {activeTab === 0 && (
+              <Box>
+                {/* Filters */}
+                <Box mb={2} display="flex" gap={2} flexWrap="wrap">
+                  <TextField
+                    select
+                    label="Status"
+                    size="small"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    sx={{ minWidth: 160 }}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {statusOptions.map((s) => (
+                      <MenuItem key={s} value={s}>
+                        {formatEnum(s)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
 
-                  {/* Existing resolution notes */}
-                  {report.ResolutionNotes && (
-                    <Typography variant="body2" mt={1} color="text.secondary">
-                      Notes: {report.ResolutionNotes}
-                    </Typography>
+                  <TextField
+                    select
+                    label="Type"
+                    size="small"
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    sx={{ minWidth: 160 }}
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {typeOptions.map((t) => (
+                      <MenuItem key={t} value={t}>
+                        {formatEnum(t)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    label="From"
+                    type="date"
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                  />
+
+                  <TextField
+                    label="To"
+                    type="date"
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                  />
+
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setStatusFilter("all");
+                      setTypeFilter("all");
+                      setFromDate("");
+                      setToDate("");
+                    }}
+                  >
+                    Reset
+                  </Button>
+                </Box>
+
+                <Box sx={{ border: "1px solid #eee", borderRadius: "8px", p: 2 }}>
+                  {visibleReports.length > 0 ? (
+                    visibleReports.map((report) => (
+                      <Box key={report.ReportId} mb={3} sx={{ borderBottom: "1px solid #f0f0f0", pb: 2 }}>
+                        <Typography variant="subtitle1">
+                          Report #{report.ReportId} –{" "}
+                          <Chip label={formatEnum(report.ReportCategory)} size="small" color="warning" />
+                        </Typography>
+                        <Typography variant="body2" mt={0.5}>
+                          Reported {formatEnum(report.ReportedType)} ID {report.ReportedId} by {formatEnum(report.ReporterType)} ID {report.ReporterId}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(report.DateTime).toLocaleString()} | Status: <b>{formatEnum(report.Status)}</b>
+                        </Typography>
+
+                        {/* Action buttons */}
+                        {renderActionButtons(report)}
+
+                        {/* Existing resolution notes */}
+                        {report.ResolutionNotes && (
+                          <Typography variant="body2" mt={1} color="text.secondary">
+                            Notes: {report.ResolutionNotes}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography>No reports available.</Typography>
                   )}
                 </Box>
-              ))
-            ) : (
-              <Typography>No reports available.</Typography>
+
+                {reports.length > 3 && (
+                  <Box mt={2}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => setShowAll(!showAll)}
+                    >
+                      {showAll ? "Show Less" : "Show All Reports"}
+                    </Button>
+                  </Box>
+                )}
+              </Box>
             )}
           </Box>
 
-          {reports.length > 3 && (
-            <Box mt={2}>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => setShowAll(!showAll)}
-              >
-                {showAll ? "Show Less" : "Show All Reports"}
-              </Button>
-            </Box>
-          )}
+          {/* Subscriptions Tab Panel */}
+          <Box
+            role="tabpanel"
+            hidden={activeTab !== 1}
+            id="tabpanel-1"
+            aria-labelledby="tab-1"
+            sx={{ pt: 3 }}
+          >
+            {activeTab === 1 && <SubscriptionSection subscriptions={subscriptions} />}
+          </Box>
         </Box>
       </Box>
 

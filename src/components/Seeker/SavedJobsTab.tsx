@@ -19,30 +19,52 @@ import { useAuth } from "../../context/AuthContext";
 import { saved_jobs } from "../../types/job";
 
 const SavedJobsTab = () => {
-  const { userInfo } = useAuth();
-  const [seekerID, setSeekerID] = useState<number>(0);
+  const { userInfo, firebaseUser } = useAuth();
+  const [seekerID, setSeekerID] = useState<string | number | null>(null);
   const [savedJobs, setSavedJobs] = useState<saved_jobs[]>([]);
   const navigate = useNavigate();
 
   // Get seeker ID
+  // Get seeker ID (prefer SeekerId from userInfo, fallbacks to other fields, then firebase uid)
   useEffect(() => {
-    if (userInfo && "UserId" in userInfo) {
-      setSeekerID(userInfo.UserId);
+    if (userInfo) {
+      if ("SeekerId" in userInfo && userInfo.SeekerId) {
+        setSeekerID(userInfo.SeekerId);
+        return;
+      }
+      if ("UserId" in userInfo && userInfo.UserId) {
+        setSeekerID(userInfo.UserId);
+        return;
+      }
+      if ("id" in userInfo && userInfo.id) {
+        setSeekerID(userInfo.id);
+        return;
+      }
+      if ("userId" in userInfo && userInfo.userId) {
+        setSeekerID(userInfo.userId);
+        return;
+      }
     }
-  }, [userInfo]);
+
+    if (firebaseUser?.uid) {
+      setSeekerID(firebaseUser.uid);
+      return;
+    }
+  }, [userInfo, firebaseUser]);
 
   // Fetch saved jobs
   useEffect(() => {
     const fetchSavedJobs = async () => {
-      if (seekerID !== 0) {
-        try {
-          const data: saved_jobs[] = await getSeekerSavedJobs(
-            seekerID.toString()
-          );
-          setSavedJobs(data);
-        } catch (err) {
-          console.error("Failed to fetch saved jobs:", err);
-        }
+      const uid = seekerID;
+      if (!uid) return;
+      console.debug("Fetching saved jobs for seekerID:", uid);
+      try {
+        const data: saved_jobs[] = await getSeekerSavedJobs(
+          encodeURIComponent(String(uid))
+        );
+        setSavedJobs(data);
+      } catch (err) {
+        console.error("Failed to fetch saved jobs:", err);
       }
     };
     fetchSavedJobs();
@@ -50,9 +72,10 @@ const SavedJobsTab = () => {
 
   // Remove saved job
   const handleRemove = async (jobId: number) => {
-    if (!seekerID) return;
+    const uid = seekerID;
+    if (!uid) return;
     try {
-      await deleteSeekerSavedJob(seekerID.toString(), jobId);
+      await deleteSeekerSavedJob(encodeURIComponent(String(uid)), jobId);
       setSavedJobs((prev) => prev.filter((job) => job.JobId !== jobId));
     } catch (err) {
       console.error("Failed to remove job:", err);

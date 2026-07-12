@@ -113,6 +113,11 @@ export const signupSeeker = async (data: { ContactNo: string }) => {
   return response.data;
 };
 
+export const getAllSeekers = async () => {
+  const response = await axiosInstance.get(`/employers/`);
+  return response.data;
+};
+
 // ------------------ SEEKER MAIN ------------------
 export const createSeeker = async (
   data: Omit<
@@ -130,9 +135,22 @@ export const createSeeker = async (
 };
 
 //Seeker files
-export const getSeekerFiles = async (id: string): Promise<seekerFiles> => {
+const normalizeSeekerFile = (file: any): seekerFiles => ({
+  id: file.Id ?? file.id,
+  user_id: file.UserId ?? file.user_id,
+  file_name: file.FileName ?? file.file_name,
+  file_url: file.FileUrl ?? file.file_url,
+  uploaded_at: new Date(file.UploadedAt ?? file.uploaded_at),
+  file_type: file.FileCategory ?? file.file_type,
+});
+
+export const getSeekerFiles = async (
+  id: string
+): Promise<seekerFiles[]> => {
   const response = await axiosInstance.get(`/seeker_files/${id}/files`);
-  return response.data;
+  const rawData = response.data;
+  const filesArray = Array.isArray(rawData) ? rawData : [rawData];
+  return filesArray.map(normalizeSeekerFile);
 };
 
 // ------------------ CAREER ------------------
@@ -173,7 +191,7 @@ export const createSkill = async (skill: Skill & { SeekerId: number }) => {
 // ------------------ LANGUAGE ------------------
 export const createLanguage = async (
   seekerId: number,
-  language: languages
+  language: Partial<languages>
 ) => {
   try {
     const response = await axiosInstance.post(
@@ -351,9 +369,56 @@ export const getCandidatesOfJob = async (JobID: number) => {
   return response.data;
 };
 
+// employer new files upload
+export const uploadNewEmployerFiles = async (employerId: number, formData: FormData) => {
+  const response = await axiosInstance.post(
+    `/employer_files/${employerId}/files`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
+
+//get employer files
+export const getEmployerFiles = async (employerId: number) => {
+  const response = await axiosInstance.get(`/employer_files/${employerId}/files`);
+  return response.data;
+};
+
+// Update existing employer file
+export const updateEmployerFile = async (
+  employerId: number,
+  fileId: number,
+  formData: FormData,
+  onUploadProgress?: (progressEvent: any) => void
+) => {
+  const response = await axiosInstance.put(
+    `/employer_files/${employerId}/files/${fileId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      onUploadProgress, // 👈 track upload progress here
+    }
+  );
+  return response.data;
+};
+
+// delete employer files
+export const deleteEmployerFiles = async (employerId: number, file_id: number) => {
+  const response = await axiosInstance.delete(`/employer_files/${employerId}/files/${file_id}`);
+  return response.data;
+};
+
+// -----------------------EDITORS--------------------------
 // create a new editor
-export const createNewEditor = async ( data: any) => {
-  const response = await axiosInstance.post(`/editors/`, data);
+export const createNewEditor = async (employer_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/employers/${employer_id}/editors`, data);
   return response.data;
 };
 
@@ -369,6 +434,23 @@ export const editorLogin = async () => {
   return response.data;
 };
 
+// delete editor
+export const deleteEditor = async (editor_id:number) => {
+  const response = await axiosInstance.delete(`/editors/${editor_id}`);
+  return response.data;
+};
+
+//update editor
+export const updateEditor = async (editor_id:number, data:any) => {
+  const response = await axiosInstance.put(`/editors/${editor_id}`, data);
+  return response.data;
+};
+
+// post a new job - editor
+export const newJobPostEditor = async (editor_id: string, data: any) => {
+  const response = await axiosInstance.post(`/editors/${editor_id}/job_posts`, data);
+  return response.data;
+};
 
 // ------------------JOB DETAILS -------------------
 
@@ -418,12 +500,12 @@ export const markNotificationAsRead = async (
   );
 };
 
-/*export const deleteNotifications = async (
-  seekerId: string,
-  jobId: number
-): Promise<void> => {
-  await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
-};*/
+// export const deleteNotifications = async (
+//   seekerId: string,
+//   jobId: number
+// ): Promise<void> => {
+//   await axiosInstance.delete(`/seekers/${seekerId}/notifications/${jobId}`);
+// };
 
 //-------------Skills Management for Seeker------------------
 
@@ -537,4 +619,101 @@ export const createReport = async (reportData: {
     console.error("Error creating report:", error);
     throw error;
   }
+};
+
+const getSubscriptionTierCandidates = (tier: string) => {
+  const raw = tier?.trim() || "";
+  const lower = raw.toLowerCase();
+  const upper = raw.toUpperCase();
+  const title = raw ? raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase() : "";
+
+  const values = new Set<string>();
+  [raw, lower, upper, title].forEach((value) => {
+    if (value) values.add(value);
+  });
+
+  const planAliases = ["free", "basic", "standard", "premium"];
+  if (planAliases.includes(lower)) {
+    values.add(lower);
+    values.add(upper);
+    values.add(title);
+  }
+
+  return Array.from(values);
+};
+
+const normalizeSubscriptionTier = (tier: string) => {
+  const normalized = tier?.trim().toLowerCase();
+  if (normalized === "basic") return "free";
+  if (normalized === "standard") return "free";
+  if (normalized === "premium") return "free";
+  return normalized || "free";
+};
+
+// Submit payment proof for subscription
+export const submitPaymentProof = async (data: {
+  SubscriptionTier: string;
+  Price: number;
+  file: File;
+}) => {
+  const form = new FormData();
+  form.append("SubscriptionTier", normalizeSubscriptionTier(data.SubscriptionTier));
+  form.append("Price", data.Price.toString());
+  form.append("file", data.file);
+
+  const response = await axiosInstance.post("/payments/submit", form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
+// Create a seeker subscription record directly
+export const createSeekerSubscription = async (
+  seekerId: number,
+  data: {
+    SubscriptionTier: string;
+    Price: number;
+    StartDate: string;
+    EndDate: string;
+    Status: string;
+  }
+) => {
+  const candidates = getSubscriptionTierCandidates(data.SubscriptionTier);
+  const orderedCandidates = ["free", ...candidates.filter((value) => value !== "free")];
+  let lastError: any = null;
+
+  for (const candidate of orderedCandidates) {
+    try {
+      const response = await axiosInstance.post(
+        `/seekers/${seekerId}/subscriptions`,
+        {
+          ...data,
+          SubscriptionTier: candidate,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("Unable to create subscription with the provided tier value.");
+};
+
+// Get subscription details by ID
+export const getSubscriptionDetails = async (subId: number) => {
+  const response = await axiosInstance.get(`/admin/seeker-subs/${subId}`);
+  return response.data;
+};
+
+// Update subscription
+export const updateSubscription = async (subId: number, data: {
+  SubscriptionTier: string;
+  Price: number;
+  StartDate: string;
+  EndDate: string;
+  Status: string;
+}) => {
+  const response = await axiosInstance.put(`/admin/seeker-subs/${subId}`, data);
+  return response.data;
 };

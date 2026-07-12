@@ -21,6 +21,9 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import { EditorProfilePage } from "../pages/Editor/EditorProfilePage";
 import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
+import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
+import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
+import HeadHuntingPage from "../pages/Editor/HeadHuntPage";
 
 const AppRoutes = () => (
   <Routes>
@@ -34,9 +37,11 @@ const AppRoutes = () => (
     <Route path="/contact" element={<ContactPage />} />
     <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
     <Route path="/unauthorized" element={<UnauthorizedPage />} />
-    <Route path="/editor" element={<EditorProfilePage />} />
+
     <Route path="/editor_login" element={<EditorLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+    <Route path="/head_hunt" element={<HeadHuntingPage />} />
 
     {/* Protected routes */}
     <Route
@@ -56,10 +61,27 @@ const AppRoutes = () => (
       }
     />
     <Route
+      path="/seeker/subscription-upload"
+      element={
+        <ProtectedRoute allowedRoles={["seeker"]}>
+          <SeekerSubscriptionUpload />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path="/employer/profile"
       element={
         <ProtectedRoute allowedRoles={["employer"]}>
           <EmployerProfilePage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/employer/subscription-upload"
+      element={
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <EmployerSubscriptionUpload />
         </ProtectedRoute>
       }
     />
@@ -103,6 +125,15 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["employer", "seeker"]}>
           <SeekerPublicViewPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/editor"
+      element={
+        <ProtectedRoute allowedRoles={["editor"]}>
+          <EditorProfilePage />
         </ProtectedRoute>
       }
     />

@@ -6,15 +6,16 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  // IconButton,
+  IconButton,
   Divider,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
+  CircularProgress,
 } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import { notification } from "../../types/notification";
@@ -29,6 +30,7 @@ const NotificationsTab = () => {
   const [employerID, setEmployerID] = useState<number>(0);
   const [notifications, setNotifications] = useState<notification[]>([]);
   const [selectedNote, setSelectedNote] = useState<notification | null>(null); // For dialog
+  const [loading, setLoading] = useState(true);
 
   // Get seeker ID from context
   useEffect(() => {
@@ -43,6 +45,7 @@ const NotificationsTab = () => {
     const fetchData = async () => {
       if (employerID !== 0) {
         try {
+          setLoading(true);
           const data = await getAllEmployerNotifications(employerID.toString());
 
           // 🔹 Sort newest first
@@ -50,10 +53,11 @@ const NotificationsTab = () => {
             (a, b) =>
               new Date(b.DateTime).getTime() - new Date(a.DateTime).getTime(),
           );
-
           setNotifications(sorted);
         } catch (error) {
           console.error("Failed to fetch notifications:", error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -97,73 +101,97 @@ const NotificationsTab = () => {
     }
   };
 
+  const handleRemove = (id: number) => {
+    console.log(id);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6" mb={2}>
         Notifications
       </Typography>
 
-      <List
-        sx={{
-          maxHeight: "600px",
-          overflowY: "auto",
-          bgcolor: "white",
-          borderRadius: 1,
-          boxShadow: 1,
-        }}
-      >
-        {notifications.map((note) => (
-          <React.Fragment key={note.NotificationId}>
-            <ListItem
-              // secondaryAction={
-              //   <IconButton
-              //     edge="end"
-              //     aria-label="delete"
-              //     onClick={(e) => {
-              //       e.stopPropagation();
-              //       // handleRemove(note.NotificationId);
-              //     }}
-              //   >
-              //     <DeleteIcon color="error" />
-              //   </IconButton>
-              // }
-              disablePadding
-            >
-              <ListItemButton
-                onClick={() => handleClick(note)}
-                sx={{
-                  "&:hover": { backgroundColor: "#f5f5f5" },
-                }}
-              >
-                {note.Status === "Unread" ? (
-                  <MailIcon color="primary" sx={{ mr: 2 }} />
-                ) : (
-                  <DraftsIcon sx={{ color: "gray", mr: 2 }} />
-                )}
-
-                <ListItemText
-                  primary={note.Message}
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      {new Date(note.DateTime).toLocaleString()}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-            <Divider component="li" />
-          </React.Fragment>
-        ))}
-
-        {notifications.length === 0 && (
-          <Typography p={2} color="secondary">
-            No notifications.
+      {loading ? (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : notifications.length === 0 ? (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 6,
+            border: "1px dashed",
+            borderColor: "grey.400",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="body1" color="lightgray">
+            No Applied Candidates yet.
           </Typography>
-        )}
-      </List>
+        </Box>
+      ) : (
+        <List
+          sx={{
+            maxHeight: "600px",
+            overflowY: "auto",
+            bgcolor: "white",
+            borderRadius: 1,
+            // boxShadow: 1,
+          }}
+        >
+          {notifications.map((note) => (
+            <React.Fragment key={note.NotificationId}>
+              <ListItem
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemove(note.NotificationId);
+                    }}
+                  >
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                }
+                disablePadding
+              >
+                <ListItemButton
+                  onClick={() => handleClick(note)}
+                  sx={{
+                    "&:hover": { backgroundColor: "#f5f5f5" },
+                  }}
+                >
+                  {note.Status === "Unread" ? (
+                    <MailIcon color="primary" sx={{ mr: 2 }} />
+                  ) : (
+                    <DraftsIcon sx={{ color: "gray", mr: 2 }} />
+                  )}
+
+                  <ListItemText
+                    primary={note.Message}
+                    secondary={
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
+                        {new Date(note.DateTime).toLocaleString()}
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+              <Divider component="li" />
+            </React.Fragment>
+          ))}
+
+          {notifications.length === 0 && (
+            <Typography p={2} color="secondary">
+              No notifications.
+            </Typography>
+          )}
+        </List>
+      )}
 
       {/* 🔹 Dialog to show full message */}
       <Dialog

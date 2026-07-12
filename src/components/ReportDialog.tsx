@@ -8,7 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
-// import { createReport } from "../services/APIs/APIs";
+import { createReport } from "../services/APIs/APIs";
 // import { useAuth } from "../context/AuthContext";
 
 interface ReportDialogProps {
@@ -24,31 +24,35 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   open,
   onClose,
   mode,
-  // id,
+  id,
 }) => {
-  // const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  // const [confirmOpen, setConfirmOpen] = useState(false);
   // const [_, setUserID] = useState();
   // const { userInfo } = useAuth();
-  // const [loading, setLoading_] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("spam");
 
   // useEffect(() => {
   //   if (userInfo && "UserId" in userInfo) setUserID(userInfo.UserId);
   // }, [userInfo]);
 
-  const handleSubmit = () => {
-    // setConfirmOpen(true);
+  const handleSubmit = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      await createReport({
+        ReportedType: mode,
+        ReportedId: id,
+        ReportCategory: category,
+        Description: description,
+      });
+      setLoading(false);
+      onClose();
+    } catch (error) {
+      console.error("Failed to create report:", error);
+      setLoading(false);
+    }
   };
-
-  // const handleConfirm = () => {
-  //   console.log("Report submitted:", { reason, description });
-  //   setConfirmOpen(false);
-  //   onClose();
-  //   setReason("");
-  //   setDescription("");
-  // };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

@@ -7,7 +7,8 @@ import {
 } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { userLogin } from "../services/APIs/APIs";
+import { userLogin, editorLogin } from "../services/APIs/APIs";
+// import { useNotification } from "./NotificationsProvider";
 
 // --- Types ---
 interface AuthContextType {
@@ -20,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   userInfo: any;
   setUserRoleAndInfo: (role: string, info: any) => void;
+  loginEditor: (token: string) => Promise<string>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,6 +34,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<string | null>(null);
+  const [isEditorLogin, setIsEditorLogin] = useState(false);
+
+  // const {notify} = useNotification();
+  console.log(isEditorLogin);
 
   const setUserRoleAndInfo = (role: string, info: any) => {
     setUserRole(role);
@@ -41,8 +47,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (token: string): Promise<string> => {
     setToken(token);
+    setIsEditorLogin(false);
     try {
       const response = await userLogin(); // backend API
+
       if (response) {
         const role = response.role;
         const userData =
@@ -50,7 +58,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setUserRole(role);
         console.log("role set :", role);
-
         setUserInfo(userData);
         console.log("info set: ", userData);
         setIsAuthenticated(true);
@@ -68,11 +75,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return "null";
   };
 
+  const loginEditor = async (token: string): Promise<string> => {
+    setToken(token);
+    setIsEditorLogin(true);
+    localStorage.setItem("editorLogin", "true");
+
+    try {
+      const response = await editorLogin();
+
+      if (response) {
+        const editorID = response.EditorId;
+        const userData = response.editor;
+        const isActive = userData.Active;
+
+        if (!isActive) {
+          logout();
+          return "inactive";
+        }
+
+        setUserRole("editor");
+        setUserInfo(userData);
+        console.log("info set: ", userData);
+
+        setIsAuthenticated(true);
+        return editorID;
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      logout();
+      return "null";
+    }
+    setLoading(false);
+    return "null";
+  };
+
   const logout = () => {
     setToken(null);
     setFirebaseUser(null);
     setUserRole(null);
     setIsAuthenticated(false);
+    localStorage.removeItem("profileImage");
+    localStorage.removeItem("editorLogin");
     signOut(auth);
     console.log("logout function - OK");
   };
@@ -83,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("presist");
 
       console.log(user);
-      
+
       if (user) {
         const token = await user.getIdToken();
         setFirebaseUser(user);
@@ -95,6 +138,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (isNewUser) {
           console.log("New user just signed up — skip userLogin");
           setLoading(false); // Still update UI state
+          return;
+        }
+
+        const editorPersist = localStorage.getItem("editorLogin") === "true";
+
+        if (editorPersist) {
+          console.log("Editor session - skip backend fetch");
+          setUserRole("editor");
+          setIsAuthenticated(true);
+          setLoading(false);
           return;
         }
 
@@ -134,6 +187,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         loading,
         userInfo,
         setUserRoleAndInfo,
+        loginEditor,
       }}
     >
       {children}
