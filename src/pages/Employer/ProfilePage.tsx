@@ -23,7 +23,7 @@ import NotificationsTab from "../../components/Employer/NotificationsTab";
 import PostedJobs from "../../components/Employer/PostedJobs";
 import PendingApprovalsTab from "../../components/Employer/PendingApprovalsTab";
 import ManageEditorsTab from "../../components/Employer/ManageEditorsTab";
-// import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
+import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
 
 const EmployerProfilePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,6 +38,18 @@ const EmployerProfilePage = () => {
     title: "My Profile",
     desc: "Job seeker account. Manage your profile and preferences.",
   });
+
+  const tabStyle = {
+    color: "secondary.main",
+    width: "100%",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    textAlign: "left",
+    "& .MuiTab-wrapper": {
+      width: "100%",
+      alignItems: "flex-start",
+    },
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -55,32 +67,32 @@ const EmployerProfilePage = () => {
         break;
       case 1:
         setBreadcrumb({
-          title: "Subscriptions",
-          desc: "Manage your subscription status and payslips.",
-        });
-        break;
-      case 2:
-        setBreadcrumb({
           title: "Manage Posted Jobs",
           desc: "Check your updates and alerts here.",
         });
         break;
-      case 3:
+      case 2:
         setBreadcrumb({
           title: "Notifications",
           desc: "Check your applications here.",
         });
         break;
-      case 4:
+      case 3:
         setBreadcrumb({
           title: "Pending Approvals",
           desc: "Check your applications here.",
         });
         break;
-      case 5:
+      case 4:
         setBreadcrumb({
           title: "Manage Editors",
           desc: "Manage editors accounts here.",
+        });
+        break;
+      case 5:
+        setBreadcrumb({
+          title: "Subscriptions",
+          desc: "Manage your subscription status and payslips.",
         });
         break;
       default:
@@ -92,7 +104,6 @@ const EmployerProfilePage = () => {
     switch (selectedTab) {
       case 0:
         return <EmployerProfileTab />;
-
       case 1:
         return <ManageCandidatesTab />;
       case 2:
@@ -103,6 +114,8 @@ const EmployerProfilePage = () => {
         return <PendingApprovalsTab />;
       case 5:
         return <ManageEditorsTab />;
+      case 6:
+        return <SubscriptionStatusTab />;
       default:
         return null;
     }
@@ -147,34 +160,13 @@ const EmployerProfilePage = () => {
               textColor="primary"
               indicatorColor="primary"
             >
-              <Tab
-                label="My Profile"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Subscriptions"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Manage Candidates"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Posted Jobs"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Notifications"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Pending Approvals"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
-              <Tab
-                label="Manage Editors"
-                sx={{ color: "secondary.main", alignItems: "flex-start" }}
-              />
+              <Tab label="My Profile" sx={tabStyle} />
+              <Tab label="Manage Candidates" sx={tabStyle} />
+              <Tab label="Posted Jobs" sx={tabStyle} />
+              <Tab label="Notifications" sx={tabStyle} />
+              <Tab label="Pending Approvals" sx={tabStyle} />
+              <Tab label="Manage Editors" sx={tabStyle} />
+              <Tab label="Subscriptions" sx={tabStyle} />
             </Tabs>
 
             <Button sx={{ mt: 5 }} fullWidth variant="contained">
@@ -225,12 +217,12 @@ const EmployerProfilePage = () => {
                 }
               >
                 <MenuItem value={0}>My Profile</MenuItem>
-                <MenuItem value={1}>Subscriptions</MenuItem>
-                <MenuItem value={2}>Manage Candidates</MenuItem>
-                <MenuItem value={3}>Posted Jobs</MenuItem>
-                <MenuItem value={4}>Notifications</MenuItem>
-                <MenuItem value={5}>Pending Approvals</MenuItem>
-                <MenuItem value={6}>Manage Editors</MenuItem>
+                <MenuItem value={1}>Manage Candidates</MenuItem>
+                <MenuItem value={2}>Posted Jobs</MenuItem>
+                <MenuItem value={3}>Notifications</MenuItem>
+                <MenuItem value={4}>Pending Approvals</MenuItem>
+                <MenuItem value={5}>Manage Editors</MenuItem>
+                <MenuItem value={6}>Subscriptions</MenuItem>
               </Select>
             </FormControl>
           )}
