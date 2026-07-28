@@ -276,7 +276,16 @@ const EditSeekerProfile = () => {
       await Promise.all(fileUploads);
       try { const f = await getSeekerFiles(seekerID.toString()); setFiles(f || []); } catch (e) { console.warn("Failed to refresh files", e); }
 
-      const updatedData: Partial<SEEKER_DATA> = { ...form, ProfessionalExperience: Number(form.ProfessionalExperience) || 0, MinSalary: minSalary, MaxSalary: maxSalary, Currency: form.Currency || undefined, PayPeriod: form.PayPeriod || "Monthly", JobType2: form.JobType2 || form.WorkType || "", WorkType: form.JobType2 || form.WorkType || "" };
+      const updatedData: Partial<SEEKER_DATA> = {
+      ...form,
+      ProfessionalExperience: Number(form.ProfessionalExperience) || 0,
+      MinSalary: minSalary,
+      MaxSalary: maxSalary,
+      Currency: form.Currency || undefined,
+      PayPeriod: form.PayPeriod || "Monthly",
+      JobType: form.JobType,
+      WorkType: form.WorkType,
+    };
       delete (updatedData as any).skills; delete (updatedData as any).educations; delete (updatedData as any).careers; delete (updatedData as any).languages;
       await updateSeeker(seekerID, updatedData);
 
@@ -440,7 +449,7 @@ const EditSeekerProfile = () => {
               </FormControl>
               <FormControl fullWidth size="small">
                 <InputLabel>Work mode</InputLabel>
-                <Select value={form.JobType2 || ""} label="Work mode" onChange={(e) => setForm({ ...form, JobType2: e.target.value })}>
+                <Select value={form.WorkType || ""} label="Work mode" onChange={(e) => setForm({ ...form, WorkType: e.target.value })}>
                   {jobModeOptions.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
                 </Select>
               </FormControl>

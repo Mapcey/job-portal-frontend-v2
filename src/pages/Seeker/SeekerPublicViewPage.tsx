@@ -71,7 +71,7 @@ const SeekerPublicViewPage = () => {
   }
 
   const displayRole = seeker?.JobType || seeker?.WorkType || "Software Engineer";
-  const displayWorkMode = seeker?.JobType2 || seeker?.WorkType || "";
+  const displayWorkMode = seeker?.WorkType || seeker?.WorkType || "";
   const salaryLabel = seeker?.MinSalary != null || seeker?.MaxSalary != null
     ? `Salary: ${seeker?.MinSalary ?? "-"} - ${seeker?.MaxSalary ?? "-"}${seeker?.Currency ? ` ${seeker.Currency}` : ""}`
     : "Salary not specified";

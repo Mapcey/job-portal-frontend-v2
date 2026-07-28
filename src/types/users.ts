@@ -26,7 +26,6 @@ export interface SEEKER_DATA {
   Currency?: string;
   PayPeriod?: string | "null";
   JobType: string;
-  JobType2: string;
   WorkType?: string;
   SocialLinks: string;
   Summary: string;
