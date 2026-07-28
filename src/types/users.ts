@@ -30,7 +30,8 @@ export interface SEEKER_DATA {
   WorkType?: string;
   SocialLinks: string;
   Summary: string;
-  IsSubscribed: boolean;
+  Subscription: boolean;
+  AllowHeadHunting?: boolean;
   careers?: Career[];
   educations?: Education[];
   skills?: Skill[];

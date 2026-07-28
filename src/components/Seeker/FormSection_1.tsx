@@ -46,11 +46,9 @@ const CreateSeeker: React.FC = () => {
     Currency: "",
     ProfessionalExperience: 0,
     DateOfBirth: "",
-    JobType: "",
-    JobType2: "",
     SocialLinks: "",
     Summary: "",
-    IsSubscribed: false, // Add default value for IsSubscribed
+    Subscription: false, // Add default value for IsSubscribed
   });
 
   useEffect(() => {
@@ -97,7 +95,7 @@ const CreateSeeker: React.FC = () => {
         LocationY: Number(form.LocationY || 0),
         ProfessionalExperience: Number(form.ProfessionalExperience || 0),
         DateOfBirth: form.DateOfBirth ? new Date(form.DateOfBirth) : undefined,
-        IsSubscribed: Boolean(form.IsSubscribed),
+        Subscription: Boolean(form.Subscription),
       };
 
       await updateSeeker(seekerID, payload);
