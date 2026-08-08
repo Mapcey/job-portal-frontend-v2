@@ -155,7 +155,7 @@ const Header_2 = () => {
   const handleDeactivate = async () => {
     handleCloseUserMenu();
     const confirm = window.confirm(
-      "Are you sure you want to deactivate your account? This will permanently delete your Firebase account.",
+      "Are you sure you want to deactivate your account? This will permanently delete your account.",
     );
     if (!confirm) return;
 

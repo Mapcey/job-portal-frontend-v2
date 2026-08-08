@@ -31,7 +31,7 @@ import { currencies } from "../../data/currencies";
 // ];
 
 const CreateSeeker: React.FC = () => {
-  const { userInfo } = useAuth(); // ✅ hook inside component
+  const { userInfo, logout } = useAuth();
   const [seekerID, setSeekerID] = useState<number>(0);
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -100,7 +100,10 @@ const CreateSeeker: React.FC = () => {
 
       await updateSeeker(seekerID, payload);
       setSuccessMessage("Profile updated successfully! Please login again.");
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => {
+        logout();
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       alert("Failed to update seeker");
       console.error(error);
