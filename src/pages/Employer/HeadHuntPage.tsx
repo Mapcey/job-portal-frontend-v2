@@ -13,10 +13,11 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import Header_2 from "../../components/header/Header_2";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
-import { getAllHHSeekers } from "../../services/APIs/APIs";
+import { getAllHHSeekers, getSeekerFiles } from "../../services/APIs/APIs";
 import SeekerCard from "../../components/headhunt/SeekerCard";
 import SeekerFilterPanel from "../../components/headhunt/SeekerFilterPanel";
 import Pagination from "@mui/material/Pagination";
+import SeekerCardSkeleton from "../../components/placeholders/SeekerCardSkeleton";
 
 const HeadHuntPage = () => {
   const [seekers, setSeekers] = useState<any[]>([]);
@@ -27,6 +28,20 @@ const HeadHuntPage = () => {
 
   const [totalPages, setTotalPages] = useState(1);
   const [totalSeekers, setTotalSeekers] = useState(0);
+
+  const getLatestImage = (files: any[]) => {
+    if (!Array.isArray(files)) return null;
+
+    return (
+      [...files]
+        .filter((file) => /\.(jpg|jpeg|png|webp)$/i.test(file.file_name))
+        .sort(
+          (a, b) =>
+            new Date(b.uploaded_at).getTime() -
+            new Date(a.uploaded_at).getTime(),
+        )[0] || null
+    );
+  };
 
   const handleFilterChange = (newFilters: any) => {
     setPage(1);
@@ -70,7 +85,35 @@ const HeadHuntPage = () => {
           languages: filters.languages || undefined,
         });
 
-        setSeekers(response.items);
+        const seekersWithImages = await Promise.all(
+          response.items.map(async (seeker: any) => {
+            try {
+              const filesData = await getSeekerFiles(seeker.UserId.toString());
+
+              const files = Array.isArray(filesData) ? filesData : [filesData];
+
+              const latestImage = getLatestImage(files);
+
+              return {
+                ...seeker,
+                profileImage: latestImage?.file_url || null,
+              };
+            } catch (error) {
+              console.error(
+                `Failed to load image for seeker ${seeker.UserId}`,
+                error,
+              );
+
+              return {
+                ...seeker,
+                profileImage: null,
+              };
+            }
+          }),
+        );
+
+        setSeekers(seekersWithImages);
+
         setTotalPages(response.pages);
         setTotalSeekers(response.total);
         console.log(response);
@@ -149,9 +192,17 @@ const HeadHuntPage = () => {
               </Typography>
             </Box>
             {loading ? (
-              <Box textAlign="center" mt={4}>
-                <CircularProgress />
-              </Box>
+              <Grid container spacing={2}>
+                {Array.from({ length: perPage }).map((_, index) => (
+                  <Grid
+                    key={index}
+                    size={{ xs: 12, sm: 6, md: 4 }}
+                    sx={{ display: "flex" }}
+                  >
+                    <SeekerCardSkeleton />
+                  </Grid>
+                ))}
+              </Grid>
             ) : seekers.length === 0 ? (
               <Typography>No seekers found</Typography>
             ) : (

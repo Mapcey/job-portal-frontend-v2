@@ -50,7 +50,7 @@ const SeekerCard = ({ seeker }: any) => {
         {/* Profile Header */}
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar
-            src={seeker.profileImage}
+            src={seeker.profileImage || undefined}
             sx={{
               width: 64,
               height: 64,
