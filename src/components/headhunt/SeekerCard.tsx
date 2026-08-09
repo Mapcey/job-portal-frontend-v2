@@ -37,7 +37,8 @@ const SeekerCard = ({ seeker }: any) => {
           borderColor: "primary.main",
         },
       }}
-      onClick={() => navigate(`/seekers/${seeker.id}`)}
+      onClick={() => navigate(`/seeker_account/${seeker.UserId}`)}
+      // onClick={() => navigate(`/seekers/1`)}
     >
       <CardContent
         sx={{

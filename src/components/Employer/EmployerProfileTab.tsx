@@ -18,6 +18,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getEmployerData } from "../../services/APIs/APIs";
 import EditIcon from "@mui/icons-material/Edit";
 import { getEmployerFiles } from "../../services/APIs/APIs";
+import EmployerProfileSkeleton from "../../components/placeholders/EmployerProfileSkeleton";
 
 const EmployerProfileTab = () => {
   const [imageSrc, setImageSrc] = useState("");
@@ -106,9 +107,7 @@ const EmployerProfileTab = () => {
   return (
     <div className="employer-profile-tab-container">
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
+        <EmployerProfileSkeleton />
       ) : (
         <div className="employer-profile-tab-content">
           {/* section */}

@@ -18,6 +18,7 @@ import { SEEKER_DATA } from "../../types/users";
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import ReportDialog from "../../components/ReportDialog";
+import SeekerPulicViewSkeleton from "../../components/placeholders/SeekerPagePublicView";
 
 import { seekerFiles } from "../../types/users";
 
@@ -60,8 +61,22 @@ const SeekerPublicViewPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ textAlign: "center", py: 4 }}>
-        <CircularProgress />
+      <Box>
+        <Header_2 />
+
+        <Box
+          sx={{
+            maxWidth: "1000px",
+            mx: "auto",
+            mt: { xs: 8, sm: 15 },
+            mb: 6,
+            px: { xs: 2, sm: 3 },
+          }}
+        >
+          <SeekerPulicViewSkeleton />
+        </Box>
+
+        <FooterSection_1 />
       </Box>
     );
   }
@@ -70,11 +85,13 @@ const SeekerPublicViewPage = () => {
     return <Typography variant="h6">Seeker profile not found</Typography>;
   }
 
-  const displayRole = seeker?.JobType || seeker?.WorkType || "Software Engineer";
+  const displayRole =
+    seeker?.JobType || seeker?.WorkType || "Software Engineer";
   const displayWorkMode = seeker?.WorkType || seeker?.WorkType || "";
-  const salaryLabel = seeker?.MinSalary != null || seeker?.MaxSalary != null
-    ? `Salary: ${seeker?.MinSalary ?? "-"} - ${seeker?.MaxSalary ?? "-"}${seeker?.Currency ? ` ${seeker.Currency}` : ""}`
-    : "Salary not specified";
+  const salaryLabel =
+    seeker?.MinSalary != null || seeker?.MaxSalary != null
+      ? `Salary: ${seeker?.MinSalary ?? "-"} - ${seeker?.MaxSalary ?? "-"}${seeker?.Currency ? ` ${seeker.Currency}` : ""}`
+      : "Salary not specified";
 
   return (
     <Box>
@@ -110,7 +127,7 @@ const SeekerPublicViewPage = () => {
                     .sort(
                       (a, b) =>
                         new Date(b.uploaded_at).getTime() -
-                        new Date(a.uploaded_at).getTime()
+                        new Date(a.uploaded_at).getTime(),
                     )[0] || null;
 
                 const latestCV = getLatestByType(/\.(pdf|docx)$/i);
@@ -157,7 +174,7 @@ const SeekerPublicViewPage = () => {
                       .sort(
                         (a, b) =>
                           new Date(b.uploaded_at).getTime() -
-                          new Date(a.uploaded_at).getTime()
+                          new Date(a.uploaded_at).getTime(),
                       )[0] || null;
 
                   const latestImage = getLatestByType(/\.(jpg|jpeg|png)$/i);
@@ -202,7 +219,9 @@ const SeekerPublicViewPage = () => {
                     } yrs`}
                   />
                   <Chip variant="outlined" label={displayRole} />
-                  {displayWorkMode && <Chip variant="outlined" label={displayWorkMode} />}
+                  {displayWorkMode && (
+                    <Chip variant="outlined" label={displayWorkMode} />
+                  )}
                   <Chip variant="outlined" label={salaryLabel} />
                 </Box>
               </Box>
@@ -249,7 +268,7 @@ const SeekerPublicViewPage = () => {
                   {section.content}
                 </Typography>
               </Box>
-            )
+            ),
         )}
 
         {/* Career History */}
