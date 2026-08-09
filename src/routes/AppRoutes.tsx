@@ -23,7 +23,7 @@ import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
 import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
-import HeadHuntingPage from "../pages/Editor/HeadHuntPage";
+import HeadHuntingPage from "../pages/Employer/HeadHuntPage";
 
 const AppRoutes = () => (
   <Routes>
@@ -41,7 +41,14 @@ const AppRoutes = () => (
     <Route path="/editor_login" element={<EditorLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-    <Route path="/head_hunt" element={<HeadHuntingPage />} />
+    <Route
+      path="/head_hunt"
+      element={
+        <ProtectedRoute allowedRoles={["employer"]}>
+          <HeadHuntingPage />
+        </ProtectedRoute>
+      }
+    />
 
     {/* Protected routes */}
     <Route

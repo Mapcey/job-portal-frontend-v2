@@ -114,7 +114,15 @@ export const signupSeeker = async (data: { ContactNo: string }) => {
 };
 
 export const getAllSeekers = async () => {
-  const response = await axiosInstance.get(`/employers/`);
+  const response = await axiosInstance.get(`/seekers/`);
+  return response.data;
+};
+
+export const getAllHHSeekers = async (params: any) => {
+  const response = await axiosInstance.get("/headhunt/seekers", {
+    params,
+  });
+
   return response.data;
 };
 
