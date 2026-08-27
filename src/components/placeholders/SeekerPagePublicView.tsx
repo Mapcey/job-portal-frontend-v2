@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { Box, Card, CardContent, Skeleton, Divider } from "@mui/material";
 
 const SeekerPulicViewSkeleton = () => {

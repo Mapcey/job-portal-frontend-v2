@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Skeleton, Divider } from "@mui/material";
+// import React from "react";
+import { Box, Skeleton } from "@mui/material";
 
 const EmployerProfileSkeleton = () => {
   return (

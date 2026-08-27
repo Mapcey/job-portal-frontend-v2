@@ -6,7 +6,7 @@ import {
   Button,
   Typography,
   Divider,
-  Stack,
+  // Stack,
 } from "@mui/material";
 
 interface JobFilterPanelProps {

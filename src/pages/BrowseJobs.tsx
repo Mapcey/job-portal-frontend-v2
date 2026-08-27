@@ -77,14 +77,14 @@ const BrowseJobs = () => {
     fetchJobs();
   }, [page, perPage, filters]);
 
-  const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
+  // const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
+  //   setPage(value);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  //   window.scrollTo({
+  //     top: 0,
+  //     behavior: "smooth",
+  //   });
+  // };
 
   // 👇 main apply function
   const handleApply = async (job: saved_jobs) => {
