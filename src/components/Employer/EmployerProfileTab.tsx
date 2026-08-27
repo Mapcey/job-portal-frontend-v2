@@ -101,7 +101,7 @@ const EmployerProfileTab = () => {
   };
 
   const BrowseEditProfile = () => {
-    navigate("/employer/edit_profile");
+    window.open("/employer/edit_profile", "_blank", "noopener,noreferrer");
   };
 
   return (
