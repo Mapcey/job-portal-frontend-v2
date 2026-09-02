@@ -101,7 +101,8 @@ const EmployerProfileTab = () => {
   };
 
   const BrowseEditProfile = () => {
-    window.open("/employer/edit_profile", "_blank", "noopener,noreferrer");
+    // window.open("/employer/edit_profile", "_blank", "noopener,noreferrer");
+    navigate("/employer/edit_profile");
   };
 
   return (
@@ -194,7 +195,7 @@ const EmployerProfileTab = () => {
               <TextField
                 label="Website"
                 disabled
-                value={user?.WebSite || ""}
+                value={user?.Website || ""}
                 variant="outlined"
                 className="text-field-dis"
                 size="small"

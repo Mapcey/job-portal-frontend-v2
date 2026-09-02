@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "./ScrollToTop";
+
 import LandingPage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
@@ -26,12 +28,16 @@ import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
 import HeadHuntingPage from "../pages/Employer/HeadHuntPage";
 
 const AppRoutes = () => (
+  <>
+    <ScrollToTop />
+
   <Routes>
+  
     <Route path="*" element={<NotFoundPage />} />
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
-    <Route path="/jobs" element={<BrowseJobs />} />
+    <Route path="/job_posts" element={<BrowseJobs />} />
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/contact" element={<ContactPage />} />
@@ -52,7 +58,7 @@ const AppRoutes = () => (
 
     {/* Protected routes */}
     <Route
-      path="/jobs/details/:id"
+      path="/job_posts/details/:id"
       element={
         <ProtectedRoute>
           <JobDetailsPage />
@@ -145,6 +151,7 @@ const AppRoutes = () => (
       }
     />
   </Routes>
+    </>
 );
 
 export default AppRoutes;

@@ -357,12 +357,6 @@ export const updateJobPost = async (
   await axiosInstance.put(`/jobs/${job_id}`, data);
 };
 
-// get application under a job post
-// export const getCandidatesOfJob = async (JobID: number) => {
-//   const response = await axiosInstance.get(`jobs/employer/${JobID}/applications`);
-//   return response.data;
-// };
-
 export const getCandidatesOfJob = async (JobID: number) => {
   const response = await axiosInstance.get(`jobs/${JobID}/applications`);
   return response.data;

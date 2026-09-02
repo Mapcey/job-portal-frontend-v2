@@ -104,7 +104,7 @@ const Header_2 = () => {
 
   const pages = [
     { label: "Home", path: "/" },
-    { label: "Browse Jobs", path: "/jobs" },
+    { label: "Browse Jobs", path: "/job_posts" },
     { label: "Contact", path: "/contact" },
     { label: "About", path: "/about" },
     { label: "Pricing", path: "/pricing" },
