@@ -196,9 +196,9 @@ const JobResults = ({
                 <Button
                   size="small"
                   component={Link}
-                  to={`/jobs/details/${job.JobId}`}
-                  // target="_blank"
-                  // rel="noopener noreferrer"
+                  to={`/job_posts/details/${job.JobId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   View
                 </Button>

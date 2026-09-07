@@ -104,7 +104,7 @@ const Header_2 = () => {
 
   const pages = [
     { label: "Home", path: "/" },
-    { label: "Browse Jobs", path: "/jobs" },
+    { label: "Browse Jobs", path: "/job_posts" },
     { label: "Contact", path: "/contact" },
     { label: "About", path: "/about" },
     { label: "Pricing", path: "/pricing" },
@@ -138,6 +138,7 @@ const Header_2 = () => {
         navigate("/seeker/profile");
       } else if (userRole === "employer") {
         navigate("/employer/profile");
+        console.log("profile");
       } else if (userRole === "editor") {
         navigate("/editor"); // ✅ Optional route if available
       }
@@ -244,6 +245,10 @@ const Header_2 = () => {
     setDrawerOpen(false);
   };
 
+  const HandleBacktoHome = () => {
+    navigate("/");
+  };
+
   return (
     <div style={{ marginBottom: 90 }}>
       <AppBar
@@ -262,12 +267,15 @@ const Header_2 = () => {
             }}
           >
             {/* logo */}
-            <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+            >
               <img
                 src="/logos/logo_header.svg"
                 alt="Logo"
                 className="header-logo"
                 style={{ height: 50 }}
+                onClick={HandleBacktoHome}
               />
             </Box>
 

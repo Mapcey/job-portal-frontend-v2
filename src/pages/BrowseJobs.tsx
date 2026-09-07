@@ -12,6 +12,9 @@ import { getAllJobs, addJobApplication } from "../services/APIs/APIs"; // 👈 i
 import JobFilterPanel from "../components/browseJobs/JobFilterPanel";
 import JobResults from "../components/browseJobs/JobResults";
 
+import { Button, Drawer } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const [jobs, setJobs] = useState<saved_jobs[]>([]);
@@ -39,6 +42,8 @@ const BrowseJobs = () => {
   });
 
   const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set()); // 👈 track applied jobs
+
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -126,6 +131,26 @@ const BrowseJobs = () => {
           py: 4,
         }}
       >
+        {/* Mobile Filter Button */}
+        <Box
+          sx={{
+            display: { xs: "flex", md: "none" },
+            justifyContent: "flex-end",
+            mb: 2,
+          }}
+        >
+          <Button
+            variant="outlined"
+            startIcon={<FilterListIcon />}
+            onClick={() => setFilterDrawerOpen(true)}
+            sx={{
+              borderRadius: 2,
+            }}
+          >
+            Filters
+          </Button>
+        </Box>
+
         <Box
           sx={{
             display: "flex",
@@ -133,7 +158,7 @@ const BrowseJobs = () => {
             alignItems: "flex-start",
           }}
         >
-          {/* LEFT FILTER */}
+          {/* DESKTOP FILTER */}
           <Box
             sx={{
               width: 280,
@@ -188,12 +213,60 @@ const BrowseJobs = () => {
             totalPages={totalPages}
             onPageChange={(_, value) => {
               setPage(value);
+
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
             }}
             appliedJobs={appliedJobs}
             onApply={handleApply}
           />
         </Box>
       </Box>
+
+      <Drawer
+        anchor="left"
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+      >
+        <Box
+          sx={{
+            width: {
+              xs: "85vw",
+              sm: 350,
+            },
+            maxWidth: 380,
+            p: 2,
+          }}
+        >
+          <JobFilterPanel
+            filters={filters}
+            setFilters={setFilters}
+            onApply={() => {
+              setPage(1);
+              setFilterDrawerOpen(false);
+            }}
+            onClear={() => {
+              setFilters({
+                title: "",
+                location: "",
+                category: "",
+                job_type: "",
+                work_type: "",
+                education: "",
+                experience: "",
+                posted_days_ago: "",
+                min_salary: "",
+                max_salary: "",
+              });
+
+              setPage(1);
+              setFilterDrawerOpen(false);
+            }}
+          />
+        </Box>
+      </Drawer>
     </Box>
   );
 };

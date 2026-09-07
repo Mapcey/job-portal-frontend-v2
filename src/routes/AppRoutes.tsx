@@ -31,7 +31,7 @@ const AppRoutes = () => (
     <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
-    <Route path="/jobs" element={<BrowseJobs />} />
+    <Route path="/job_posts" element={<BrowseJobs />} />
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/contact" element={<ContactPage />} />
@@ -40,6 +40,8 @@ const AppRoutes = () => (
 
     <Route path="/editor_login" element={<EditorLogin />} />
     <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+    <Route path="/job_posts/details/:id" element={<JobDetailsPage />} />
 
     <Route
       path="/head_hunt"
@@ -51,14 +53,7 @@ const AppRoutes = () => (
     />
 
     {/* Protected routes */}
-    <Route
-      path="/jobs/details/:id"
-      element={
-        <ProtectedRoute>
-          <JobDetailsPage />
-        </ProtectedRoute>
-      }
-    />
+
     <Route
       path="/seeker/profile"
       element={
