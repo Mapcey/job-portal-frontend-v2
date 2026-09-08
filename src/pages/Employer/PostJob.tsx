@@ -5,16 +5,18 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from "@mui/material/TextField";
-import { Button, MenuItem } from "@mui/material";
+import { Button, MenuItem, Box } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { CREATE_JOB } from "../../types/job";
-import { sriLankaCities } from "../../assets/data/sriLankaCities";
+// import { sriLankaCities } from "../../assets/data/sriLankaCities";
 import RichTextBox from "../../components/RichTextBox";
 import { useNotification } from "../../context/NotificationsProvider";
+
+import { Country, State, City } from "country-state-city";
 
 import {
   JOB_CAT,
@@ -29,7 +31,9 @@ import { createNewJob } from "../../services/APIs/APIs";
 const PostJob = () => {
   const [formData, setFormData] = useState<CREATE_JOB>({
     JobTitle: "",
-    Location: "",
+    Country: "Sri Lanka",
+    State: "",
+    City: "",
     JobCategory: "",
     JobType: "",
     WorkType: "",
@@ -41,6 +45,23 @@ const PostJob = () => {
     Description: "",
     Status: "Active",
   });
+
+  const countries = Country.getAllCountries();
+
+  const selectedCountry = countries.find(
+    (country) => country.name === formData.Country,
+  );
+
+  const states = selectedCountry
+    ? State.getStatesOfCountry(selectedCountry.isoCode)
+    : [];
+
+  const selectedState = states.find((state) => state.name === formData.State);
+
+  const cities =
+    selectedCountry && selectedState
+      ? City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
+      : [];
 
   const navigate = useNavigate();
   const { notify } = useNotification();
@@ -63,22 +84,23 @@ const PostJob = () => {
       notify("New job posted", "success");
 
       setFormData({
-      JobTitle: "",
-      Location: "",
-      JobCategory: "",
-      JobType: "",
-      WorkType: "",
-      EducationLevel: "",
-      ProfExperience: "",
-      Languages: "",
-      SalaryRange: "",
-      ExpiryDate: "",
-      Description: "",
-      Status: "Active",
-    });
+        JobTitle: "",
+        Country: "Sri Lanka",
+        State: "",
+        City: "",
+        JobCategory: "",
+        JobType: "",
+        WorkType: "",
+        EducationLevel: "",
+        ProfExperience: "",
+        Languages: "",
+        SalaryRange: "",
+        ExpiryDate: "",
+        Description: "",
+        Status: "Active",
+      });
 
-    setEditorKey((prev) => prev + 1);
-
+      setEditorKey((prev) => prev + 1);
     } catch (err) {
       console.error(err);
       notify("Error posting job", "error");
@@ -90,7 +112,9 @@ const PostJob = () => {
       <Header_2 />
       <Breadcrumb
         title={"Post a New Job"}
-        description={"this is the description"}
+        description={
+          "Fill out the details below to publish your opening and connect with top talent across our network."
+        }
         backgroundImage={"/imgs/backgrounds/bg-1.jpg"}
       />
       <Button sx={{ p: 2 }} onClick={() => navigate("/employer/profile")}>
@@ -115,32 +139,97 @@ const PostJob = () => {
                 variant="outlined"
                 size="small"
                 sx={{ mr: 5, mt: 3 }}
-                // placeholder="Add your full name"
                 className="text-input-3"
                 value={formData.JobTitle}
                 onChange={handleChange}
                 required
               />
+            </div>
 
+            <div className="p-j-form-row">
+              {/* Country */}
               <Autocomplete
-                fullWidth
-                options={sriLankaCities}
-                value={formData.Location}
-                className="text-input-3"
                 sx={{ mr: 5, mt: 3 }}
-                onChange={(_e, newValue) =>
-                  setFormData((prev) => ({ ...prev, Location: newValue || "" }))
+                fullWidth
+                options={countries}
+                value={
+                  countries.find(
+                    (country) => country.name === formData.Country,
+                  ) || null
                 }
+                getOptionLabel={(option) => option.name}
+                onChange={(_e, newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    Country: newValue?.name || "",
+                    State: "",
+                    City: "",
+                  }));
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Location"
+                    label="Country"
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+              />
+
+              {/* State */}
+              <Autocomplete
+                sx={{ mr: 5, mt: 3 }}
+                fullWidth
+                options={states}
+                value={
+                  states.find((state) => state.name === formData.State) || null
+                }
+                getOptionLabel={(option) => option.name}
+                disabled={!formData.Country}
+                onChange={(_e, newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    State: newValue?.name || "",
+                    City: "",
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="State / Province"
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+              />
+
+              {/* City */}
+              <Autocomplete
+                sx={{ mr: 5, mt: 3 }}
+                fullWidth
+                options={cities}
+                value={
+                  cities.find((city) => city.name === formData.City) || null
+                }
+                getOptionLabel={(option) => option.name}
+                disabled={!formData.State}
+                onChange={(_e, newValue) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    City: newValue?.name || "",
+                  }));
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="City"
                     size="small"
                     variant="outlined"
                   />
                 )}
               />
             </div>
+
             <div className="p-j-form-row">
               <TextField
                 fullWidth
@@ -326,12 +415,15 @@ const PostJob = () => {
           <h3 style={{ marginBottom: 5, paddingTop: "20", marginTop: 30 }}>
             Job Description
           </h3>
+          <p style={{ color: "#666", fontSize: "14px", marginTop: 0 }}>
+            <i>Add your job description below, or paste an existing one.</i>
+          </p>
         </div>
 
         {/* section */}
         <div className="post-job-content-section-1">
           <RichTextBox
-          key={editorKey}
+            key={editorKey}
             value={formData.Description}
             onChange={(val) =>
               setFormData((prev) => ({ ...prev, Description: val }))
