@@ -16,7 +16,8 @@ import { CREATE_JOB } from "../../types/job";
 import RichTextBox from "../../components/RichTextBox";
 import { useNotification } from "../../context/NotificationsProvider";
 
-import { Country, State, City } from "country-state-city";
+// import { Country, State, City } from "country-state-city";
+import { COUNTRIES } from "../../assets/data/slCities";
 
 import {
   JOB_CAT,
@@ -46,22 +47,34 @@ const PostJob = () => {
     Status: "Active",
   });
 
-  const countries = Country.getAllCountries();
+  // const countries = Country.getAllCountries();
+
+  // const selectedCountry = countries.find(
+  //   (country) => country.name === formData.Country,
+  // );
+
+  // const states = selectedCountry
+  //   ? State.getStatesOfCountry(selectedCountry.isoCode)
+  //   : [];
+
+  // const selectedState = states.find((state) => state.name === formData.State);
+
+  // const cities =
+  //   selectedCountry && selectedState
+  //     ? City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
+  //     : [];
+
+  const countries = COUNTRIES;
 
   const selectedCountry = countries.find(
     (country) => country.name === formData.Country,
   );
 
-  const states = selectedCountry
-    ? State.getStatesOfCountry(selectedCountry.isoCode)
-    : [];
+  const states = selectedCountry?.states || [];
 
   const selectedState = states.find((state) => state.name === formData.State);
 
-  const cities =
-    selectedCountry && selectedState
-      ? City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
-      : [];
+  const cities = selectedState?.cities || [];
 
   const navigate = useNavigate();
   const { notify } = useNotification();
@@ -148,17 +161,13 @@ const PostJob = () => {
 
             <div className="p-j-form-row">
               {/* Country */}
+              {/* Country */}
               <Autocomplete
-                sx={{ mr: 5, mt: 3 }}
                 fullWidth
                 options={countries}
-                value={
-                  countries.find(
-                    (country) => country.name === formData.Country,
-                  ) || null
-                }
+                value={selectedCountry || null}
                 getOptionLabel={(option) => option.name}
-                onChange={(_e, newValue) => {
+                onChange={(_event, newValue) => {
                   setFormData((prev) => ({
                     ...prev,
                     Country: newValue?.name || "",
@@ -176,17 +185,14 @@ const PostJob = () => {
                 )}
               />
 
-              {/* State */}
+              {/* State / Province */}
               <Autocomplete
-                sx={{ mr: 5, mt: 3 }}
                 fullWidth
                 options={states}
-                value={
-                  states.find((state) => state.name === formData.State) || null
-                }
+                value={selectedState || null}
                 getOptionLabel={(option) => option.name}
                 disabled={!formData.Country}
-                onChange={(_e, newValue) => {
+                onChange={(_event, newValue) => {
                   setFormData((prev) => ({
                     ...prev,
                     State: newValue?.name || "",
@@ -205,18 +211,14 @@ const PostJob = () => {
 
               {/* City */}
               <Autocomplete
-                sx={{ mr: 5, mt: 3 }}
                 fullWidth
                 options={cities}
-                value={
-                  cities.find((city) => city.name === formData.City) || null
-                }
-                getOptionLabel={(option) => option.name}
+                value={cities.find((city) => city === formData.City) || null}
                 disabled={!formData.State}
-                onChange={(_e, newValue) => {
+                onChange={(_event, newValue) => {
                   setFormData((prev) => ({
                     ...prev,
-                    City: newValue?.name || "",
+                    City: newValue || "",
                   }));
                 }}
                 renderInput={(params) => (

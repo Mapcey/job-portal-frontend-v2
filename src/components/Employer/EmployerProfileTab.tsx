@@ -165,6 +165,7 @@ const EmployerProfileTab = () => {
                       bgcolor: "white",
                       boxShadow: 6,
                       scale: 1.1,
+                      color: "black",
                     },
                   }}
                 >

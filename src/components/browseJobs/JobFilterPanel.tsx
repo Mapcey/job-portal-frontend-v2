@@ -6,6 +6,16 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
+
+import {
+  JOB_CAT,
+  JOB_TYPES,
+  WORK_TYPE,
+  EDU_LEVELS,
+} from "../../types/jobOptions";
+
+import { LOCATION_DATA } from "../../types/locationOptions";
+
 interface JobFilterPanelProps {
   filters: any;
   setFilters: any;
@@ -21,6 +31,21 @@ const JobFilterPanel = ({
   const handleChange = (name: string, value: string) => {
     setFilters((prev: any) => ({ ...prev, [name]: value }));
   };
+
+  const countries = LOCATION_DATA;
+
+  const selectedCountry = countries.find(
+    (country) => country.name === filters.country,
+  );
+
+  const provinces = selectedCountry?.provinces || [];
+
+  const selectedProvince = provinces.find(
+    (province) => province.name === filters.province,
+  );
+
+  const cities = selectedProvince?.cities || [];
+
   return (
     <Box
       sx={{
@@ -47,14 +72,6 @@ const JobFilterPanel = ({
         Filters{" "}
       </Typography>{" "}
       <Divider sx={{ mb: { xs: 2, sm: 2.5 } }} /> {/* Location */}{" "}
-      <TextField
-        fullWidth
-        size="small"
-        label="Location"
-        value={filters.location}
-        onChange={(e) => handleChange("location", e.target.value)}
-        sx={{ mb: 2 }}
-      />{" "}
       {/* Category */}{" "}
       <TextField
         fullWidth
@@ -66,10 +83,12 @@ const JobFilterPanel = ({
         sx={{ mb: 2 }}
       >
         {" "}
-        <MenuItem value="">All Categories</MenuItem>{" "}
-        <MenuItem value="IT">IT</MenuItem>{" "}
-        <MenuItem value="Design">Design</MenuItem>{" "}
-        <MenuItem value="Marketing">Marketing</MenuItem>{" "}
+        <MenuItem value="">All Categories</MenuItem>
+        {JOB_CAT.map((category) => (
+          <MenuItem key={category} value={category}>
+            {category}
+          </MenuItem>
+        ))}
       </TextField>{" "}
       {/* Job Type */}{" "}
       <TextField
@@ -82,12 +101,14 @@ const JobFilterPanel = ({
         sx={{ mb: 2 }}
       >
         {" "}
-        <MenuItem value="">All Job Types</MenuItem>{" "}
-        <MenuItem value="Full-time">Full-time</MenuItem>{" "}
-        <MenuItem value="Part-time">Part-time</MenuItem>{" "}
-        <MenuItem value="Contract">Contract</MenuItem>{" "}
-      </TextField>{" "}
-      {/* Work Type */}{" "}
+        <MenuItem value="">All Job Types</MenuItem>
+        {JOB_TYPES.map((category) => (
+          <MenuItem key={category} value={category}>
+            {category}
+          </MenuItem>
+        ))}
+      </TextField>
+      {/* Work Type */}
       <TextField
         fullWidth
         select
@@ -97,12 +118,80 @@ const JobFilterPanel = ({
         onChange={(e) => handleChange("work_type", e.target.value)}
         sx={{ mb: 2 }}
       >
-        {" "}
-        <MenuItem value="">All Work Types</MenuItem>{" "}
-        <MenuItem value="On-site">On-site</MenuItem>{" "}
-        <MenuItem value="Remote">Remote</MenuItem>{" "}
-        <MenuItem value="Hybrid">Hybrid</MenuItem>{" "}
-      </TextField>{" "}
+        <MenuItem value="">All Work Types</MenuItem>
+        {WORK_TYPE.map((category) => (
+          <MenuItem key={category} value={category}>
+            {category}
+          </MenuItem>
+        ))}
+      </TextField>
+      {/* Country */}
+      <TextField
+        fullWidth
+        select
+        size="small"
+        label="Country"
+        value={filters.country}
+        onChange={(e) => {
+          handleChange("country", e.target.value);
+
+          // Reset dependent fields
+          handleChange("province", "");
+          handleChange("city", "");
+        }}
+        sx={{ mb: 2 }}
+      >
+        <MenuItem value="">All Countries</MenuItem>
+
+        {countries.map((country) => (
+          <MenuItem key={country.name} value={country.name}>
+            {country.name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {/* Province */}
+      <TextField
+        fullWidth
+        select
+        size="small"
+        label="Province"
+        value={filters.province}
+        disabled={!filters.country}
+        onChange={(e) => {
+          handleChange("province", e.target.value);
+
+          // Reset city when province changes
+          handleChange("city", "");
+        }}
+        sx={{ mb: 2 }}
+      >
+        <MenuItem value="">All Provinces</MenuItem>
+
+        {provinces.map((province) => (
+          <MenuItem key={province.name} value={province.name}>
+            {province.name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {/* City */}
+      <TextField
+        fullWidth
+        select
+        size="small"
+        label="City"
+        value={filters.city}
+        disabled={!filters.province}
+        onChange={(e) => handleChange("city", e.target.value)}
+        sx={{ mb: 2 }}
+      >
+        <MenuItem value="">All Cities</MenuItem>
+
+        {cities.map((city) => (
+          <MenuItem key={city} value={city}>
+            {city}
+          </MenuItem>
+        ))}
+      </TextField>
       {/* Education */}{" "}
       <TextField
         fullWidth
@@ -115,11 +204,11 @@ const JobFilterPanel = ({
       >
         {" "}
         <MenuItem value="">All Education Levels</MenuItem>{" "}
-        <MenuItem value="High School">High School</MenuItem>{" "}
-        <MenuItem value="Diploma">Diploma</MenuItem>{" "}
-        <MenuItem value="Bachelors">Bachelors</MenuItem>{" "}
-        <MenuItem value="Masters">Masters</MenuItem>{" "}
-        <MenuItem value="PhD">PhD</MenuItem>{" "}
+        {EDU_LEVELS.map((category) => (
+          <MenuItem key={category} value={category}>
+            {category}
+          </MenuItem>
+        ))}
       </TextField>{" "}
       {/* Experience */}{" "}
       <TextField

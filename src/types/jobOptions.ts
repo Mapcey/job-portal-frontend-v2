@@ -54,10 +54,13 @@ export const JOB_TYPES = [
   "Internship",
 ] as const;
 
+export const WORK_TYPE = ["On-Site", "Remote", "Hybrid"] as const;
+
 export const EDU_LEVELS = [
   "O/L",
   "A/L",
   "Certificate",
+  "High School",
   "Diploma",
   "Bachelors",
   "Masters",
@@ -68,5 +71,3 @@ export const EDU_LEVELS = [
 export const LANG = ["Sinhala", "English", "Tamil"];
 
 export const SAL_RANGES = ["0 - 60k", "60k - 100k", "100k - 150k", "150k +"];
-
-export const WORK_TYPE = ["On-Site", "Remote", "Hybrid"];

@@ -30,7 +30,9 @@ const BrowseJobs = () => {
 
   const [filters, setFilters] = useState({
     title: "",
-    location: "",
+    country: "",
+    state: "",
+    city: "",
     category: "",
     job_type: "",
     work_type: "",
@@ -55,7 +57,11 @@ const BrowseJobs = () => {
           per_page: perPage,
 
           title: filters.title || undefined,
-          location: filters.location || undefined,
+
+          contry: filters.country || undefined,
+          state: filters.state || undefined,
+          city: filters.city || undefined,
+
           category: filters.category || undefined,
           job_type: filters.job_type || undefined,
           work_type: filters.work_type || undefined,
@@ -68,6 +74,8 @@ const BrowseJobs = () => {
 
           max_salary: filters.max_salary || undefined,
         });
+
+        console.log("Loaded jobs:", response.items);
 
         setJobs(response.items);
         setTotalJobs(response.total);
