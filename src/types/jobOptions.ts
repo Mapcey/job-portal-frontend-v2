@@ -71,3 +71,104 @@ export const EDU_LEVELS = [
 export const LANG = ["Sinhala", "English", "Tamil"];
 
 export const SAL_RANGES = ["0 - 60k", "60k - 100k", "100k - 150k", "150k +"];
+
+export interface JobCategoryGroup {
+  name: string;
+  subcategories: string[];
+}
+
+// for landing page
+export const JOB_CATEGORY_GROUPS: JobCategoryGroup[] = [
+  {
+    name: "Business, Finance & Administration",
+    subcategories: [
+      "Accounting & Finance",
+      "Administration & Office Support",
+      "Banking & Financial Services",
+      "Consulting & Strategy",
+      "Executive & C-Level",
+      "Human Resources & Recruitment",
+      "Insurance",
+      "Project Management",
+    ],
+  },
+
+  {
+    name: "Technology, Science & Engineering",
+    subcategories: [
+      "Engineering",
+      "Information & Communication Technology (ICT)",
+      "Science & Technology",
+      "Biotechnology & Life Sciences",
+      "Telecommunications",
+    ],
+  },
+
+  {
+    name: "Construction, Property & Trades",
+    subcategories: [
+      "Architecture & Design",
+      "Construction & Property",
+      "Real Estate & Property",
+      "Trades & Services",
+      "Automotive",
+      "Manufacturing, Production & Operations",
+    ],
+  },
+
+  {
+    name: "Sales, Marketing & Customer Services",
+    subcategories: [
+      "Advertising & Marketing",
+      "Sales",
+      "Call Centre & Customer Service",
+      "Retail & Consumer Products",
+    ],
+  },
+
+  {
+    name: "Healthcare, Care & Community Services",
+    subcategories: [
+      "Healthcare & Medical",
+      "Community Services & Development",
+      "Social Work & Counselling",
+      "Personal Services & Care",
+      "Veterinary & Animal Care",
+    ],
+  },
+
+  {
+    name: "Public Sector, Security & Environment",
+    subcategories: [
+      "Government & Public Sector",
+      "Defence & Emergency Services",
+      "Security & Surveillance",
+      "Environmental Services",
+      "Utilities & Energy",
+      "Mining, Resources & Energy",
+      "Agriculture, Forestry & Fishing",
+    ],
+  },
+
+  {
+    name: "Education, Creative & Media",
+    subcategories: [
+      "Education & Training",
+      "Arts, Media & Entertainment",
+      "Design & Creative",
+      "Writing, Editing & Publishing",
+      "Translation & Languages",
+    ],
+  },
+
+  {
+    name: "Hospitality, Transport & Recreation",
+    subcategories: [
+      "Hospitality & Tourism",
+      "Logistics, Transport & Supply Chain",
+      "Sports & Recreation",
+      "Non-Profit & NGOs",
+      "Legal",
+    ],
+  },
+];

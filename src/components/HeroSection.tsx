@@ -273,7 +273,8 @@ const HeroSection = () => {
         </div>
       </div>
       <div className="hero-section-left">
-        <img src="/imgs/img1.jpg" alt="Hero" className="hero-section-image" />
+        {/* <img src="/imgs/img1.jpg" alt="Hero" className="hero-section-image" /> */}
+        <img src="/GIFs/gif2.gif" alt="Hero" className="hero-section-image" />
       </div>
     </div>
   );
