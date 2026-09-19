@@ -5,19 +5,18 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from "@mui/material/TextField";
-import { Button, MenuItem, Box } from "@mui/material";
+import { Button, MenuItem } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { CREATE_JOB } from "../../types/job";
-// import { sriLankaCities } from "../../assets/data/sriLankaCities";
 import RichTextBox from "../../components/RichTextBox";
 import { useNotification } from "../../context/NotificationsProvider";
 
-// import { Country, State, City } from "country-state-city";
-import { COUNTRIES } from "../../assets/data/slCities";
+// import { COUNTRIES } from "../../assets/data/slCities";
+import { LOCATION_DATA } from "../../types/locationOptions";
 
 import {
   JOB_CAT,
@@ -47,33 +46,21 @@ const PostJob = () => {
     Status: "Active",
   });
 
-  // const countries = Country.getAllCountries();
+  // Country options
+  const countries = LOCATION_DATA;
 
-  // const selectedCountry = countries.find(
-  //   (country) => country.name === formData.Country,
-  // );
+  // Selected country
+  const selectedCountry =
+    countries.find((country) => country.name === formData.Country) || null;
 
-  // const states = selectedCountry
-  //   ? State.getStatesOfCountry(selectedCountry.isoCode)
-  //   : [];
+  // Province / State options
+  const states = selectedCountry?.provinces || [];
 
-  // const selectedState = states.find((state) => state.name === formData.State);
+  // Selected province
+  const selectedState =
+    states.find((state) => state.name === formData.State) || null;
 
-  // const cities =
-  //   selectedCountry && selectedState
-  //     ? City.getCitiesOfState(selectedCountry.isoCode, selectedState.isoCode)
-  //     : [];
-
-  const countries = COUNTRIES;
-
-  const selectedCountry = countries.find(
-    (country) => country.name === formData.Country,
-  );
-
-  const states = selectedCountry?.states || [];
-
-  const selectedState = states.find((state) => state.name === formData.State);
-
+  // City options
   const cities = selectedState?.cities || [];
 
   const navigate = useNavigate();
@@ -157,15 +144,14 @@ const PostJob = () => {
                 onChange={handleChange}
                 required
               />
-            </div>
 
-            <div className="p-j-form-row">
-              {/* Country */}
-              {/* Country */}
               <Autocomplete
                 fullWidth
+                size="small"
+                sx={{ mr: 5, mt: 3 }}
+                className="text-input-3"
                 options={countries}
-                value={selectedCountry || null}
+                value={selectedCountry}
                 getOptionLabel={(option) => option.name}
                 onChange={(_event, newValue) => {
                   setFormData((prev) => ({
@@ -184,12 +170,17 @@ const PostJob = () => {
                   />
                 )}
               />
+            </div>
 
+            <div className="p-j-form-row">
               {/* State / Province */}
               <Autocomplete
                 fullWidth
+                size="small"
+                sx={{ mr: 5, mt: 3 }}
+                className="text-input-3"
                 options={states}
-                value={selectedState || null}
+                value={selectedState}
                 getOptionLabel={(option) => option.name}
                 disabled={!formData.Country}
                 onChange={(_event, newValue) => {
@@ -207,19 +198,18 @@ const PostJob = () => {
                     variant="outlined"
                   />
                 )}
-              />
-
-              {/* City */}
+              />{" "}
+              {/* City */}{" "}
               <Autocomplete
                 fullWidth
+                size="small"
+                sx={{ mr: 5, mt: 3 }}
+                className="text-input-3"
                 options={cities}
                 value={cities.find((city) => city === formData.City) || null}
                 disabled={!formData.State}
                 onChange={(_event, newValue) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    City: newValue || "",
-                  }));
+                  setFormData((prev) => ({ ...prev, City: newValue || "" }));
                 }}
                 renderInput={(params) => (
                   <TextField

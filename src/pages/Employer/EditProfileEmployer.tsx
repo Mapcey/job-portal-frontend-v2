@@ -34,7 +34,7 @@ const EditProfileEmployer = () => {
     FirebaseUID: "",
     CompanyName: "",
     ContactNo: "",
-    Website: "",
+    // Website: "",
     Location: "",
     LinkedIn: "",
     Overview: "",
@@ -368,7 +368,7 @@ const EditProfileEmployer = () => {
               fullWidth
               label="Website"
               name="Website"
-              value={formData.Website}
+              // value={formData.Website}
               onChange={handleChange}
               size="small"
               className="text-field-1"

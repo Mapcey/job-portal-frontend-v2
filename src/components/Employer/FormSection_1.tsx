@@ -1,13 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Box,
-  TextField,
-  Avatar,
-  Button,
-  IconButton,
-} from "@mui/material";
+import { Box, TextField, Avatar, Button, IconButton } from "@mui/material";
 import { Backup } from "@mui/icons-material";
 
 import { EMPLOYER_DATA } from "../../types/users";
@@ -38,7 +32,7 @@ const FormSection_1 = () => {
     FirebaseUID: "",
     CompanyName: "",
     ContactNo: "",
-    WebSite: "",
+    // WebSite: "",
     Location: "",
     LinkedIn: "",
     Overview: "",

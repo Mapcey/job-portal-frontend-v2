@@ -31,7 +31,9 @@ import { useAuth } from "../../context/AuthContext";
 const CreateNewPost = () => {
   const [formData, setFormData] = useState<CREATE_JOB>({
     JobTitle: "",
-    Location: "",
+    Country: "",
+    State: "",
+    City: "",
     JobCategory: "",
     JobType: "",
     WorkType: "",
@@ -90,7 +92,7 @@ const CreateNewPost = () => {
 
           <Autocomplete
             options={sriLankaCities}
-            value={formData.Location}
+            value={formData.City}
             className="text-input-3"
             sx={{ mr: 5, mt: 3 }}
             onChange={(_e, newValue) =>

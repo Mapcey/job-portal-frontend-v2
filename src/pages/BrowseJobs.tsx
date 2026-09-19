@@ -186,7 +186,9 @@ const BrowseJobs = () => {
               onClear={() => {
                 setFilters({
                   title: "",
-                  location: "",
+                  country: "",
+                  state: "",
+                  city: "",
                   category: "",
                   job_type: "",
                   work_type: "",
@@ -258,7 +260,9 @@ const BrowseJobs = () => {
             onClear={() => {
               setFilters({
                 title: "",
-                location: "",
+                country: "",
+                state: "",
+                city: "",
                 category: "",
                 job_type: "",
                 work_type: "",

@@ -3,7 +3,7 @@ export interface EMPLOYER_DATA {
   FirebaseUID: string;
   CompanyName: string;
   ContactNo: string;
-  Website: string;
+  // Website: string;
   Location: string;
   LinkedIn: string;
   Overview: string;

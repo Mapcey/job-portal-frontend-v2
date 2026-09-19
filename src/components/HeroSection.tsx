@@ -1,12 +1,26 @@
+import { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { Search as SearchIcon } from "@mui/icons-material";
 
 const HeroSection = () => {
   const keywords = ["Software Engineer", "Product Manager", "UX Designer"];
 
   const navigate = useNavigate();
+
+  const [jobCategory, setJobCategory] = useState("");
+  const [jobCity, setJobCity] = useState("");
+
+  const handleSearch = () => {
+    navigate("/job_posts", {
+      state: {
+        category: jobCategory.trim(),
+        city: jobCity.trim(),
+      },
+    });
+  };
 
   return (
     <div className="hero-section-container">
@@ -15,9 +29,9 @@ const HeroSection = () => {
           Find Your Career <br /> ti Make a Better Life
         </div>
         <div className="hero-section-sub-title">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. In rutrum sed
-          leo eget venenatis. Sed ullamcorper pulvinar lectus. Nulla at libero
-          semper, pharetra arcu et, rutrum dui.
+          Discover the right opportunities, connect with great employers, and
+          take the next step toward a career that matches your skills,
+          experience, and goals.
         </div>
 
         <div className="hero-section-buttons">
@@ -38,7 +52,7 @@ const HeroSection = () => {
                 bgcolor: "secondary.dark",
               },
             }}
-            onClick={() => navigate("/jobs")}
+            onClick={() => navigate("/job_posts")}
           >
             See Our Jobs
           </Button>
@@ -48,77 +62,123 @@ const HeroSection = () => {
           <div className="search-content">
             <Box
               sx={{
+                width: "100%",
+                maxWidth: "1050px",
+                margin: "0 auto",
+                padding: { xs: 1, sm: 1.5 },
                 display: "flex",
-                flexDirection: "row",
-                // gap: 2,
                 alignItems: "center",
-                justifyContent: "center",
-                padding: 2,
-                flexWrap: "wrap", // Makes it responsive on smaller screens
+                gap: 1,
+                backgroundColor: "#ffffff",
+                border: "1px solid #e0e0e0",
+                borderRadius: "12px",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08)",
+                flexWrap: { xs: "wrap", md: "nowrap" },
               }}
             >
+              {" "}
+              {/* What */}{" "}
               <TextField
+                fullWidth
                 label="What"
+                placeholder="Job category"
                 variant="outlined"
-                placeholder="Job title, keywords"
-                className="search-input"
-                InputLabelProps={{
-                  sx: {
-                    color: "black",
-                    fontSize: 18,
-                  },
-                }}
+                size="small"
+                value={jobCategory}
+                onChange={(e) => setJobCategory(e.target.value)}
                 sx={{
-                  // width: { xs: "100%", sm: "40%" },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+                  flex: 1,
+                  minWidth: { xs: "100%", md: "280px" },
+
+                  "& .MuiOutlinedInput-root": {
+                    height: "52px",
+                    backgroundColor: "#fafafa",
+                    borderRadius: "8px",
+
+                    "& fieldset": {
+                      borderColor: "#e0e0e0",
+                    },
+
+                    "&:hover fieldset": {
+                      borderColor: "#bdbdbd",
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderColor: "primary.main",
+                      borderWidth: "2px",
+                    },
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+
+                  "& .MuiInputLabel-root": {
+                    color: "#555",
+                    fontSize: "15px",
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
-                    borderWidth: "2px",
+
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "primary.main",
                   },
                 }}
               />
-
+              {/* Where */}{" "}
               <TextField
+                fullWidth
                 label="Where"
+                placeholder="City"
                 variant="outlined"
-                placeholder="City, state, or zip"
-                className="search-input"
-                InputLabelProps={{
-                  sx: {
-                    color: "black",
-                    fontSize: 18,
-                  },
-                }}
+                size="small"
+                value={jobCity}
+                onChange={(e) => setJobCity(e.target.value)}
                 sx={{
-                  // width: { xs: "100%", sm: "40%" },
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+                  flex: 1,
+                  minWidth: { xs: "100%", md: "280px" },
+
+                  "& .MuiOutlinedInput-root": {
+                    height: "52px",
+                    backgroundColor: "#fafafa",
+                    borderRadius: "8px",
+
+                    "& fieldset": {
+                      borderColor: "#e0e0e0",
+                    },
+
+                    "&:hover fieldset": {
+                      borderColor: "#bdbdbd",
+                    },
+
+                    "&.Mui-focused fieldset": {
+                      borderColor: "primary.main",
+                      borderWidth: "2px",
+                    },
                   },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "transparent",
+
+                  "& .MuiInputLabel-root": {
+                    color: "#555",
+                    fontSize: "15px",
                   },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
-                    borderWidth: "2px",
+
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "primary.main",
                   },
                 }}
               />
-
+              {/* Search Button */}{" "}
               <Button
                 variant="contained"
                 color="primary"
-                className="search-button"
+                startIcon={<SearchIcon />}
+                onClick={handleSearch}
                 sx={{
-                  height: "48px",
-                  borderRadius: 2,
-                  whiteSpace: "nowrap",
-                  // width: { xs: "100%", sm: 130 },
-                  marginLeft: 2,
+                  height: "52px",
+                  minWidth: { xs: "100%", md: "135px" },
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  boxShadow: "none",
+
+                  "&:hover": {
+                    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
+                  },
                 }}
               >
                 Search
