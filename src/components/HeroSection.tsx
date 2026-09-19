@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Box } from "@mui/material";
+import { Box, Autocomplete } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Search as SearchIcon } from "@mui/icons-material";
+import { JOB_CAT } from "../types/jobOptions";
+import { LOCATION_DATA, CountryLocation } from "../types/locationOptions";
 
 const HeroSection = () => {
   const keywords = ["Software Engineer", "Product Manager", "UX Designer"];
@@ -11,13 +13,29 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const [jobCategory, setJobCategory] = useState("");
-  const [jobCity, setJobCity] = useState("");
+  const [jobLocation, setJobLocation] = useState({
+    country: "",
+    province: "",
+    city: "",
+  });
+
+  const cityOptions = LOCATION_DATA.flatMap((country) =>
+    country.provinces.flatMap((province) =>
+      province.cities.map((city) => ({
+        city,
+        province: province.name,
+        country: country.name,
+      })),
+    ),
+  );
 
   const handleSearch = () => {
     navigate("/job_posts", {
       state: {
-        category: jobCategory.trim(),
-        city: jobCity.trim(),
+        category: jobCategory,
+        country: jobLocation.country,
+        province: jobLocation.province,
+        city: jobLocation.city,
       },
     });
   };
@@ -78,14 +96,26 @@ const HeroSection = () => {
             >
               {" "}
               {/* What */}{" "}
-              <TextField
+              <Autocomplete
                 fullWidth
-                label="What"
-                placeholder="Job category"
-                variant="outlined"
-                size="small"
+                freeSolo
+                options={JOB_CAT}
                 value={jobCategory}
-                onChange={(e) => setJobCategory(e.target.value)}
+                onChange={(_event, newValue) => {
+                  setJobCategory(newValue || "");
+                }}
+                onInputChange={(_event, newInputValue) => {
+                  setJobCategory(newInputValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="What"
+                    placeholder="Job category"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
                 sx={{
                   flex: 1,
                   minWidth: { xs: "100%", md: "280px" },
@@ -120,14 +150,58 @@ const HeroSection = () => {
                 }}
               />
               {/* Where */}{" "}
-              <TextField
+              <Autocomplete
                 fullWidth
-                label="Where"
-                placeholder="City"
-                variant="outlined"
-                size="small"
-                value={jobCity}
-                onChange={(e) => setJobCity(e.target.value)}
+                options={cityOptions}
+                value={
+                  cityOptions.find(
+                    (option) => option.city === jobLocation.city,
+                  ) || null
+                }
+                getOptionLabel={(option) => option.city}
+                isOptionEqualToValue={(option, value) =>
+                  option.city === value.city
+                }
+                onChange={(_event, newValue) => {
+                  if (newValue) {
+                    setJobLocation({
+                      country: newValue.country,
+                      province: newValue.province,
+                      city: newValue.city,
+                    });
+                  } else {
+                    setJobLocation({
+                      country: "",
+                      province: "",
+                      city: "",
+                    });
+                  }
+                }}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
+                    <Box>
+                      <Box sx={{ fontWeight: 500 }}>{option.city}</Box>
+
+                      <Box
+                        sx={{
+                          fontSize: "12px",
+                          color: "text.secondary",
+                        }}
+                      >
+                        {option.province}, {option.country}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Where"
+                    placeholder="City"
+                    variant="outlined"
+                    size="small"
+                  />
+                )}
                 sx={{
                   flex: 1,
                   minWidth: { xs: "100%", md: "280px" },
