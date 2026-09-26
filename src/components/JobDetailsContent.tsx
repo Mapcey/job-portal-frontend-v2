@@ -320,20 +320,6 @@ const JobDetailsContent = ({
             >
               {isSaved ? "Job Saved" : "Save Job"}
             </Button>
-
-            <Button
-              variant="text"
-              color="secondary"
-              fullWidth
-              onClick={onReport}
-              startIcon={<ReportProblemOutlinedIcon />}
-              sx={{
-                mt: 1,
-                textTransform: "none",
-              }}
-            >
-              Report a problem
-            </Button>
           </Paper>
 
           {/* JOB OVERVIEW */}
@@ -397,6 +383,19 @@ const JobDetailsContent = ({
           </Paper>
         </Box>
       </Box>
+      <Button
+        variant="text"
+        color="secondary"
+        fullWidth
+        onClick={onReport}
+        startIcon={<ReportProblemOutlinedIcon />}
+        sx={{
+          mt: 1,
+          textTransform: "none",
+        }}
+      >
+        Report a problem
+      </Button>
     </Box>
   );
 };
