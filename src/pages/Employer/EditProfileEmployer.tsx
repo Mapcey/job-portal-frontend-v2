@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -10,18 +10,23 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Backup, Delete } from "@mui/icons-material";
+
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import Breadcrumb from "../../components/common/Breadcrumb";
-import { getEmployerData, putEmployerData } from "../../services/APIs/APIs";
+
 import { EMPLOYER_DATA } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationsProvider";
 
-import { getEmployerFiles } from "../../services/APIs/APIs";
-import { uploadNewEmployerFiles } from "../../services/APIs/APIs";
-import { updateEmployerFile } from "../../services/APIs/APIs";
-import { deleteEmployerFiles } from "../../services/APIs/APIs";
+import {
+  getEmployerData,
+  putEmployerData,
+  getEmployerFiles,
+  uploadNewEmployerFiles,
+  updateEmployerFile,
+  deleteEmployerFiles,
+} from "../../services/APIs/APIs";
 
 const EditProfileEmployer = () => {
   const [formData, setFormData] = useState<EMPLOYER_DATA>({
@@ -29,32 +34,34 @@ const EditProfileEmployer = () => {
     FirebaseUID: "",
     CompanyName: "",
     ContactNo: "",
-    WebSite: "",
+    // Website: "",
     Location: "",
     LinkedIn: "",
     Overview: "",
     IsSub: false,
   });
 
+  // Profile image
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImageUrl, setProfileImageUrl] =
     useState<string>("/icons/account.svg");
   const [existingFileId, setExistingFileId] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Video upload states
+  // Company video
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [existingVideoId, setExistingVideoId] = useState<number | null>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [uploading, setUploading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const { userInfo } = useAuth();
   const navigate = useNavigate();
   const { notify } = useNotification();
 
-  // Set EmployerId from logged-in user
+  // Get Employer ID from logged-in user
   useEffect(() => {
     if (userInfo && "EmployerId" in userInfo) {
       setFormData((prev) => ({
@@ -64,169 +71,200 @@ const EditProfileEmployer = () => {
     }
   }, [userInfo]);
 
-  // Fetch employer files and profile image
+  // Fetch employer data and files
   useEffect(() => {
+    if (!formData.EmployerId) return;
+
     const fetchData = async () => {
-      if (formData.EmployerId) {
-        try {
-          const data = await getEmployerData(formData.EmployerId.toString());
-          setFormData(data); // pre-fill form with existing data
-          console.log("Employer data fetched:", data);
-        } catch (error) {
-          console.error("Failed to fetch employer data:", error);
-        }
+      try {
+        const data = await getEmployerData(formData.EmployerId.toString());
+
+        setFormData(data);
+      } catch (error) {
+        console.error("Failed to fetch employer data:", error);
       }
     };
-    fetchData();
 
     const fetchEmployerFiles = async () => {
-      if (!formData.EmployerId) return;
-
       try {
         const files = await getEmployerFiles(formData.EmployerId);
 
-        // Image
-        const profileFile = files.find(
-          (file: any) => file.file_type === "FileType.image"
+        // Profile image
+        const imageFile = files.find(
+          (file: any) => file.FileCategory === "FileType.image",
         );
-        if (profileFile) {
-          setProfileImageUrl(profileFile.file_url);
-          setExistingFileId(profileFile.id);
+
+        if (imageFile) {
+          setProfileImageUrl(imageFile.FileUrl);
+          setExistingFileId(imageFile.Id);
         }
 
-        // 🎥 Video
+        // Company video
         const videoFile = files.find(
-          (file: any) => file.file_type === "FileType.video"
+          (file: any) => file.FileCategory === "FileType.video",
         );
+
         if (videoFile) {
-          setVideoUrl(videoFile.file_url);
-          setExistingVideoId(videoFile.id);
+          setVideoUrl(videoFile.FileUrl);
+          setExistingVideoId(videoFile.Id);
         }
-      } catch (err) {
-        console.error("Failed to fetch employer files:", err);
+      } catch (error) {
+        console.error("Failed to fetch employer files:", error);
       }
     };
+
+    fetchData();
     fetchEmployerFiles();
   }, [formData.EmployerId]);
 
-  // Handle file selection
+  // Select profile image
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setProfileImageFile(file);
-      setProfileImageUrl(URL.createObjectURL(file));
-    }
+
+    if (!file) return;
+
+    setProfileImageFile(file);
+    setProfileImageUrl(URL.createObjectURL(file));
   };
 
+  // Select company video
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setVideoFile(file);
-      setVideoUrl(URL.createObjectURL(file));
-    }
+
+    if (!file) return;
+
+    setVideoFile(file);
+    setVideoUrl(URL.createObjectURL(file));
   };
 
-  const handleUploadVideoClick = () => {
-    videoInputRef.current?.click();
-  };
-
+  // Open image file selector
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  // Open video file selector
+  const handleUploadVideoClick = () => {
+    videoInputRef.current?.click();
   };
 
+  // Handle form input changes
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Delete profile image
   const handleDeleteImage = async () => {
-    if (!existingFileId || !formData.EmployerId) return;
+    if (!formData.EmployerId || !existingFileId) return;
 
     try {
       await deleteEmployerFiles(formData.EmployerId, existingFileId);
-      setProfileImageUrl("/icons/account.svg"); // reset to default avatar
+
+      setProfileImageUrl("/icons/account.svg");
+      setProfileImageFile(null);
       setExistingFileId(null);
-      localStorage.removeItem("profileImage");
+
       notify("Profile image deleted", "success");
-    } catch (err) {
-      console.error("Failed to delete image:", err);
+    } catch (error) {
+      console.error("Failed to delete image:", error);
       notify("Failed to delete image", "error");
     }
   };
 
+  // Delete company video
   const handleDeleteVideo = async () => {
-    if (!existingVideoId || !formData.EmployerId) return;
+    if (!formData.EmployerId || !existingVideoId) return;
 
     try {
       await deleteEmployerFiles(formData.EmployerId, existingVideoId);
+
       setVideoUrl("");
+      setVideoFile(null);
       setExistingVideoId(null);
+
       notify("Video deleted successfully", "success");
-    } catch (err) {
-      console.error("Failed to delete video:", err);
+    } catch (error) {
+      console.error("Failed to delete video:", error);
       notify("Failed to delete video", "error");
     }
   };
 
-  // Save updated data
+  // Save profile
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.EmployerId) {
+      notify("Employer ID is missing", "error");
+      return;
+    }
+
     setUploading(true);
+
     try {
-      // Replace old profile image if a new one is selected
+      // 1. Update employer information
+      await putEmployerData(formData.EmployerId, formData);
+
+      // 2. Upload/update profile image
       if (profileImageFile) {
-        const formDataFile = new FormData();
-        formDataFile.append("file", profileImageFile);
-        formDataFile.append("file_type", "image");
+        const imageFormData = new FormData();
+
+        imageFormData.append("file", profileImageFile);
+        imageFormData.append("file_type", "image");
 
         if (existingFileId) {
-          // Update existing image
           await updateEmployerFile(
             formData.EmployerId,
             existingFileId,
-            formDataFile
+            imageFormData,
           );
         } else {
-          // No existing file, upload new
-          await uploadNewEmployerFiles(formData.EmployerId, formDataFile);
+          await uploadNewEmployerFiles(formData.EmployerId, imageFormData);
         }
       }
 
+      // 3. Upload/update company video
       if (videoFile) {
-        const formDataFile = new FormData();
-        formDataFile.append("file", videoFile);
-        formDataFile.append("file_type", "video");
+        const videoFormData = new FormData();
+
+        videoFormData.append("file", videoFile);
+        videoFormData.append("file_type", "video");
 
         if (existingVideoId) {
-          // Update existing image
           await updateEmployerFile(
             formData.EmployerId,
             existingVideoId,
-            formDataFile
+            videoFormData,
           );
         } else {
-          // No existing file, upload new
-          await uploadNewEmployerFiles(formData.EmployerId, formDataFile);
+          await uploadNewEmployerFiles(formData.EmployerId, videoFormData);
         }
       }
 
-      localStorage.removeItem("profileImage");
-
-      // Update profile details
-      await putEmployerData(formData.EmployerId, formData);
       notify("Profile updated successfully", "success");
+
       navigate("/employer/profile");
-    } catch (err) {
-      console.error("Failed to update profile:", err);
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+
+      if (error.response) {
+        console.error("Status:", error.response.status);
+
+        console.error("Response:", error.response.data);
+      }
+
       notify("Failed to update profile", "error");
     } finally {
-      setUploading(false); // hide overlay
+      setUploading(false);
     }
   };
 
+  // Cancel editing
   const handleCancel = () => {
     navigate("/employer/profile");
   };
@@ -258,6 +296,7 @@ const EditProfileEmployer = () => {
         backgroundImage="/imgs/backgrounds/bg-1.jpg"
       />
       <Container sx={{ mt: 4, mb: 4 }}>
+        {/* ? exising profile image */}
         <div>
           {/* Profile Image */}
           <Box display="flex" alignItems="center" mb={3}>
@@ -327,9 +366,9 @@ const EditProfileEmployer = () => {
 
             <TextField
               fullWidth
-              label="WebSite"
-              name="WebSite"
-              value={formData.WebSite}
+              label="Website"
+              name="Website"
+              // value={formData.Website}
               onChange={handleChange}
               size="small"
               className="text-field-1"

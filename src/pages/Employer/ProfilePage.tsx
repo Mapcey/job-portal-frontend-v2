@@ -13,6 +13,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import { Menu } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
@@ -30,6 +31,8 @@ const EmployerProfilePage = () => {
   const tabFromUrl = Number(searchParams.get("tab")) || 0;
 
   const [selectedTab, setSelectedTab] = useState(tabFromUrl);
+
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -169,7 +172,12 @@ const EmployerProfilePage = () => {
               <Tab label="Subscriptions" sx={tabStyle} />
             </Tabs>
 
-            <Button sx={{ mt: 5 }} fullWidth variant="contained">
+            <Button
+              sx={{ mt: 5 }}
+              fullWidth
+              variant="contained"
+              onClick={() => navigate(`/head_hunt`)}
+            >
               Start Head Hunting
             </Button>
             <button className="glow-on-hover" type="button">

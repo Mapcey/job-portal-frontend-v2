@@ -1,13 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  Box,
-  TextField,
-  Avatar,
-  Button,
-  IconButton,
-} from "@mui/material";
+import { Box, TextField, Avatar, Button, IconButton } from "@mui/material";
 import { Backup } from "@mui/icons-material";
 
 import { EMPLOYER_DATA } from "../../types/users";
@@ -21,7 +15,7 @@ const FormSection_1 = () => {
   const [imageSrc, setImageSrc] = useState("/icons/account.svg");
   const [profileImage, setProfileImage] = useState<File | null>(null);
 
-  const { userInfo } = useAuth();
+  const { userInfo, logout } = useAuth();
   const [employerID, setEmployerID] = useState(0);
   const navigate = useNavigate();
   const { notify } = useNotification();
@@ -38,7 +32,7 @@ const FormSection_1 = () => {
     FirebaseUID: "",
     CompanyName: "",
     ContactNo: "",
-    WebSite: "",
+    // WebSite: "",
     Location: "",
     LinkedIn: "",
     Overview: "",
@@ -102,7 +96,8 @@ const FormSection_1 = () => {
       console.log("Profile updated:", response);
 
       notify("Profile updated successfully", "success");
-      navigate("/employer/profile/");
+      logout();
+      navigate("/login");
     } catch (err) {
       console.error("Error updating employer:", err);
       notify("Error updating employer profile", "error");

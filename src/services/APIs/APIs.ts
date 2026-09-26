@@ -66,24 +66,15 @@ export const userLogin = async () => {
 // ------------------ JOBS ------------------
 
 // get all jobs
-export const getAllJobs = async (): Promise<saved_jobs[]> => {
-  const response = await axiosInstance.get("/jobs/");
+export const getAllJobs = async (params?: any) => {
+  const response = await axiosInstance.get("/jobs/", {
+    params,
+  });
+
   return response.data;
 };
 
-// export const getAllJobs = async (): Promise<JOB[]> => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       resolve(mockJobs);
-//     }, 1000); // simulate API delay
-//   });
-// };
-
 // ------------------ SEEKER ------------------
-// export const getJobDetails = async (id: string): Promise<JOB> => {
-//   const response = await axiosInstance.get(`/jobs/${id}`);
-//   return response.data;
-// };
 
 export const createNewJob = async (data: CREATE_JOB): Promise<CREATE_JOB> => {
   const response = await axiosInstance.post(`/jobs/`, data);
@@ -114,7 +105,15 @@ export const signupSeeker = async (data: { ContactNo: string }) => {
 };
 
 export const getAllSeekers = async () => {
-  const response = await axiosInstance.get(`/employers/`);
+  const response = await axiosInstance.get(`/seekers/`);
+  return response.data;
+};
+
+export const getAllHHSeekers = async (params: any) => {
+  const response = await axiosInstance.get("/headhunt/seekers", {
+    params,
+  });
+
   return response.data;
 };
 
@@ -357,12 +356,6 @@ export const updateJobPost = async (
 ) => {
   await axiosInstance.put(`/jobs/${job_id}`, data);
 };
-
-// get application under a job post
-// export const getCandidatesOfJob = async (JobID: number) => {
-//   const response = await axiosInstance.get(`jobs/employer/${JobID}/applications`);
-//   return response.data;
-// };
 
 export const getCandidatesOfJob = async (JobID: number) => {
   const response = await axiosInstance.get(`jobs/${JobID}/applications`);

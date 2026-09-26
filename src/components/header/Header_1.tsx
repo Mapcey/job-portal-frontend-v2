@@ -36,7 +36,7 @@ const Header_1 = () => {
 
   const handleMenuButtons = (page: string) => {
     if (page === "Home") navigate(`/`);
-    else if (page === "Browse Jobs") navigate(`/jobs`);
+    else if (page === "Browse Jobs") navigate(`/job_posts`);
     else if (page === "Contact") navigate(`/contact`);
     else if (page === "About") navigate(`/about`);
     else navigate("/notFound");

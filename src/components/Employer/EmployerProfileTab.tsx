@@ -18,6 +18,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getEmployerData } from "../../services/APIs/APIs";
 import EditIcon from "@mui/icons-material/Edit";
 import { getEmployerFiles } from "../../services/APIs/APIs";
+import EmployerProfileSkeleton from "../../components/placeholders/EmployerProfileSkeleton";
 
 const EmployerProfileTab = () => {
   const [imageSrc, setImageSrc] = useState("");
@@ -100,15 +101,14 @@ const EmployerProfileTab = () => {
   };
 
   const BrowseEditProfile = () => {
+    // window.open("/employer/edit_profile", "_blank", "noopener,noreferrer");
     navigate("/employer/edit_profile");
   };
 
   return (
     <div className="employer-profile-tab-container">
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
+        <EmployerProfileSkeleton />
       ) : (
         <div className="employer-profile-tab-content">
           {/* section */}
@@ -165,6 +165,7 @@ const EmployerProfileTab = () => {
                       bgcolor: "white",
                       boxShadow: 6,
                       scale: 1.1,
+                      color: "black",
                     },
                   }}
                 >
@@ -195,7 +196,7 @@ const EmployerProfileTab = () => {
               <TextField
                 label="Website"
                 disabled
-                value={user?.WebSite || ""}
+                // value={user?.Website || ""}
                 variant="outlined"
                 className="text-field-dis"
                 size="small"

@@ -44,7 +44,9 @@ export interface SavedJob {
 
 export interface CREATE_JOB {
   JobTitle: string;
-  Location: string;
+  Country: string;
+  State: string;
+  City: string;
   JobCategory: string;
   JobType: string;
   WorkType: string;

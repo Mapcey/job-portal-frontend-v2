@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "./ScrollToTop";
+
 import LandingPage from "../pages/HomePage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
@@ -23,121 +25,128 @@ import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
 import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
-import HeadHuntingPage from "../pages/Editor/HeadHuntPage";
+import HeadHuntingPage from "../pages/Employer/HeadHuntPage";
 
 const AppRoutes = () => (
-  <Routes>
-    <Route path="*" element={<NotFoundPage />} />
-    <Route path="/" element={<LandingPage />} />
-    <Route path="/login" element={<LoginPage />} />
-    <Route path="/signup" element={<SignupPage />} />
-    <Route path="/jobs" element={<BrowseJobs />} />
-    <Route path="/pricing" element={<PricingPage />} />
-    <Route path="/about" element={<AboutPage />} />
-    <Route path="/contact" element={<ContactPage />} />
-    <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
-    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+  <>
+    <ScrollToTop />
 
-    <Route path="/editor_login" element={<EditorLogin />} />
-    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+    <Routes>
+      <Route path="*" element={<NotFoundPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/job_posts" element={<BrowseJobs />} />
+      <Route path="/job_posts" element={<BrowseJobs />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/seeker/profile/edit" element={<SeekerEditPage />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-    <Route path="/head_hunt" element={<HeadHuntingPage />} />
+      <Route path="/editor_login" element={<EditorLogin />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-    {/* Protected routes */}
-    <Route
-      path="/jobs/details/:id"
-      element={
-        <ProtectedRoute>
-          <JobDetailsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/seeker/profile"
-      element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
-          <SeekerProfile />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/seeker/subscription-upload"
-      element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
-          <SeekerSubscriptionUpload />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/employer/profile"
-      element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <EmployerProfilePage />
-        </ProtectedRoute>
-      }
-    />
+      <Route path="/job_posts/details/:id" element={<JobDetailsPage />} />
 
-    <Route
-      path="/employer/subscription-upload"
-      element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <EmployerSubscriptionUpload />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/employer/post"
-      element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <PostJob />
-        </ProtectedRoute>
-      }
-    />
+      <Route
+        path="/head_hunt"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <HeadHuntingPage />
+          </ProtectedRoute>
+        }
+      />
 
-    <Route
-      path="/employer/register"
-      element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <CreateNewAcEmployer />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/seeker/register"
-      element={
-        <ProtectedRoute allowedRoles={["seeker"]}>
-          <CreateNewAcSeeker />
-        </ProtectedRoute>
-      }
-    />
+      {/* Protected routes */}
 
-    <Route
-      path="/employer/edit_profile"
-      element={
-        <ProtectedRoute allowedRoles={["employer"]}>
-          <EditProfileEmployer />
-        </ProtectedRoute>
-      }
-    />
+      <Route
+        path="/seeker/profile"
+        element={
+          <ProtectedRoute allowedRoles={["seeker"]}>
+            <SeekerProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seeker/subscription-upload"
+        element={
+          <ProtectedRoute allowedRoles={["seeker"]}>
+            <SeekerSubscriptionUpload />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/profile"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <EmployerProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
-    <Route
-      path="/seeker_account/:seekerID"
-      element={
-        <ProtectedRoute allowedRoles={["employer", "seeker"]}>
-          <SeekerPublicViewPage />
-        </ProtectedRoute>
-      }
-    />
+      <Route
+        path="/employer/subscription-upload"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <EmployerSubscriptionUpload />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employer/post"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <PostJob />
+          </ProtectedRoute>
+        }
+      />
 
-    <Route
-      path="/editor"
-      element={
-        <ProtectedRoute allowedRoles={["editor"]}>
-          <EditorProfilePage />
-        </ProtectedRoute>
-      }
-    />
-  </Routes>
+      <Route
+        path="/employer/register"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <CreateNewAcEmployer />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/seeker/register"
+        element={
+          <ProtectedRoute allowedRoles={["seeker"]}>
+            <CreateNewAcSeeker />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/employer/edit_profile"
+        element={
+          <ProtectedRoute allowedRoles={["employer"]}>
+            <EditProfileEmployer />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seeker_account/:seekerID"
+        element={
+          <ProtectedRoute allowedRoles={["employer", "seeker"]}>
+            <SeekerPublicViewPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/editor"
+        element={
+          <ProtectedRoute allowedRoles={["editor"]}>
+            <EditorProfilePage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  </>
 );
 
 export default AppRoutes;
