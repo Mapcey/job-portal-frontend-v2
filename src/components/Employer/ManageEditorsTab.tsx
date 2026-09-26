@@ -135,8 +135,11 @@ const ManageEditorsTab = () => {
   // Delete editor
   const handleDeleteEditor = async (editorId: number) => {
     try {
-      await deleteEditor(9);
+      await deleteEditor(editorId);
+
       setEditors((prev) => prev.filter((e) => e.EditorId !== editorId));
+
+      console.log("Deleted editor:", editorId);
     } catch (err) {
       console.error("Failed to delete editor:", err);
     }

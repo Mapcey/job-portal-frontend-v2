@@ -14,6 +14,8 @@ import {
   signInWithEmailAndPassword,
   setPersistence,
   browserLocalPersistence,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { useAuth } from "../../context/AuthContext";
@@ -28,37 +30,52 @@ const EditorLogin: React.FC = () => {
 
   const navigate = useNavigate();
   const { loginEditor } = useAuth();
-
   const { notify } = useNotification();
-
-  console.log(error);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
     setError("");
 
     try {
       await setPersistence(auth, browserLocalPersistence);
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        email,
+        email.trim(),
         password,
       );
-      const token = await userCredential.user.getIdToken();
 
+      const user = userCredential.user;
+
+      // First login / email not verified
+      if (!user.emailVerified) {
+        await sendEmailVerification(user);
+        await signOut(auth);
+
+        notify(
+          "Verification email sent. Please verify your email before logging in.",
+          "info",
+        );
+
+        return;
+      }
+
+      // Email already verified
+      const token = await user.getIdToken();
       const result = await loginEditor(token);
 
-      console.log(result);
-
       if (result === "inactive") {
+        await signOut(auth);
         notify("Inactive Account", "error");
-        return; // Stop navigation
+        return;
       }
 
       navigate("/editor");
     } catch (err: any) {
-      setError(err.message || "Unexpected login error");
+      console.error(err);
+      setError(err.message || "Unexpected login error.");
     } finally {
       setLoading(false);
     }
@@ -71,7 +88,7 @@ const EditorLogin: React.FC = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: 2,
+        p: 2,
       }}
     >
       <Card
@@ -80,7 +97,7 @@ const EditorLogin: React.FC = () => {
           maxWidth: 400,
           borderRadius: 3,
           boxShadow: 6,
-          backgroundColor: "white",
+          bgcolor: "white",
         }}
       >
         <CardContent sx={{ p: 4 }}>
@@ -92,20 +109,27 @@ const EditorLogin: React.FC = () => {
             flexDirection="column"
           >
             <LockOutlined sx={{ fontSize: 40, color: "primary.main", mb: 1 }} />
-            <Typography variant="h5" fontWeight={600} gutterBottom>
+
+            <Typography variant="h5" fontWeight={600}>
               Editor Login
             </Typography>
+
             <Typography variant="body2" color="text.secondary">
               Sign in to your editor account
             </Typography>
           </Box>
+
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mb: 1 }}>
+              {error}
+            </Typography>
+          )}
 
           <form onSubmit={handleLogin}>
             <TextField
               fullWidth
               label="Email"
               type="email"
-              variant="outlined"
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -116,7 +140,6 @@ const EditorLogin: React.FC = () => {
               fullWidth
               label="Password"
               type="password"
-              variant="outlined"
               margin="normal"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -127,7 +150,6 @@ const EditorLogin: React.FC = () => {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
               size="large"
               sx={{
                 mt: 2,
