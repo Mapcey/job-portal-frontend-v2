@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  IconButton,
   Divider,
   Dialog,
   DialogTitle,
@@ -14,7 +13,6 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";
 import { notification } from "../../types/notification";
@@ -102,18 +100,6 @@ const NotificationsTab = () => {
         {notifications.map((note) => (
           <React.Fragment key={note.NotificationId}>
             <ListItem
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // handleRemove(note.NotificationId);
-                  }}
-                >
-                  <DeleteIcon color="error" />
-                </IconButton>
-              }
               disablePadding
             >
               <ListItemButton

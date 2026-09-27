@@ -267,7 +267,7 @@ export const addJobApplication = async (
 export const getSeekerApplications = async (
   id: string
 ): Promise<ApplicationsSeeker[]> => {
-  const response = await axiosInstance.get(`/jobs/seeker/${id}/applications`);
+  const response = await axiosInstance.get(`/seekers/${id}/applications`);
   return response.data;
 };
 

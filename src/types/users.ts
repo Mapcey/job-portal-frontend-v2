@@ -15,8 +15,9 @@ export interface SEEKER_DATA {
   FirstName: string;
   LastName: string;
   ContactNo: string;
-  LocationX: number;
-  LocationY: number;
+  Country: string;
+  State: string;
+  City: string;
   Address: string;
   Email: string;
   ProfessionalExperience: number;
@@ -51,12 +52,14 @@ export interface EDITOR_DATA {
 }
 
 export interface Career {
-  id: number;
+  Id: number;
+  UserId: number;
+  Sector: string;
   Designation: string;
   CompanyName: string;
   StartDate: string;
-  EndDate?: string;
-  Description?: string;
+  EndDate: string;
+  Description: string;
 }
 export interface Education {
   id: number;

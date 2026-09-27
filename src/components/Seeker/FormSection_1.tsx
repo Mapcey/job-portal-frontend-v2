@@ -15,6 +15,7 @@ import { updateSeeker } from "../../services/APIs/APIs";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { currencies } from "../../data/currencies";
+import { LOCATION_DATA } from "../../types/locationOptions";
 
 // const jobTypes = [
 //   "Full-time",
@@ -39,8 +40,9 @@ const CreateSeeker: React.FC = () => {
     FirstName: "",
     LastName: "",
     ContactNo: "",
-    LocationX: 0,
-    LocationY: 0,
+    Country: "Sri Lanka",
+    State: "",
+    City: "",
     Address: "",
     Email: "",
     Currency: "",
@@ -50,26 +52,6 @@ const CreateSeeker: React.FC = () => {
     Summary: "",
     Subscription: false, // Add default value for IsSubscribed
   });
-
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          // set your LocationX and LocationY with latitude/longitude
-          setForm((prev) => ({
-            ...prev,
-            LocationX: position.coords.latitude, // X = latitude
-            LocationY: position.coords.longitude, // Y = longitude
-          }));
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        },
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
-  }, []);
 
   useEffect(() => {
     if (userInfo && "UserId" in userInfo) setSeekerID(userInfo.UserId);
@@ -91,8 +73,6 @@ const CreateSeeker: React.FC = () => {
         ...form,
         Email: userInfo?.Email || form.Email,
         Currency: form.Currency || undefined,
-        LocationX: Number(form.LocationX || 0),
-        LocationY: Number(form.LocationY || 0),
         ProfessionalExperience: Number(form.ProfessionalExperience || 0),
         DateOfBirth: form.DateOfBirth ? new Date(form.DateOfBirth) : undefined,
         Subscription: Boolean(form.Subscription),
@@ -177,24 +157,54 @@ const CreateSeeker: React.FC = () => {
         sx={{ mb: 2 }}
       />
 
-      {/* LocationX / LocationY */}
+      {/* Country / State / City */}
       <Box display="flex" gap={2} mb={2}>
-        <TextField
-          fullWidth
-          type="number"
-          label="Location X"
-          placeholder="Enter location X"
-          value={form.LocationX}
-          onChange={(e) => handleChange("LocationX", Number(e.target.value))}
-        />
-        <TextField
-          fullWidth
-          type="number"
-          label="Location Y"
-          placeholder="Enter location Y"
-          value={form.LocationY}
-          onChange={(e) => handleChange("LocationY", Number(e.target.value))}
-        />
+        <FormControl fullWidth>
+          <InputLabel id="seeker-country-label">Country</InputLabel>
+          <Select
+            labelId="seeker-country-label"
+            value={form.Country}
+            label="Country"
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              Country: e.target.value,
+              State: "",
+              City: "",
+            }))}
+          >
+            {LOCATION_DATA.map((country) => (
+              <MenuItem key={country.name} value={country.name}>{country.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel id="seeker-state-label">State / Province</InputLabel>
+          <Select
+            labelId="seeker-state-label"
+            value={form.State}
+            label="State / Province"
+            disabled={!form.Country}
+            onChange={(e) => setForm((prev) => ({ ...prev, State: e.target.value, City: "" }))}
+          >
+            {(LOCATION_DATA.find((country) => country.name === form.Country)?.provinces || []).map((state) => (
+              <MenuItem key={state.name} value={state.name}>{state.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel id="seeker-city-label">City</InputLabel>
+          <Select
+            labelId="seeker-city-label"
+            value={form.City}
+            label="City"
+            disabled={!form.State}
+            onChange={(e) => handleChange("City", e.target.value)}
+          >
+            {(LOCATION_DATA.find((country) => country.name === form.Country)?.provinces.find((state) => state.name === form.State)?.cities || []).map((city) => (
+              <MenuItem key={city} value={city}>{city}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
       {/* Professional Experience /*/}

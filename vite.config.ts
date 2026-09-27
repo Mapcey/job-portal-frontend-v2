@@ -8,6 +8,12 @@ export default defineConfig({
   plugins: [react(),],
   server: {
     proxy: {
+      '/api/skills': {
+        target: 'https://ec.europa.eu',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/skills/, '/esco/api/suggest2'),
+      },
       '/auth': {
         target: 'http://46.62.192.148/api2',
         changeOrigin: true,

@@ -8,10 +8,12 @@ import {
   Paper,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 // DownloadIcon removed (unused)
 import { getSeekerData, getSeekerFiles } from "../../services/APIs/APIs";
 import { SEEKER_DATA, seekerFiles } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
+import { isCurrentWorkplace } from "../../utils/career";
 
 const SeekerProfileTab = () => {
   const navigate = useNavigate();
@@ -314,11 +316,20 @@ const SeekerProfileTab = () => {
         <SectionBox title="Career History">
           {user?.careers && user.careers.length > 0 ? (
             user.careers.map((career, index) => (
-              <Box key={career.id ?? `career-${index}`} mb={2}>
+              <Box key={career.Id ?? `career-${index}`} mb={2}>
                 <Typography variant="h6">{career.Designation}</Typography>
                 <Typography variant="subtitle2">{career.CompanyName}</Typography>
+                {isCurrentWorkplace(career.EndDate) && (
+                  <Chip
+                    icon={<CheckCircleOutlineIcon />}
+                    label="Current workplace"
+                    color="success"
+                    size="small"
+                    sx={{ my: 0.5 }}
+                  />
+                )}
                 <Typography variant="body2">
-                  {career.StartDate} - {career.EndDate || "Present"}
+                  {career.StartDate} - {isCurrentWorkplace(career.EndDate) ? "Present" : career.EndDate}
                 </Typography>
                 <Typography variant="body1">{career.Description}</Typography>
               </Box>
