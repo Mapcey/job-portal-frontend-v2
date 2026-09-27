@@ -10,7 +10,6 @@ import {
 import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router-dom";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
-import FlagIcon from "@mui/icons-material/Flag";
 import {
   getSeekerSavedJobs,
   deleteSeekerSavedJob,
@@ -82,12 +81,6 @@ const SavedJobsTab = () => {
     }
   };
 
-  // Report job
-  const handleReport = (jobId: number) => {
-    alert(`Reported Job ID: ${jobId}`);
-    // TODO: Call report API here
-  };
-
   // Navigate to job details
   const handleOpenJob = (jobId: number) => {
     navigate(`/jobs/details/${jobId}`);
@@ -124,26 +117,6 @@ const SavedJobsTab = () => {
               sx={{
                 position: "absolute",
                 top: 5,
-                right: 35, // Shift left for report icon
-                zIndex: 1,
-                backgroundColor: "white",
-                boxShadow: 1,
-                ":hover": { backgroundColor: "#f5f5f5" },
-              }}
-            >
-              <BookmarkRemoveIcon />
-            </IconButton>
-
-            {/* Report Job Icon */}
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleReport(job.JobId);
-              }}
-              sx={{
-                position: "absolute",
-                top: 5,
                 right: 5,
                 zIndex: 1,
                 backgroundColor: "white",
@@ -151,7 +124,7 @@ const SavedJobsTab = () => {
                 ":hover": { backgroundColor: "#f5f5f5" },
               }}
             >
-              <FlagIcon />
+              <BookmarkRemoveIcon />
             </IconButton>
 
             <CardActionArea onClick={() => handleOpenJob(job.JobId)}>

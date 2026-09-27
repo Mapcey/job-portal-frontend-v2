@@ -1,6 +1,6 @@
 // Form state type for controlled input
 type ArrayFieldKey = "careers" | "educations" | "skills" | "languages";
-type DraftCareer = Omit<Career, "id"> & { id?: number };
+type DraftCareer = Career & { id?: number };
 type DraftEducation = Omit<Education, "id"> & { id?: number };
 type DraftSkill = Omit<Skill, "id"> & { id?: number };
 type DraftLanguage = Omit<languages, "id"> & { id?: number };
@@ -28,7 +28,12 @@ import {
   Alert,
   Chip,
 } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import { currencies } from "../../data/currencies";
+import { JOB_CAT } from "../../types/jobOptions";
+import { JOB_SKILL_CATEGORY_BY_NAME, JOB_SKILL_SUGGESTIONS } from "../../data/jobSkills";
+import { LOCATION_DATA } from "../../types/locationOptions";
+import { getLocalDateString } from "../../utils/career";
 import { SEEKER_DATA, Skill, languages, Career, Education } from "../../types/users";
 import {
   getSeekerData,
@@ -163,7 +168,55 @@ const EditSeekerProfile = () => {
   const [originalCareers, setOriginalCareers] = useState<any[]>([]);
   const [originalEducations, setOriginalEducations] = useState<any[]>([]);
   const [files, setFiles] = useState<seekerFiles[]>([]);
+  const [skillSearchInput, setSkillSearchInput] = useState("");
+  const [onlineSkillSuggestions, setOnlineSkillSuggestions] = useState<string[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const query = skillSearchInput.trim();
+    if (query.length < 2) {
+      setOnlineSkillSuggestions([]);
+      return;
+    }
+
+    setOnlineSkillSuggestions([]);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({
+          text: query,
+          language: "en",
+          type: "skill",
+          limit: "12",
+        });
+        const response = await fetch(`/api/skills?${params}`, { signal: controller.signal });
+        if (!response.ok) return;
+        const result = (await response.json()) as {
+          skills?: string[];
+          _embedded?: {
+            results?: Array<{
+              title?: string;
+              preferredLabel?: Record<string, string>;
+              searchHit?: string;
+            }>;
+          };
+        };
+        const skills = result.skills ?? result._embedded?.results?.map(
+          (suggestion) => suggestion.title ?? suggestion.preferredLabel?.en ?? suggestion.searchHit ?? "",
+        ) ?? [];
+        setOnlineSkillSuggestions(skills.filter(Boolean));
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.warn("Could not load ESCO skill suggestions:", error);
+        }
+      }
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [skillSearchInput]);
 
   const isEqualRecord = (prev: any, current: any) => {
     if (!prev || !current) return false;
@@ -181,6 +234,22 @@ const EditSeekerProfile = () => {
     return items.map((i) => ({ ...i, id: i?.id ?? i?.Id ?? 0, UserId: i?.UserId ?? i?.userId ?? undefined })) as languages[];
   };
 
+  const normalizeCareerItems = (items?: any[]): DraftCareer[] => {
+    if (!Array.isArray(items)) return [];
+    return items.map((career) => {
+      const id = career?.Id ?? career?.id ?? 0;
+      return {
+        ...career,
+        Id: id,
+        id,
+        UserId: career?.UserId ?? career?.userId ?? seekerID,
+        Sector: career?.Sector ?? "",
+        EndDate: career?.EndDate ?? "",
+        Description: career?.Description ?? "",
+      };
+    });
+  };
+
   const normalizeFetchedSeekerData = (data: any) => ({
     ...data,
     JobType: data?.JobType ?? data?.JobTypeName ?? "",
@@ -194,10 +263,11 @@ const EditSeekerProfile = () => {
       const nd = normalizeFetchedSeekerData(data);
       const ns = normalizeSkillItems(nd.skills);
       const nl = normalizeLanguageItems(nd.languages);
-      setForm({ ...nd, MinSalary: nd.MinSalary != null ? String(nd.MinSalary) : "", MaxSalary: nd.MaxSalary != null ? String(nd.MaxSalary) : "", languages: nl, skills: ns });
+      const nc = normalizeCareerItems(data.careers);
+      setForm({ ...nd, MinSalary: nd.MinSalary != null ? String(nd.MinSalary) : "", MaxSalary: nd.MaxSalary != null ? String(nd.MaxSalary) : "", languages: nl, skills: ns, careers: nc });
       setOriginalSkills(ns);
       setOriginalLanguages(nl);
-      setOriginalCareers(data.careers ?? []);
+      setOriginalCareers(nc);
       setOriginalEducations(data.educations ?? []);
       const f = await getSeekerFiles(id.toString());
       setFiles(f || []);
@@ -213,6 +283,10 @@ const EditSeekerProfile = () => {
 
   const jobTypeOptions = [{ value: "Full-time", label: "Full-time" }, { value: "Part-time", label: "Part-time" }, { value: "Internship", label: "Internship" }, { value: "Contract", label: "Contract" }];
   const jobModeOptions = [{ value: "On-site", label: "On-site" }, { value: "Remote", label: "Remote" }, { value: "Hybrid", label: "Hybrid" }];
+  const selectedCountry = LOCATION_DATA.find((country) => country.name === form.Country);
+  const states = selectedCountry?.provinces ?? [];
+  const selectedState = states.find((state) => state.name === form.State);
+  const cities = selectedState?.cities ?? [];
 
   const validateProfileImage = (file: File) => { if (!["image/jpeg", "image/png"].includes(file.type)) return "Profile image must be JPG or PNG"; if (file.size > 5 * 1024 * 1024) return "Profile image must be ≤ 5 MB"; return null; };
   const validateCV = (file: File) => { const valid = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]; if (!valid.includes(file.type)) return "CV must be PDF or DOCX"; if (file.size > 5 * 1024 * 1024) return "CV must be ≤ 5 MB"; return null; };
@@ -297,7 +371,7 @@ const EditSeekerProfile = () => {
       await Promise.all([
         ...getArrayDiffPromises("skills", currentSkills, originalSkills, (s) => addSkill(seekerID, { Skill: s.Skill, ExpertLevel: s.ExpertLevel }), (s) => updateSkill(seekerID, s.id!, { Skill: s.Skill, ExpertLevel: s.ExpertLevel }), (id) => deleteSkill(seekerID, id)),
         ...getArrayDiffPromises("languages", currentLanguages, originalLanguages, (l) => createLanguage(seekerID, { Language: l.Language, ExpertLevel: l.ExpertLevel }), (l) => updateLanguage(seekerID, l.id!, { Language: l.Language, ExpertLevel: l.ExpertLevel }), (id) => deleteLanguage(seekerID, id)),
-        ...getArrayDiffPromises("careers", currentCareers, originalCareers, (c) => addCareer(seekerID, c), (c) => updateCareer(seekerID, c.id!, c), (id) => deleteCareer(seekerID, id)),
+        ...getArrayDiffPromises("careers", currentCareers, originalCareers, (c) => addCareer(seekerID, toCareerApiPayload(c)), (c) => updateCareer(seekerID, c.id!, toCareerApiPayload(c)), (id) => deleteCareer(seekerID, id)),
         ...getArrayDiffPromises("educations", currentEducations, originalEducations, (ed) => addEducation(seekerID, ed), (ed) => updateEducation(seekerID, ed.id!, ed), (id) => deleteEducation(seekerID, id)),
       ]);
 
@@ -317,11 +391,22 @@ const EditSeekerProfile = () => {
 
   // ── Array helpers ──────────────────────────────────────────────────────────
   const defaultArrayItems: Record<ArrayFieldKey, any> = {
-    careers: { id: undefined, Designation: "", CompanyName: "", StartDate: "", EndDate: "", Description: "" },
+    careers: { id: undefined, Id: 0, UserId: seekerID, Sector: "", Designation: "", CompanyName: "", StartDate: "", EndDate: "", Description: "" },
     educations: { id: undefined, InstituteName: "", FieldOfStudy: "", StartDate: "", EndDate: "", LevelOfStudy: "", Status: "" },
     skills: { id: undefined, Skill: "", ExpertLevel: "" },
     languages: { id: undefined, Language: "", ExpertLevel: "" },
   };
+
+  const toCareerApiPayload = (career: DraftCareer): Career => ({
+    Id: career.id ?? career.Id ?? 0,
+    UserId: career.UserId ?? seekerID,
+    CompanyName: career.CompanyName ?? "",
+    Designation: career.Designation ?? "",
+    StartDate: career.StartDate ?? "",
+    EndDate: career.EndDate?.trim() || getLocalDateString(),
+    Description: career.Description ?? "",
+    Sector: career.Sector ?? "",
+  });
 
   const getArray = (type: ArrayFieldKey) => (form[type] as any[]) ?? [];
 
@@ -342,7 +427,6 @@ const EditSeekerProfile = () => {
   const removeAllLanguages = () => setForm({ ...form, languages: [] });
 
   const languageOptions = ["English", "Sinhala", "Tamil", "Hindi", "French", "German", "Spanish", "Chinese", "Japanese", "Arabic"];
-  const skillOptions = ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "C#", "SQL", "HTML", "CSS", "AWS", "Docker"];
   const expertLevelOptions = ["Beginner", "Intermediate", "Advanced", "Fluent", "Native"];
 
   const renderArraySection = (type: ArrayFieldKey, icon: React.ReactNode, title: string, subtitle: string, fields: string[]) => {
@@ -375,13 +459,40 @@ const EditSeekerProfile = () => {
                     </Select>
                   </FormControl>
                 );
-                if (type === "skills" && field === "Skill") return (
+                if (type === "careers" && field === "Sector") return (
                   <FormControl key={field} fullWidth margin="dense" size="small">
-                    <InputLabel>Skill</InputLabel>
-                    <Select value={(item as any)[field] || ""} label="Skill" onChange={(e) => handleArrayChange(type, idx, field, e.target.value)}>
-                      {skillOptions.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                    <InputLabel>Sector</InputLabel>
+                    <Select value={(item as any)[field] || ""} label="Sector" onChange={(e) => handleArrayChange(type, idx, field, e.target.value)}>
+                      <MenuItem value="">Select a sector</MenuItem>
+                      {JOB_CAT.map((sector) => <MenuItem key={sector} value={sector}>{sector}</MenuItem>)}
                     </Select>
                   </FormControl>
+                );
+                if (type === "skills" && field === "Skill") return (
+                  <Autocomplete
+                    key={field}
+                    freeSolo
+                    options={Array.from(new Set([...onlineSkillSuggestions, ...JOB_SKILL_SUGGESTIONS]))}
+                    groupBy={(skill) => JOB_SKILL_CATEGORY_BY_NAME[skill] ?? "Other skills"}
+                    value={(item as any)[field] || ""}
+                    onChange={(_event, value) => handleArrayChange(type, idx, field, value ?? "")}
+                    onInputChange={(_event, value, reason) => {
+                      if (reason === "input" || reason === "clear") {
+                        setSkillSearchInput(value);
+                        handleArrayChange(type, idx, field, value);
+                      }
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Skill"
+                        placeholder="Type to see suggestions or enter your own"
+                        helperText="Suggestions include the ESCO skills dataset and curated cross-industry skills; custom entries are also supported."
+                        margin="dense"
+                        size="small"
+                      />
+                    )}
+                  />
                 );
                 if ((type === "skills" || type === "languages") && field === "ExpertLevel") return (
                   <FormControl key={field} fullWidth margin="dense" size="small">
@@ -392,7 +503,18 @@ const EditSeekerProfile = () => {
                   </FormControl>
                 );
                 return (
-                  <TextField key={field} label={field} size="small" type={field === "StartDate" || field === "EndDate" ? "date" : "text"} InputLabelProps={field === "StartDate" || field === "EndDate" ? { shrink: true } : {}} value={(item as any)[field] || ""} onChange={(e) => handleArrayChange(type, idx, field, e.target.value)} fullWidth margin="dense" />
+                  <TextField
+                    key={field}
+                    label={field}
+                    helperText={type === "careers" && field === "EndDate" ? "Leave blank for your current workplace; today's date will be sent to the API." : undefined}
+                    size="small"
+                    type={field === "StartDate" || field === "EndDate" ? "date" : "text"}
+                    InputLabelProps={field === "StartDate" || field === "EndDate" ? { shrink: true } : {}}
+                    value={(item as any)[field] || ""}
+                    onChange={(e) => handleArrayChange(type, idx, field, e.target.value)}
+                    fullWidth
+                    margin="dense"
+                  />
                 );
               })}
             </ItemCard>
@@ -454,12 +576,28 @@ const EditSeekerProfile = () => {
                 </Select>
               </FormControl>
               <TextField label="Experience (years)" name="ProfessionalExperience" type="number" value={form.ProfessionalExperience || ""} onChange={handleChange} fullWidth size="small" />
-              <TextField label="Location X" name="LocationX" type="number" value={form.LocationX || ""} onChange={handleChange} fullWidth size="small" />
-              <TextField label="Location Y" name="LocationY" type="number" value={form.LocationY || ""} onChange={handleChange} fullWidth size="small" />
+              <FormControl fullWidth size="small">
+                <InputLabel>Country</InputLabel>
+                <Select value={form.Country || ""} label="Country" onChange={(e) => setForm({ ...form, Country: e.target.value, State: "", City: "" })}>
+                  {LOCATION_DATA.map((country) => <MenuItem key={country.name} value={country.name}>{country.name}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel>State / Province</InputLabel>
+                <Select value={form.State || ""} label="State / Province" disabled={!form.Country} onChange={(e) => setForm({ ...form, State: e.target.value, City: "" })}>
+                  {states.map((state) => <MenuItem key={state.name} value={state.name}>{state.name}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel>City</InputLabel>
+                <Select value={form.City || ""} label="City" disabled={!form.State} onChange={(e) => setForm({ ...form, City: e.target.value })}>
+                  {cities.map((city) => <MenuItem key={city} value={city}>{city}</MenuItem>)}
+                </Select>
+              </FormControl>
             </Box>
             <Divider sx={{ my: 2.5 }} />
             <Typography variant="body2" sx={{ fontWeight: 600, color: TEXT_PRIMARY, mb: 1.5 }}>Salary expectations</Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr 1fr" }, gap: 2 }}>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 180px))" }, gap: 2, maxWidth: 580 }}>
               <TextField label="Min salary" name="MinSalary" type="number" value={form.MinSalary} onChange={handleChange} fullWidth size="small" />
               <TextField label="Max salary" name="MaxSalary" type="number" value={form.MaxSalary} onChange={handleChange} fullWidth size="small" />
               <FormControl fullWidth size="small">
@@ -498,7 +636,7 @@ const EditSeekerProfile = () => {
           </SectionCard>
 
           {/* Array sections */}
-          {renderArraySection("careers", <WorkOutlineIcon fontSize="small" />, "Career history", "Your past roles and experience", ["Designation", "CompanyName", "StartDate", "EndDate", "Description"])}
+          {renderArraySection("careers", <WorkOutlineIcon fontSize="small" />, "Career history", "Your past roles and experience", ["Sector", "Designation", "CompanyName", "StartDate", "EndDate", "Description"])}
           {renderArraySection("educations", <SchoolOutlinedIcon fontSize="small" />, "Education", "Degrees, diplomas, and certifications", ["InstituteName", "FieldOfStudy", "StartDate", "EndDate", "LevelOfStudy", "Status"])}
           {renderArraySection("skills", <CodeOutlinedIcon fontSize="small" />, "Skills", "Technical and professional skills", ["Skill", "ExpertLevel"])}
           {renderArraySection("languages", <TranslateIcon fontSize="small" />, "Languages", "Languages you speak", ["Language", "ExpertLevel"])}

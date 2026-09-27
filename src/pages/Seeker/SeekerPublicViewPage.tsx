@@ -12,6 +12,7 @@ import {
   Divider,
 } from "@mui/material";
 import { Report } from "@mui/icons-material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 import { getSeekerData, getSeekerFiles } from "../../services/APIs/APIs"; // assume you have an API function
 import { SEEKER_DATA } from "../../types/users";
@@ -21,6 +22,7 @@ import ReportDialog from "../../components/ReportDialog";
 import SeekerPulicViewSkeleton from "../../components/placeholders/SeekerPagePublicView";
 
 import { seekerFiles } from "../../types/users";
+import { isCurrentWorkplace } from "../../utils/career";
 
 const SeekerPublicViewPage = () => {
   const { seekerID } = useParams<{ seekerID: string }>();
@@ -279,13 +281,22 @@ const SeekerPublicViewPage = () => {
           <Divider sx={{ mb: 2 }} />
           {seeker?.careers?.length ? (
             seeker.careers.map((career) => (
-              <Box key={career.id} mb={2}>
+              <Box key={career.Id} mb={2}>
                 <Typography variant="h6">{career.Designation}</Typography>
                 <Typography variant="subtitle2" color="text.secondary">
                   {career.CompanyName}
                 </Typography>
+                {isCurrentWorkplace(career.EndDate) && (
+                  <Chip
+                    icon={<CheckCircleOutlineIcon />}
+                    label="Current workplace"
+                    color="success"
+                    size="small"
+                    sx={{ my: 0.5 }}
+                  />
+                )}
                 <Typography variant="body2" color="text.secondary">
-                  {career.StartDate} - {career.EndDate || "Present"}
+                  {career.StartDate} - {isCurrentWorkplace(career.EndDate) ? "Present" : career.EndDate}
                 </Typography>
                 <Typography variant="body1">{career.Description}</Typography>
               </Box>
