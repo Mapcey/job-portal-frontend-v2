@@ -24,7 +24,9 @@ export interface saved_jobs {
     WebSite: string | null;
   };
   JobTitle: string;
-  Location: string;
+  Country: string;
+  State: string;
+  City: string;
   JobCategory: string;
   JobType: string;
   WorkType: string;

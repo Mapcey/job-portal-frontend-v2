@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Box,
   TextField,
@@ -13,7 +14,6 @@ import {
 
 import SearchIcon from "@mui/icons-material/Search";
 import { Work, Category, School } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import JobResultsSkeleton from "../placeholders/JobResultsSkeleton";
 
 interface JobResultsProps {
@@ -22,12 +22,10 @@ interface JobResultsProps {
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   onSearch: () => void;
-
   totalJobs: number;
   page: number;
   totalPages: number;
   onPageChange: (_: any, value: number) => void;
-
   appliedJobs: Set<number>;
   onApply: (job: any) => void;
 }
@@ -158,7 +156,8 @@ const JobResults = ({
 
                 <Typography variant="body2" color="text.secondary">
                   {job.employer?.CompanyName || "Company"} •{" "}
-                  {job.Location || "Location not specified"}
+                  {[job.City, job.State].filter(Boolean).join(", ") ||
+                    "Location not specified"}
                 </Typography>
 
                 <Box mt={1} display="flex" gap={1} flexWrap="wrap">

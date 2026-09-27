@@ -130,10 +130,12 @@ const JobDetailsContent = ({
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Chip label={job.JobType} color="primary" size="small" />
 
-              {job.Location && (
+              {(job.Country || job.State || job.City) && (
                 <Chip
                   icon={<LocationOnOutlinedIcon />}
-                  label={job.Location}
+                  label={[job.Country, job.State, job.City]
+                    .filter(Boolean)
+                    .join(", ")}
                   variant="outlined"
                   size="small"
                 />
@@ -318,20 +320,6 @@ const JobDetailsContent = ({
             >
               {isSaved ? "Job Saved" : "Save Job"}
             </Button>
-
-            <Button
-              variant="text"
-              color="secondary"
-              fullWidth
-              onClick={onReport}
-              startIcon={<ReportProblemOutlinedIcon />}
-              sx={{
-                mt: 1,
-                textTransform: "none",
-              }}
-            >
-              Report a problem
-            </Button>
           </Paper>
 
           {/* JOB OVERVIEW */}
@@ -379,7 +367,11 @@ const JobDetailsContent = ({
               <OverviewItem
                 icon={<LocationOnOutlinedIcon sx={{ color: "white" }} />}
                 label="Location"
-                value={job.Location}
+                value={
+                  [job.Country, job.State, job.City]
+                    .filter(Boolean)
+                    .join(", ") || "Location not specified"
+                }
               />
 
               <OverviewItem
@@ -391,6 +383,19 @@ const JobDetailsContent = ({
           </Paper>
         </Box>
       </Box>
+      <Button
+        variant="text"
+        color="secondary"
+        fullWidth
+        onClick={onReport}
+        startIcon={<ReportProblemOutlinedIcon />}
+        sx={{
+          mt: 1,
+          textTransform: "none",
+        }}
+      >
+        Report a problem
+      </Button>
     </Box>
   );
 };

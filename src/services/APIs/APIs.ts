@@ -344,11 +344,22 @@ export const getAllEmployerNotifications = async (id: string) => {
 
 // update notification employer
 export const updateEmployerNotification = async (
-  id: number,
-  notificationId: number
+  employerId: number,
+  notificationId: number,
+  data: {
+    DateTime: string;
+    Message: string;
+    Status: string;
+  }
 ) => {
-  await axiosInstance.put(`/employer/${id}/notifications/${notificationId}`);
+  const response = await axiosInstance.put(
+    `/employers/${employerId}/notifications/${notificationId}`,
+    data
+  );
+
+  return response.data;
 };
+
 
 export const updateJobPost = async (
   job_id: number,

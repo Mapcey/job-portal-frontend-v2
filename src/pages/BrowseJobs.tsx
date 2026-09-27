@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 
 // FIELS
@@ -28,12 +29,19 @@ const BrowseJobs = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const location = useLocation();
+
+  const searchCategory = location.state?.category || "";
+  const searchCountry = location.state?.country || "";
+  const searchProvince = location.state?.province || "";
+  const searchCity = location.state?.city || "";
+
   const [filters, setFilters] = useState({
     title: "",
-    country: "",
-    state: "",
-    city: "",
-    category: "",
+    country: searchCountry,
+    state: searchProvince,
+    city: searchCity,
+    category: searchCategory,
     job_type: "",
     work_type: "",
     education: "",
