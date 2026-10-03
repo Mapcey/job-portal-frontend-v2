@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  IconButton,
   Divider,
   Dialog,
   DialogTitle,
@@ -15,7 +14,6 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { AccessTime } from "@mui/icons-material";
 import MailIcon from "@mui/icons-material/Mail";
 import DraftsIcon from "@mui/icons-material/Drafts";

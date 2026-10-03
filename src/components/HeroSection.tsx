@@ -5,7 +5,7 @@ import { Box, Autocomplete } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { JOB_CAT } from "../types/jobOptions";
-import { LOCATION_DATA, CountryLocation } from "../types/locationOptions";
+import { LOCATION_DATA } from "../types/locationOptions";
 
 const HeroSection = () => {
   const keywords = ["Software Engineer", "Product Manager", "UX Designer"];

@@ -59,7 +59,7 @@ const SavedJobsTab = () => {
       console.debug("Fetching saved jobs for seekerID:", uid);
       try {
         const data: saved_jobs[] = await getSeekerSavedJobs(
-          encodeURIComponent(String(uid))
+          encodeURIComponent(String(uid)),
         );
         setSavedJobs(data);
       } catch (err) {
@@ -162,7 +162,7 @@ const SavedJobsTab = () => {
                     size="small"
                   />
                   <Chip
-                    label={job.Location || "-"}
+                    label={job.City || "-"}
                     variant="outlined"
                     color="primary"
                     size="small"

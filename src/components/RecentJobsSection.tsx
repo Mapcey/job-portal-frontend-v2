@@ -30,7 +30,7 @@ const RecentJobsSection = () => {
         // Sort by date (assuming you have CreatedAt or similar field)
         const sortedJobs = [...data].sort(
           (a, b) =>
-            new Date(b.PostedDate).getTime() - new Date(a.PostedDate).getTime()
+            new Date(b.PostedDate).getTime() - new Date(a.PostedDate).getTime(),
         );
 
         // Limit to first 18
@@ -44,7 +44,7 @@ const RecentJobsSection = () => {
 
   const handlePageChange = (
     _event: React.ChangeEvent<unknown>,
-    value: number
+    value: number,
   ) => {
     setPage(value);
   };
@@ -53,7 +53,7 @@ const RecentJobsSection = () => {
 
   const displayedJobs = jobs.slice(
     (page - 1) * jobsPerPage,
-    page * jobsPerPage
+    page * jobsPerPage,
   );
 
   return (
@@ -103,13 +103,13 @@ const RecentJobsSection = () => {
                 <CardContent>
                   <Typography variant="h6">{job.JobTitle}</Typography>
                   <Typography variant="body2" color="text.disabled">
-                    {job.JobCategory} — {job.Location}
+                    {job.JobCategory} — {job.State}
                   </Typography>
                   <Typography variant="body2" mt={1} color="text.secondary">
                     {job.Description
                       ? job.Description.replace(/<\/?[^>]+(>|$)/g, "").slice(
                           0,
-                          50
+                          50,
                         ) + "..."
                       : ""}
                   </Typography>
@@ -129,12 +129,8 @@ const RecentJobsSection = () => {
                       label={job.EducationLevel}
                     />
                   )} */}
-                  {job.Location && (
-                    <Chip
-                      variant="outlined"
-                      size="small"
-                      label={job.Location}
-                    />
+                  {job.City && (
+                    <Chip variant="outlined" size="small" label={job.City} />
                   )}
                   {job.JobType && (
                     <Chip variant="outlined" size="small" label={job.JobType} />
