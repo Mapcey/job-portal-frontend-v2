@@ -201,32 +201,66 @@ const Header_2 = () => {
 
   useEffect(() => {
     const fetchProfileImage = async () => {
-      // Check if already cached
-      const cachedImage = localStorage.getItem("profileImage");
+      console.log("Getting profile image");
+
+      // Determine the correct user ID
+      let userId: undefined;
+
+      if (userRole === "employer") {
+        userId = userInfo?.EmployerId;
+      } else if (userRole === "seeker") {
+        userId = userInfo?.UserId;
+      }
+
+      if (!userId) {
+        console.log("No user ID available yet");
+        return;
+      }
+
+      // Separate cache for employer/seeker and each user
+      const cacheKey = `profileImage_${userRole}_${userId}`;
+
+      const cachedImage = localStorage.getItem(cacheKey);
+
       if (cachedImage) {
+        console.log("Using cached profile image:", cachedImage);
         setProfileImage(cachedImage);
-        return; // Skip fetching again
+        return;
       }
 
       try {
         let files;
-        if (userRole === "employer" && userInfo?.EmployerId) {
-          files = await getEmployerFiles(userInfo.EmployerId);
-        } else if (userRole === "seeker" && userInfo?.UserId) {
-          files = await getSeekerFiles(userInfo.UserId);
+
+        if (userRole === "employer") {
+          console.log("Getting employer files:", userId);
+          files = await getEmployerFiles(userId);
+        } else if (userRole === "seeker") {
+          console.log("Getting seeker files:", userId);
+          files = await getSeekerFiles(userId);
         }
+
+        console.log("Files:", files);
 
         if (files) {
           const imageFile = files.find(
             (file: any) => file.file_type === "FileType.image",
           );
+
           if (imageFile?.file_url) {
+            console.log("Profile image:", imageFile.file_url);
+
             setProfileImage(imageFile.file_url);
-            localStorage.setItem("profileImage", imageFile.file_url); // Cache it
+
+            // Cache for this specific account
+            localStorage.setItem(cacheKey, imageFile.file_url);
+          } else {
+            console.log("No profile image found");
+            setProfileImage(null);
           }
         }
       } catch (err) {
         console.error("Failed to fetch profile image:", err);
+        setProfileImage(null);
       }
     };
 
