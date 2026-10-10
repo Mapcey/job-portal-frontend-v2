@@ -69,6 +69,9 @@ export const userLogin = async () => {
 export const getAllJobs = async (params?: any) => {
   const response = await axiosInstance.get("/jobs/", {
     params,
+    paramsSerializer: {
+      indexes: null,
+    },
   });
 
   return response.data;
@@ -288,6 +291,14 @@ export const updateSeeker = async (
 };
 
 // ------------------ EMPLOYER ------------------
+
+// export const submitPaymentProofEmp = async (data: {
+//   SubscriptionTier: string;
+//   Price: number;
+// }) => {
+//   const response = await axiosInstance.post("/payments/submit", data);
+//   return response.data;
+// };
 
 // employer signup
 export const signupEmployer = async (data: { ContactNo: string }) => {

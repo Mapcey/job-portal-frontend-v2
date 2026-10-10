@@ -78,6 +78,47 @@ const ManageEditorsTab = () => {
       notify("Email/ Password required", "error");
       return;
     }
+
+    // Password validation
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      notify("Password must be at least 8 characters long.", "error");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError("Password must contain at least one capital letter.");
+      notify(
+        "Password must contain at least one capital letter (A-Z).",
+        "error",
+      );
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError("Password must contain at least one lowercase letter.");
+      notify(
+        "Password must contain at least one lowercase letter (a-z).",
+        "error",
+      );
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain at least one number.");
+      notify("Password must contain at least one number (0-9).", "error");
+      return;
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\/~`;'']/.test(password)) {
+      setError("Password must contain at least one special symbol.");
+      notify(
+        "Password must contain at least one special symbol (e.g., @, #, !).",
+        "error",
+      );
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       notify("Passwords do not match", "error");
@@ -205,7 +246,10 @@ const ManageEditorsTab = () => {
         </div>
 
         <div className="editor-form-row">
-          <Tooltip title="Password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.">
+          <Tooltip
+            title="Password must contain at least one uppercase letter, 
+          one lowercase letter, one number, and one special symbol."
+          >
             <TextField
               label="Password"
               type="password"

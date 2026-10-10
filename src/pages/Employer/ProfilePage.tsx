@@ -180,7 +180,11 @@ const EmployerProfilePage = () => {
             >
               Start Head Hunting
             </Button>
-            <button className="glow-on-hover" type="button">
+            <button
+              className="glow-on-hover"
+              type="button"
+              onClick={() => navigate(`/pricing`)}
+            >
               Upgrade today !
             </button>
           </Box>

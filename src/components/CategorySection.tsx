@@ -69,9 +69,7 @@ const CategorySection = () => {
       (category) => category.name === categoryTitle,
     );
 
-    if (!selectedCategory) {
-      return;
-    }
+    if (!selectedCategory) return;
 
     navigate("/job_posts", {
       state: {

@@ -31,7 +31,9 @@ const BrowseJobs = () => {
 
   const location = useLocation();
 
-  const searchCategory = location.state?.category || "";
+  const searchCategories: string[] = location.state?.categories || [];
+  const searchCategory: string = location.state?.category || "";
+
   const searchCountry = location.state?.country || "";
   const searchProvince = location.state?.province || "";
   const searchCity = location.state?.city || "";
@@ -41,7 +43,8 @@ const BrowseJobs = () => {
     country: searchCountry,
     state: searchProvince,
     city: searchCity,
-    category: searchCategory,
+    category: searchCategory, // string
+    categories: searchCategories, // string[]
     job_type: "",
     work_type: "",
     education: "",
@@ -60,6 +63,9 @@ const BrowseJobs = () => {
       try {
         setLoading(true);
 
+        console.log(filters.category);
+        console.log(filters.categories);
+
         const response = await getAllJobs({
           page,
           per_page: perPage,
@@ -70,7 +76,13 @@ const BrowseJobs = () => {
           state: filters.state || undefined,
           city: filters.city || undefined,
 
-          category: filters.category || undefined,
+          // category: filters.category || undefined,
+
+          category:
+            filters.categories.length > 0
+              ? filters.categories
+              : filters.category || undefined,
+
           job_type: filters.job_type || undefined,
           work_type: filters.work_type || undefined,
           education: filters.education || undefined,
@@ -198,6 +210,7 @@ const BrowseJobs = () => {
                   state: "",
                   city: "",
                   category: "",
+                  categories: [],
                   job_type: "",
                   work_type: "",
                   education: "",
@@ -272,6 +285,7 @@ const BrowseJobs = () => {
                 state: "",
                 city: "",
                 category: "",
+                categories: [],
                 job_type: "",
                 work_type: "",
                 education: "",
