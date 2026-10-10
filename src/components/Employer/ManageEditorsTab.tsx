@@ -38,8 +38,8 @@ const ManageEditorsTab = () => {
   const [last_name, setLast_name] = useState("");
   const [contact, setContact] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("Qq-11111");
-  const [confirmPassword, setConfirmPassword] = useState("Qq-11111");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -177,6 +177,7 @@ const ManageEditorsTab = () => {
             fullWidth
             size="small"
             className="text-field-1"
+            required
           />
         </div>
 
@@ -202,16 +203,19 @@ const ManageEditorsTab = () => {
             required
           />
         </div>
+
         <div className="editor-form-row">
-          <TextField
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            size="small"
-            className="text-field-1"
-          />
+          <Tooltip title="Password must contain at least one uppercase letter, one lowercase letter, one number, and one special symbol.">
+            <TextField
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              size="small"
+              className="text-field-1"
+            />
+          </Tooltip>
           <TextField
             label="Confirm Password"
             type="password"

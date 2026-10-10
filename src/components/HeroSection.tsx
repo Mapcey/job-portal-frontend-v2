@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import { Box, Autocomplete } from "@mui/material";
+import { Box, Autocomplete, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { JOB_CAT } from "../types/jobOptions";
@@ -94,147 +94,150 @@ const HeroSection = () => {
                 flexWrap: { xs: "wrap", md: "nowrap" },
               }}
             >
-              {" "}
-              {/* What */}{" "}
-              <Autocomplete
-                fullWidth
-                freeSolo
-                options={JOB_CAT}
-                value={jobCategory}
-                onChange={(_event, newValue) => {
-                  setJobCategory(newValue || "");
-                }}
-                onInputChange={(_event, newInputValue) => {
-                  setJobCategory(newInputValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="What"
-                    placeholder="Job category"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{
-                  flex: 1,
-                  minWidth: { xs: "100%", md: "280px" },
+              {/* What */}
+              <Tooltip title="Select the job category you are looking for">
+                <Autocomplete
+                  fullWidth
+                  freeSolo
+                  options={JOB_CAT}
+                  value={jobCategory}
+                  onChange={(_event, newValue) => {
+                    setJobCategory(newValue || "");
+                  }}
+                  onInputChange={(_event, newInputValue) => {
+                    setJobCategory(newInputValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="What"
+                      placeholder="Job category"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  sx={{
+                    flex: 1,
+                    minWidth: { xs: "100%", md: "280px" },
 
-                  "& .MuiOutlinedInput-root": {
-                    height: "52px",
-                    backgroundColor: "#fafafa",
-                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-root": {
+                      height: "52px",
+                      backgroundColor: "#fafafa",
+                      borderRadius: "8px",
 
-                    "& fieldset": {
-                      borderColor: "#e0e0e0",
+                      "& fieldset": {
+                        borderColor: "#e0e0e0",
+                      },
+
+                      "&:hover fieldset": {
+                        borderColor: "#bdbdbd",
+                      },
+
+                      "&.Mui-focused fieldset": {
+                        borderColor: "primary.main",
+                        borderWidth: "2px",
+                      },
                     },
 
-                    "&:hover fieldset": {
-                      borderColor: "#bdbdbd",
+                    "& .MuiInputLabel-root": {
+                      color: "#555",
+                      fontSize: "15px",
                     },
 
-                    "&.Mui-focused fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "2px",
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "primary.main",
                     },
-                  },
-
-                  "& .MuiInputLabel-root": {
-                    color: "#555",
-                    fontSize: "15px",
-                  },
-
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "primary.main",
-                  },
-                }}
-              />
-              {/* Where */}{" "}
-              <Autocomplete
-                fullWidth
-                options={cityOptions}
-                value={
-                  cityOptions.find(
-                    (option) => option.city === jobLocation.city,
-                  ) || null
-                }
-                getOptionLabel={(option) => option.city}
-                isOptionEqualToValue={(option, value) =>
-                  option.city === value.city
-                }
-                onChange={(_event, newValue) => {
-                  if (newValue) {
-                    setJobLocation({
-                      country: newValue.country,
-                      province: newValue.province,
-                      city: newValue.city,
-                    });
-                  } else {
-                    setJobLocation({
-                      country: "",
-                      province: "",
-                      city: "",
-                    });
+                  }}
+                />
+              </Tooltip>
+              {/* Where */}
+              <Tooltip title="Do you have a specific location in mind for a job?">
+                <Autocomplete
+                  fullWidth
+                  options={cityOptions}
+                  value={
+                    cityOptions.find(
+                      (option) => option.city === jobLocation.city,
+                    ) || null
                   }
-                }}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Box>
-                      <Box sx={{ fontWeight: 500 }}>{option.city}</Box>
+                  getOptionLabel={(option) => option.city}
+                  isOptionEqualToValue={(option, value) =>
+                    option.city === value.city
+                  }
+                  onChange={(_event, newValue) => {
+                    if (newValue) {
+                      setJobLocation({
+                        country: newValue.country,
+                        province: newValue.province,
+                        city: newValue.city,
+                      });
+                    } else {
+                      setJobLocation({
+                        country: "",
+                        province: "",
+                        city: "",
+                      });
+                    }
+                  }}
+                  renderOption={(props, option) => (
+                    <Box component="li" {...props}>
+                      <Box>
+                        <Box sx={{ fontWeight: 500 }}>{option.city}</Box>
 
-                      <Box
-                        sx={{
-                          fontSize: "12px",
-                          color: "text.secondary",
-                        }}
-                      >
-                        {option.province}, {option.country}
+                        <Box
+                          sx={{
+                            fontSize: "12px",
+                            color: "text.secondary",
+                          }}
+                        >
+                          {option.province}, {option.country}
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Where"
-                    placeholder="City"
-                    variant="outlined"
-                    size="small"
-                  />
-                )}
-                sx={{
-                  flex: 1,
-                  minWidth: { xs: "100%", md: "280px" },
+                  )}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Where"
+                      placeholder="City"
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                  sx={{
+                    flex: 1,
+                    minWidth: { xs: "100%", md: "280px" },
 
-                  "& .MuiOutlinedInput-root": {
-                    height: "52px",
-                    backgroundColor: "#fafafa",
-                    borderRadius: "8px",
+                    "& .MuiOutlinedInput-root": {
+                      height: "52px",
+                      backgroundColor: "#fafafa",
+                      borderRadius: "8px",
 
-                    "& fieldset": {
-                      borderColor: "#e0e0e0",
+                      "& fieldset": {
+                        borderColor: "#e0e0e0",
+                      },
+
+                      "&:hover fieldset": {
+                        borderColor: "#bdbdbd",
+                      },
+
+                      "&.Mui-focused fieldset": {
+                        borderColor: "primary.main",
+                        borderWidth: "2px",
+                      },
                     },
 
-                    "&:hover fieldset": {
-                      borderColor: "#bdbdbd",
+                    "& .MuiInputLabel-root": {
+                      color: "#555",
+                      fontSize: "15px",
                     },
 
-                    "&.Mui-focused fieldset": {
-                      borderColor: "primary.main",
-                      borderWidth: "2px",
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "primary.main",
                     },
-                  },
-
-                  "& .MuiInputLabel-root": {
-                    color: "#555",
-                    fontSize: "15px",
-                  },
-
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "primary.main",
-                  },
-                }}
-              />
+                  }}
+                />
+              </Tooltip>
               {/* Search Button */}{" "}
               <Button
                 variant="contained"
