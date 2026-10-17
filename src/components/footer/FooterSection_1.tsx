@@ -48,10 +48,14 @@ const FooterSection_1 = () => {
             Quick Links
           </Typography>
           <Stack spacing={1}>
-            {["Home", "Jobs", "Pricing", "About Us"].map((text, idx) => (
+            {[
+              { text: "Home", href: "/" },
+              { text: "Jobs", href: "/job_posts" },
+              { text: "Pricing", href: "/pricing" },
+            ].map((item) => (
               <Link
-                key={idx}
-                href="#"
+                key={item.text}
+                href={item.href}
                 underline="hover"
                 color="inherit"
                 sx={{
@@ -61,7 +65,7 @@ const FooterSection_1 = () => {
                   transition: "all 0.3s",
                 }}
               >
-                {text}
+                {item.text}
               </Link>
             ))}
           </Stack>
@@ -73,10 +77,15 @@ const FooterSection_1 = () => {
             Resources
           </Typography>
           <Stack spacing={1}>
-            {["Help Center", "Blog", "Terms", "Privacy"].map((text, idx) => (
+            {[
+              { text: "Help Center", href: "/contact" },
+              { text: "Blog", href: "/about" },
+              { text: "Terms of Service", href: "/terms" },
+              { text: "Privacy Policy", href: "/privacy" },
+            ].map((item) => (
               <Link
-                key={idx}
-                href="#"
+                key={item.text}
+                href={item.href}
                 underline="hover"
                 color="inherit"
                 sx={{
@@ -86,7 +95,7 @@ const FooterSection_1 = () => {
                   transition: "all 0.3s",
                 }}
               >
-                {text}
+                {item.text}
               </Link>
             ))}
           </Stack>
@@ -98,7 +107,7 @@ const FooterSection_1 = () => {
             Contact
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.85 }}>
-            Email: support@example.com
+            Email: suicullanka@gmail.com
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.85 }}>
             Phone: +1 (123) 456-7890

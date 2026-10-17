@@ -26,6 +26,7 @@ import AdminDashboard from "../pages/Admin/AdminDashboard";
 import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
 import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
 import HeadHuntingPage from "../pages/Employer/HeadHuntPage";
+import LegalPage from "../pages/LegalPage";
 
 const AppRoutes = () => (
   <>
@@ -48,6 +49,9 @@ const AppRoutes = () => (
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
       <Route path="/job_posts/details/:id" element={<JobDetailsPage />} />
+
+      <Route path="/terms" element={<LegalPage />} />
+      <Route path="/privacy" element={<LegalPage />} />
 
       <Route
         path="/head_hunt"
