@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import EditEmployerProfileImage from "./EditEmployerProfileImage";
 
 import {
   Typography,
   Box,
   TextField,
   Button,
-  // Grid,
-  // Card,
-  // CardMedia,
   CircularProgress,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -31,6 +30,8 @@ const EmployerProfileTab = () => {
   const [employerID, setEmployerID] = useState(0);
   const [user, setUser] = useState<EMPLOYER_DATA | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [editImageOpen, setEditImageOpen] = useState(false);
 
   useEffect(() => {
     if (userInfo && "EmployerId" in userInfo) {
@@ -101,7 +102,6 @@ const EmployerProfileTab = () => {
   };
 
   const BrowseEditProfile = () => {
-    // window.open("/employer/edit_profile", "_blank", "noopener,noreferrer");
     navigate("/employer/edit_profile");
   };
 
@@ -114,15 +114,33 @@ const EmployerProfileTab = () => {
           {/* section */}
           <div className="emp-create-ac-form-section">
             <div className="emp-fs-profile-image-container">
-              <Box position="relative" display="inline-block">
+              <Box className="emp-profile-avatar-wrapper">
                 <Avatar
                   className="fs-profile-image"
-                  alt="Profile"
+                  alt="Company profile"
                   src={imageSrc}
                   sx={{ width: 120, height: 120 }}
                 />
+
+                <IconButton
+                  className="emp-profile-image-edit-button"
+                  aria-label="Edit profile picture"
+                  onClick={() => setEditImageOpen(true)}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
               </Box>
             </div>
+
+            <EditEmployerProfileImage
+              open={editImageOpen}
+              employerId={employerID}
+              currentImage={imageSrc}
+              onClose={() => setEditImageOpen(false)}
+              onImageUpdated={(imageUrl) => {
+                setImageSrc(imageUrl);
+              }}
+            />
             <div className="emp-fs-text-inputs-1">
               <TextField
                 label="Company name"
@@ -257,29 +275,6 @@ const EmployerProfileTab = () => {
                 </Typography>
               )}
             </Box>
-
-            {/* <Box sx={{}}>
-              <Typography variant="h6" color="secondary.main" gutterBottom>
-                Uploaded Photos
-              </Typography>
-
-              <Grid container spacing={2}>
-                {photos.slice(0, 6).map((photo, index) => (
-                  <Grid key={index}>
-                    <Card
-                      sx={{ borderRadius: 2, overflow: "hidden", boxShadow: 3 }}
-                    >
-                      <CardMedia
-                        component="img"
-                        image={photo}
-                        alt={`Uploaded ${index + 1}`}
-                        sx={{ height: 50, objectFit: "cover" }}
-                      />
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box> */}
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>

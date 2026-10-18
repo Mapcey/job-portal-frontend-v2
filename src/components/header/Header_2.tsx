@@ -243,16 +243,19 @@ const Header_2 = () => {
 
         if (files) {
           const imageFile = files.find(
-            (file: any) => file.file_type === "FileType.image",
+            (file: any) => file.FileCategory === "FileType.image",
           );
 
-          if (imageFile?.file_url) {
-            console.log("Profile image:", imageFile.file_url);
+          console.log(imageFile);
 
-            setProfileImage(imageFile.file_url);
+          if (imageFile?.FileUrl) {
+            console.log("Profile image:", imageFile.FileUrl);
+
+            setProfileImage(imageFile.FileUrl);
+            console.log();
 
             // Cache for this specific account
-            localStorage.setItem(cacheKey, imageFile.file_url);
+            localStorage.setItem(cacheKey, imageFile.FileUrl);
           } else {
             console.log("No profile image found");
             setProfileImage(null);

@@ -5,7 +5,6 @@ import {
   Container,
   TextField,
   Box,
-  Avatar,
   Typography,
   CircularProgress,
 } from "@mui/material";
@@ -41,12 +40,6 @@ const EditProfileEmployer = () => {
     IsSub: false,
   });
 
-  // Profile image
-  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [profileImageUrl, setProfileImageUrl] =
-    useState<string>("/icons/account.svg");
-  const [existingFileId, setExistingFileId] = useState<number | null>(null);
-
   // Company video
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>("");
@@ -54,7 +47,6 @@ const EditProfileEmployer = () => {
 
   const [uploading, setUploading] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
   const { userInfo } = useAuth();
@@ -89,16 +81,6 @@ const EditProfileEmployer = () => {
       try {
         const files = await getEmployerFiles(formData.EmployerId);
 
-        // Profile image
-        const imageFile = files.find(
-          (file: any) => file.FileCategory === "FileType.image",
-        );
-
-        if (imageFile) {
-          setProfileImageUrl(imageFile.FileUrl);
-          setExistingFileId(imageFile.Id);
-        }
-
         // Company video
         const videoFile = files.find(
           (file: any) => file.FileCategory === "FileType.video",
@@ -117,16 +99,6 @@ const EditProfileEmployer = () => {
     fetchEmployerFiles();
   }, [formData.EmployerId]);
 
-  // Select profile image
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    setProfileImageFile(file);
-    setProfileImageUrl(URL.createObjectURL(file));
-  };
-
   // Select company video
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -135,11 +107,6 @@ const EditProfileEmployer = () => {
 
     setVideoFile(file);
     setVideoUrl(URL.createObjectURL(file));
-  };
-
-  // Open image file selector
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
   };
 
   // Open video file selector
@@ -157,24 +124,6 @@ const EditProfileEmployer = () => {
       ...prev,
       [name]: value,
     }));
-  };
-
-  // Delete profile image
-  const handleDeleteImage = async () => {
-    if (!formData.EmployerId || !existingFileId) return;
-
-    try {
-      await deleteEmployerFiles(formData.EmployerId, existingFileId);
-
-      setProfileImageUrl("/icons/account.svg");
-      setProfileImageFile(null);
-      setExistingFileId(null);
-
-      notify("Profile image deleted", "success");
-    } catch (error) {
-      console.error("Failed to delete image:", error);
-      notify("Failed to delete image", "error");
-    }
   };
 
   // Delete company video
@@ -209,24 +158,6 @@ const EditProfileEmployer = () => {
     try {
       // 1. Update employer information
       await putEmployerData(formData.EmployerId, formData);
-
-      // 2. Upload/update profile image
-      if (profileImageFile) {
-        const imageFormData = new FormData();
-
-        imageFormData.append("file", profileImageFile);
-        imageFormData.append("file_type", "image");
-
-        if (existingFileId) {
-          await updateEmployerFile(
-            formData.EmployerId,
-            existingFileId,
-            imageFormData,
-          );
-        } else {
-          await uploadNewEmployerFiles(formData.EmployerId, imageFormData);
-        }
-      }
 
       // 3. Upload/update company video
       if (videoFile) {
@@ -298,41 +229,6 @@ const EditProfileEmployer = () => {
       <Container sx={{ mt: 4, mb: 4 }}>
         {/* ? exising profile image */}
         <div>
-          {/* Profile Image */}
-          <Box display="flex" alignItems="center" mb={3}>
-            <Avatar
-              src={profileImageUrl}
-              alt="Profile"
-              sx={{ width: 120, height: 120, mr: 2 }}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleFileSelect}
-            />
-            <Box display={"flex"} flexDirection={"column"} gap={1}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleUploadClick}
-                startIcon={<Backup />}
-              >
-                Change Photo
-              </Button>
-              {existingFileId && (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={handleDeleteImage}
-                  startIcon={<Delete />}
-                >
-                  Delete Photo
-                </Button>
-              )}
-            </Box>
-          </Box>
           <Box gap={2} display={"flex"} flexDirection={"row"} mb={3}>
             <TextField
               fullWidth

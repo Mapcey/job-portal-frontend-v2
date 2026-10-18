@@ -399,10 +399,30 @@ export const uploadNewEmployerFiles = async (employerId: number, formData: FormD
 };
 
 //get employer files
-export const getEmployerFiles = async (employerId: number) => {
-  const response = await axiosInstance.get(`/employer_files/${employerId}/files`);
-  return response.data;
+// export const getEmployerFiles = async (
+//   id: string
+// ) => {
+//   const response = await axiosInstance.get(`/employer_files/${id}/files`);
+//   return response.data;
+// };
+
+export const getEmployerFiles = async (id: string | number) => {
+  const response = await axiosInstance.get(
+    `/employer_files/${id}/files`,
+  );
+
+  const rawData = response.data;
+  return Array.isArray(rawData) ? rawData : rawData ? [rawData] : [];
 };
+
+// export const getSeekerFiles = async (
+//   id: string
+// ): Promise<seekerFiles[]> => {
+//   const response = await axiosInstance.get(`/seeker_files/${id}/files`);
+//   const rawData = response.data;
+//   const filesArray = Array.isArray(rawData) ? rawData : [rawData];
+//   return filesArray.map(normalizeSeekerFile);
+// };
 
 // Update existing employer file
 export const updateEmployerFile = async (

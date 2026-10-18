@@ -137,6 +137,38 @@
 }
 
 
+.emp-profile-avatar-wrapper {
+  position: relative;
+  display: inline-flex;
+  border-radius: 50%;
+}
+
+.emp-profile-image-edit-button {
+  position: absolute !important;
+  right: 0;
+  bottom: 0;
+  width: 34px;
+  height: 34px;
+  background-color: #777776 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.emp-profile-avatar-wrapper:hover .emp-profile-image-edit-button,
+.emp-profile-image-edit-button:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.emp-profile-image-edit-button:hover {
+  background-color: #ff8f34 !important;
+}
+
 
 @media (max-width: 600px) {
   .emp-fs-text-inputs-1 {
