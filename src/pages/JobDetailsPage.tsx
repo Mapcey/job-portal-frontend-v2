@@ -15,6 +15,8 @@ import {
   getJobDetails,
   addJobApplication,
   addSavedJob,
+  getSeekerSavedJobs,
+  deleteSeekerSavedJob,
 } from "../services/APIs/APIs";
 
 import JobDetailsContent from "../components/JobDetailsContent";
@@ -54,6 +56,29 @@ const JobDetailsPage = () => {
 
     loadJob();
   }, [id]);
+
+  useEffect(() => {
+    const fetchSavedJobs = async () => {
+      const seekerId = userInfo?.UserId;
+
+      if (!seekerId) {
+        setSavedJobs([]);
+        return;
+      }
+
+      try {
+        const data: saved_jobs[] = await getSeekerSavedJobs(
+          encodeURIComponent(String(seekerId)),
+        );
+
+        setSavedJobs(data.map((savedJob) => savedJob.JobId));
+      } catch (error) {
+        console.error("Failed to fetch saved jobs:", error);
+      }
+    };
+
+    fetchSavedJobs();
+  }, [userInfo?.UserId]);
 
   // ---------------------------------------------------------
   // Apply
@@ -96,29 +121,39 @@ const JobDetailsPage = () => {
   // ---------------------------------------------------------
 
   const handleSaveJob = async () => {
-    if (!userInfo?.UserId || !job?.JobId) return;
+    const seekerId = userInfo?.UserId;
+    const jobId = job?.JobId;
 
-    if (savedJobs.includes(job.JobId)) {
-      return;
-    }
+    if (!seekerId || !jobId) return;
+
+    const uid = encodeURIComponent(String(seekerId));
+    const isCurrentlySaved = savedJobs.includes(jobId);
 
     try {
-      const savedJobObj = {
-        JobId: job.JobId,
-        SavedDateTime: new Date().toISOString(),
-      };
+      if (isCurrentlySaved) {
+        // Remove from saved jobs
+        await deleteSeekerSavedJob(uid, jobId);
 
-      await addSavedJob(userInfo.UserId, savedJobObj);
+        setSavedJobs((previous) => previous.filter((id) => id !== jobId));
 
-      setSavedJobs((previous) => [...previous, job.JobId]);
+        console.log("Job removed from saved jobs.");
+      } else {
+        // Add to saved jobs
+        await addSavedJob(seekerId, {
+          JobId: jobId,
+          SavedDateTime: new Date().toISOString(),
+        });
 
-      alert("Job saved successfully!");
+        setSavedJobs((previous) =>
+          previous.includes(jobId) ? previous : [...previous, jobId],
+        );
+
+        console.log("Job saved successfully.");
+      }
     } catch (error) {
-      console.error("Failed to save job:", error);
-      alert("Failed to save job. Please try again.");
+      console.error("Failed to update saved job:", error);
     }
   };
-
   // ---------------------------------------------------------
   // Loading
   // ---------------------------------------------------------

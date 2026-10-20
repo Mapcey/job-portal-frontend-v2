@@ -16,6 +16,8 @@ import JobResults from "../components/browseJobs/JobResults";
 import { Button, Drawer } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
+import JobApplicationDialog from "../components/browseJobs/ApplyJobDialog";
+
 const BrowseJobs = () => {
   const { isAuthenticated } = useAuth();
   const [jobs, setJobs] = useState<saved_jobs[]>([]);
@@ -57,6 +59,14 @@ const BrowseJobs = () => {
   const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set()); // 👈 track applied jobs
 
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  const [selectedJob, setSelectedJob] = useState<saved_jobs | null>(null);
+
+  const [applicationDialogOpen, setApplicationDialogOpen] = useState(false);
+
+  const [applicationStatus, setApplicationStatus] = useState<
+    "confirm" | "loading" | "success" | "error"
+  >("confirm");
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -110,17 +120,23 @@ const BrowseJobs = () => {
     fetchJobs();
   }, [page, perPage, filters]);
 
-  // const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
-  //   setPage(value);
+  // Open the confirmation dialog
+  const openApplyDialog = (job: saved_jobs) => {
+    if (appliedJobs.has(job.JobId)) return;
 
-  //   window.scrollTo({
-  //     top: 0,
-  //     behavior: "smooth",
-  //   });
-  // };
+    setSelectedJob(job);
+    setApplicationStatus("confirm");
+    setApplicationDialogOpen(true);
+  };
 
-  // 👇 main apply function
-  const handleApply = async (job: saved_jobs) => {
+  // Submit after the user confirms
+  const handleApply = async () => {
+    if (!selectedJob || appliedJobs.has(selectedJob.JobId)) return;
+
+    const job = selectedJob;
+
+    setApplicationStatus("loading");
+
     try {
       await addJobApplication(job.JobId, {
         JobId: job.JobId,
@@ -128,16 +144,29 @@ const BrowseJobs = () => {
         JobCategory: job.JobCategory,
         Description: job.Description,
         Status: "Applied",
-        ApplicantName: "John Doe", // replace with logged-in user's name
+        ApplicantName: "John Doe", // Replace with logged-in user's name
         AppliedDateTime: new Date().toISOString(),
       });
-      // mark as applied in UI
-      setAppliedJobs((prev) => new Set(prev).add(job.JobId));
-      alert(`Application submitted for ${job.JobTitle}`);
+
+      setAppliedJobs((prev) => {
+        const updated = new Set(prev);
+        updated.add(job.JobId);
+        return updated;
+      });
+
+      setApplicationStatus("success");
     } catch (err) {
       console.error("Failed to apply:", err);
-      alert("Could not apply for this job. Please try again.");
+      setApplicationStatus("error");
     }
+  };
+
+  // Close the dialog
+  const closeApplicationDialog = () => {
+    if (applicationStatus === "loading") return;
+
+    setApplicationDialogOpen(false);
+    setSelectedJob(null);
   };
 
   return (
@@ -251,7 +280,7 @@ const BrowseJobs = () => {
               });
             }}
             appliedJobs={appliedJobs}
-            onApply={handleApply}
+            onApply={openApplyDialog}
           />
         </Box>
       </Box>
@@ -301,6 +330,13 @@ const BrowseJobs = () => {
           />
         </Box>
       </Drawer>
+      <JobApplicationDialog
+        open={applicationDialogOpen}
+        job={selectedJob}
+        status={applicationStatus}
+        onClose={closeApplicationDialog}
+        onConfirm={handleApply}
+      />
     </Box>
   );
 };

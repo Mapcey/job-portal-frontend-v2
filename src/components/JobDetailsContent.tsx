@@ -311,14 +311,14 @@ const JobDetailsContent = ({
               fullWidth
               size="large"
               onClick={onSave}
-              disabled={isSaved || !isAuthenticated}
+              disabled={!isAuthenticated}
               startIcon={isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
               sx={{
                 py: 1.3,
                 fontWeight: 600,
               }}
             >
-              {isSaved ? "Job Saved" : "Save Job"}
+              {isSaved ? "Remove Saved Job" : "Save Job"}
             </Button>
           </Paper>
 
