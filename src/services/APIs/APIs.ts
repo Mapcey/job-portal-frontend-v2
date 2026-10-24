@@ -450,6 +450,11 @@ export const deleteEmployerFiles = async (employerId: number, file_id: number) =
   return response.data;
 };
 
+export const deleteEmployer = async (employer_id:number) => {
+  const response = await axiosInstance.delete(`/employers/${employer_id}`);
+  return response.data;
+};
+
 // -----------------------EDITORS--------------------------
 // create a new editor
 export const createNewEditor = async (employer_id: string, data: any) => {

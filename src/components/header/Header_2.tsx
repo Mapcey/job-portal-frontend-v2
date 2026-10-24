@@ -33,6 +33,7 @@ import {
   getAllEmployerNotifications,
   getEmployerFiles,
   getSeekerNotifications,
+  deleteEmployer,
 } from "../../services/APIs/APIs";
 import { getSeekerFiles } from "../../services/APIs/APIs";
 import NotificationPopover from "./NotificationPop";
@@ -169,6 +170,30 @@ const Header_2 = () => {
     try {
       await deleteUser(user);
       // After successful deletion, clear local auth state and navigate home
+
+      try {
+        let resp;
+        let userId;
+
+        if (userRole === "employer") {
+          userId = userInfo?.EmployerId;
+        } else if (userRole === "seeker") {
+          userId = userInfo?.UserId;
+        }
+
+        if (userRole === "employer") {
+          resp = await deleteEmployer(userId);
+        } else if (userRole === "seeker") {
+          console.log("Getting seeker files:", userId);
+          resp = await deleteEmployer(userId);
+        }
+
+        console.log("Files:", resp);
+      } catch (err) {
+        console.error("Failed to fetch profile image:", err);
+        setProfileImage(null);
+      }
+
       logout();
       navigate("/");
       window.alert("Account deactivated successfully.");
