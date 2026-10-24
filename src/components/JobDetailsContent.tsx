@@ -22,6 +22,7 @@ import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
 
 import { saved_jobs } from "../types/job";
 // import { color } from "framer-motion";
+import CompanyLogo from "./browseJobs/CompanyLogo";
 
 type JobDetailsContentProps = {
   job: saved_jobs;
@@ -92,7 +93,7 @@ const JobDetailsContent = ({
         >
           {/* Company / Job image */}
 
-          <Box
+          {/* <Box
             sx={{
               width: { xs: 80, md: 110 },
               height: { xs: 80, md: 110 },
@@ -102,7 +103,21 @@ const JobDetailsContent = ({
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
-          />
+          /> */}
+
+          <Box
+            sx={{
+              width: { xs: 80, md: 110 },
+              height: { xs: 80, md: 110 },
+              flexShrink: 0,
+            }}
+          >
+            <CompanyLogo
+              employerId={(job as any).CreatedByEmployerId}
+              companyName={(job as any).employer?.CompanyName}
+              size={{ xs: 80, md: 110 }}
+            />
+          </Box>
 
           {/* Main information */}
 

@@ -12,9 +12,14 @@ import {
   Pagination,
 } from "@mui/material";
 
+import { useEffect, useState } from "react";
+import { getEmployerFiles } from "../../services/APIs/APIs";
+
 import SearchIcon from "@mui/icons-material/Search";
 import { Work, Category, School } from "@mui/icons-material";
 import JobResultsSkeleton from "../placeholders/JobResultsSkeleton";
+
+import CompanyLogo from "./CompanyLogo";
 
 interface JobResultsProps {
   jobs: any[];
@@ -43,6 +48,8 @@ const JobResults = ({
   appliedJobs,
   onApply,
 }: JobResultsProps) => {
+  console.log(jobs);
+
   return (
     <Box sx={{ flex: 1, minWidth: 0 }}>
       {/* Search */}
@@ -127,7 +134,7 @@ const JobResults = ({
               }}
             >
               {/* Company Avatar */}
-              <Avatar
+              {/* <Avatar
                 sx={{
                   width: 52,
                   height: 52,
@@ -138,7 +145,13 @@ const JobResults = ({
                 {job.employer?.CompanyName
                   ? job.employer.CompanyName.charAt(0).toUpperCase()
                   : "C"}
-              </Avatar>
+              </Avatar> */}
+
+              <CompanyLogo
+                employerId={job.CreatedByEmployerId}
+                companyName={job.employer?.CompanyName}
+                size={52}
+              />
 
               {/* Job information */}
               <Box flex={1} minWidth={0}>
