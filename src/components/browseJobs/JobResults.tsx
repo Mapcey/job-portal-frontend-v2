@@ -150,11 +150,11 @@ const JobResults = ({
               <CompanyLogo
                 employerId={job.CreatedByEmployerId}
                 companyName={job.employer?.CompanyName}
-                size={52}
+                size={70}
               />
 
               {/* Job information */}
-              <Box flex={1} minWidth={0}>
+              <Box flex={1} minWidth={0} pl={2}>
                 <Typography
                   variant="h6"
                   fontWeight={600}

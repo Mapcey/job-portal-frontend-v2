@@ -77,7 +77,7 @@ const CompanyLogo = ({
       sx={{
         width: size ?? 52,
         height: size ?? 52,
-        borderRadius: 2.5,
+        borderRadius: 20,
         bgcolor: "secondary.main",
         color: "#fff",
         fontWeight: 600,
