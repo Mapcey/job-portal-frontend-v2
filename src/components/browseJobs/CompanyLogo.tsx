@@ -78,8 +78,8 @@ const CompanyLogo = ({
         width: size ?? 52,
         height: size ?? 52,
         borderRadius: 20,
-        bgcolor: "secondary.main",
-        color: "#fff",
+        bgcolor: "#f1f1f1",
+        color: "#3f3f3f",
         fontWeight: 600,
         fontSize: 28,
       }}

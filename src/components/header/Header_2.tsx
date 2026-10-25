@@ -362,6 +362,27 @@ const Header_2 = () => {
                   {page.label}
                 </Button>
               ))}
+
+              {/* Post Job Button - Employers Only */}
+              {isAuthenticated && userRole === "employer" && (
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/employer/jobs/create")}
+                  sx={{
+                    bgcolor: "primary.main",
+                    color: "#fff",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    borderRadius: 2,
+                    px: 2.5,
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  Post Job
+                </Button>
+              )}
             </Box>
 
             {/* login/user section */}
