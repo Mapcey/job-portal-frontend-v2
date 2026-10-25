@@ -36,7 +36,7 @@ const BrowseJobs = () => {
   const searchCategories: string[] = location.state?.categories || [];
   const searchCategory: string = location.state?.category || "";
 
-  const searchCountry = location.state?.country || "";
+  const searchCountry = location.state?.country || "Sri Lanka";
   const searchProvince = location.state?.province || "";
   const searchCity = location.state?.city || "";
 
@@ -97,11 +97,8 @@ const BrowseJobs = () => {
           work_type: filters.work_type || undefined,
           education: filters.education || undefined,
           experience: filters.experience || undefined,
-
           posted_days_ago: filters.posted_days_ago || undefined,
-
           min_salary: filters.min_salary || undefined,
-
           max_salary: filters.max_salary || undefined,
         });
 

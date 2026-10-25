@@ -28,9 +28,9 @@ const JobFilterPanel = ({
   onApply,
   onClear,
 }: JobFilterPanelProps) => {
-  const handleChange = (name: string, value: string) => {
-    setFilters((prev: any) => ({ ...prev, [name]: value }));
-  };
+  // const handleChange = (name: string, value: string) => {
+  //   setFilters((prev: any) => ({ ...prev, [name]: value }));
+  // };
 
   const countries = LOCATION_DATA;
 
@@ -41,10 +41,46 @@ const JobFilterPanel = ({
   const provinces = selectedCountry?.provinces || [];
 
   const selectedProvince = provinces.find(
-    (province) => province.name === filters.province,
+    (province) => province.name === filters.state,
   );
 
   const cities = selectedProvince?.cities || [];
+
+  const handleChange = (name: string, value: string) => {
+    setFilters((prev: any) => {
+      // Changing country resets the province and city.
+      if (name === "country") {
+        return {
+          ...prev,
+          country: value,
+          state: "",
+          city: "",
+        };
+      }
+
+      // Changing province resets the city.
+      if (name === "state") {
+        return {
+          ...prev,
+          state: value,
+          city: "",
+        };
+      }
+
+      // Changing city keeps the selected province.
+      if (name === "city") {
+        return {
+          ...prev,
+          city: value,
+        };
+      }
+
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
 
   return (
     <Box
@@ -133,11 +169,14 @@ const JobFilterPanel = ({
         label="Country"
         value={filters.country}
         onChange={(e) => {
-          handleChange("country", e.target.value);
+          const country = e.target.value;
 
-          // Reset dependent fields
-          handleChange("province", "");
-          handleChange("city", "");
+          setFilters((prev: any) => ({
+            ...prev,
+            country,
+            state: "",
+            city: "",
+          }));
         }}
         sx={{ mb: 2 }}
       >
@@ -155,13 +194,16 @@ const JobFilterPanel = ({
         select
         size="small"
         label="Province"
-        value={filters.province}
+        value={filters.state}
         disabled={!filters.country}
         onChange={(e) => {
-          handleChange("province", e.target.value);
+          const province = e.target.value;
 
-          // Reset city when province changes
-          handleChange("city", "");
+          setFilters((prev: any) => ({
+            ...prev,
+            state: province,
+            city: "",
+          }));
         }}
         sx={{ mb: 2 }}
       >
@@ -180,8 +222,15 @@ const JobFilterPanel = ({
         size="small"
         label="City"
         value={filters.city}
-        disabled={!filters.province}
-        onChange={(e) => handleChange("city", e.target.value)}
+        disabled={!filters.state}
+        onChange={(e) => {
+          const city = e.target.value;
+
+          setFilters((prev: any) => ({
+            ...prev,
+            city,
+          }));
+        }}
         sx={{ mb: 2 }}
       >
         <MenuItem value="">All Cities</MenuItem>
