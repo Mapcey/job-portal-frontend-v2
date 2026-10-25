@@ -39,7 +39,10 @@ const EditEmployerProfileImage = ({
   onClose,
   onImageUpdated,
 }: EditEmployerProfileImageProps) => {
-  const { userInfo, userRole } = useAuth();
+  const {
+    userInfo,
+    //  userRole
+  } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState(currentImage);

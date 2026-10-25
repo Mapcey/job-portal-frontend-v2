@@ -367,7 +367,7 @@ const Header_2 = () => {
               {isAuthenticated && userRole === "employer" && (
                 <Button
                   variant="contained"
-                  onClick={() => navigate("/employer/jobs/create")}
+                  onClick={() => navigate("/employer/post")}
                   sx={{
                     bgcolor: "primary.main",
                     color: "#fff",

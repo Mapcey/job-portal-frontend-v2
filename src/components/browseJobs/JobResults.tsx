@@ -7,13 +7,13 @@ import {
   Button,
   Typography,
   Card,
-  Avatar,
+  // Avatar,
   Chip,
   Pagination,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import { getEmployerFiles } from "../../services/APIs/APIs";
+// import { useEffect, useState } from "react";
+// import { getEmployerFiles } from "../../services/APIs/APIs";
 
 import SearchIcon from "@mui/icons-material/Search";
 import { Work, Category, School } from "@mui/icons-material";
