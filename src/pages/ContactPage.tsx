@@ -134,10 +134,10 @@ const ContactPage = () => {
                     📍 Address: 123 Suicul Street, Career City, World
                   </Typography>
                   <Typography variant="body2" color="secondary.main" mb={2}>
-                    📞 Phone: +1 (234) 567-890
+                    📞 Phone: <a href="tel:+447754798027">+44 7754 798027</a>
                   </Typography>
                   <Typography variant="body2" color="secondary.main" mb={2}>
-                    📧 Email: contact@suicul.com
+                    📧 Email: <a href="mailto:grow@suicul.com">grow@suicul.com</a>
                   </Typography>
                   <Typography variant="body2" color="secondary.main">
                     🕐 Working Hours: Mon - Fri: 9 AM - 6 PM

@@ -15,6 +15,26 @@ import { SEEKER_DATA, seekerFiles } from "../../types/users";
 import { useAuth } from "../../context/AuthContext";
 import { isCurrentWorkplace } from "../../utils/career";
 
+const calculateAge = (dateOfBirth: Date | string | null | undefined): number | null => {
+  if (!dateOfBirth) return null;
+
+  // Parse date-only API values as local dates to avoid UTC timezone shifts.
+  const birthDate = typeof dateOfBirth === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)
+    ? new Date(`${dateOfBirth}T00:00:00`)
+    : new Date(dateOfBirth);
+
+  if (Number.isNaN(birthDate.getTime())) return null;
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const birthdayHasPassed =
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+  if (!birthdayHasPassed) age -= 1;
+  return age >= 0 ? age : null;
+};
+
 const SeekerProfileTab = () => {
   const navigate = useNavigate();
   const { userInfo } = useAuth();
@@ -79,6 +99,7 @@ const SeekerProfileTab = () => {
   );
 
   const fullName = [user?.FirstName, user?.LastName].filter(Boolean).join(" ");
+  const age = calculateAge(user?.DateOfBirth);
 
   return (
     <div className="seeker-profile-tab-container">
@@ -212,7 +233,7 @@ const SeekerProfileTab = () => {
             </Box>
           </Box>
           <Box sx={{ display: "flex", mt: 1, gap: 1, flexWrap: "wrap" }}>
-            <Chip label="Colombo" variant="outlined" />
+            <Chip label={user?.City || "City not specified"} variant="outlined" />
             <Chip
               label={
                 "Experience: " + (user?.ProfessionalExperience || 0) + " years"
@@ -247,21 +268,14 @@ const SeekerProfileTab = () => {
                 variant="outlined"
               />
             )}
-            <Chip
-              label={
-                user?.DateOfBirth
-                  ? new Date(user.DateOfBirth).toLocaleDateString()
-                  : ""
-              }
-              variant="outlined"
-            />
+            {age !== null && <Chip label={`Age: ${age}`} variant="outlined" />}
           </Box>
         </SectionBox>
 
         
 
         {/* CV Section (moved above Social links) */}
-        <SectionBox title="Documents">
+        <SectionBox title="CV">
           {latestCV ? (
             <Typography
               component="a"

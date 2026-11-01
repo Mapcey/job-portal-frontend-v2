@@ -6,6 +6,9 @@ import {
   CardContent,
   IconButton,
   Chip,
+  CircularProgress,
+  Alert,
+  Button,
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router-dom";
@@ -20,34 +23,49 @@ import { ApplicationsSeeker } from "../../types/applicationsSeeker";
 const ManageApplicationsTab = () => {
   const { userInfo } = useAuth();
   const navigate = useNavigate();
-  const [seekerID, setSeekerID] = useState<number>(0);
+  const seekerID = userInfo?.UserId ?? userInfo?.SeekerId;
   const [application, setApplication] = useState<ApplicationsSeeker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Get seeker ID from context
+  // Fetch the signed-in seeker's applications from /seekers/{user_id}/applications.
   useEffect(() => {
-    if (userInfo && "UserId" in userInfo) {
-      setSeekerID(userInfo.UserId);
-      console.log("SeekerID from context:", userInfo.UserId);
-    }
-  }, [userInfo]);
+    let cancelled = false;
 
-  // Fetch applications
-  useEffect(() => {
     const fetchData = async () => {
-      if (seekerID !== 0) {
-        try {
-          const data = await getSeekerApplications(seekerID.toString());
-          setApplication(data);
-        } catch (error) {
-          console.error("Failed to fetch applications:", error);
+      if (!seekerID) {
+        setApplication([]);
+        setError(userInfo ? "Could not identify your seeker account." : null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getSeekerApplications(seekerID);
+        if (!cancelled) setApplication(data);
+      } catch (fetchError) {
+        console.error("Failed to fetch seeker applications:", fetchError);
+        if (!cancelled) {
+          setApplication([]);
+          setError("Applications could not be loaded. Please try again.");
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
+
     fetchData();
-  }, [seekerID]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [seekerID, userInfo, refreshKey]);
 
   const handleOpenApplication = (jobId: number) => {
-    navigate(`/jobs/details/${jobId}`);
+    navigate(`/job_posts/details/${jobId}`);
   };
 
   const handleRemove = async (applicationId: number) => {
@@ -58,6 +76,7 @@ const ManageApplicationsTab = () => {
       );
     } catch (err) {
       console.error("Failed to remove application:", err);
+      setError("The application could not be removed. Please try again.");
     }
   };
 
@@ -67,6 +86,22 @@ const ManageApplicationsTab = () => {
         Applied Jobs ({application.length})
       </Typography>
 
+      {error && (
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          action={
+            seekerID ? (
+              <Button color="inherit" size="small" onClick={() => setRefreshKey((key) => key + 1)}>
+                Retry
+              </Button>
+            ) : undefined
+          }
+        >
+          {error}
+        </Alert>
+      )}
+
       <Box
         sx={{
           maxHeight: "600px",
@@ -75,7 +110,9 @@ const ManageApplicationsTab = () => {
           gap: 2,
         }}
       >
-        {application.map((app) => (
+        {loading && <CircularProgress size={28} />}
+
+        {!loading && !error && application.map((app) => (
           <Card
             key={app.ApplicationId}
             variant="outlined"
@@ -106,9 +143,9 @@ const ManageApplicationsTab = () => {
 
             <CardActionArea onClick={() => handleOpenApplication(app.JobId)}>
               <CardContent>
-                <Typography variant="h6">{app.ApplicantName}</Typography>
+                <Typography variant="h6">{app.JobTitle}</Typography>
                 <Typography mb={1} color="secondary">
-                  {app.JobTitle} - {app.JobCategory}
+                  {app.JobCategory}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -127,7 +164,9 @@ const ManageApplicationsTab = () => {
                   Status: {app.Status}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Applied on: {new Date(app.AppliedDateTime).toLocaleString()}
+                  Applied on: {app.AppliedDateTime && !Number.isNaN(new Date(app.AppliedDateTime).getTime())
+                    ? new Date(app.AppliedDateTime).toLocaleString()
+                    : "Date unavailable"}
                 </Typography>
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mt: 2 }}>
@@ -149,7 +188,7 @@ const ManageApplicationsTab = () => {
           </Card>
         ))}
 
-        {application.length === 0 && (
+        {!loading && !error && application.length === 0 && (
           <Typography variant="h5" color="secondary.light">
             No applications yet.
           </Typography>

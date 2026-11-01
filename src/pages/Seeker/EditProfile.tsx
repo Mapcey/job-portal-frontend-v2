@@ -27,6 +27,8 @@ import {
   FormControl,
   Alert,
   Chip,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { currencies } from "../../data/currencies";
@@ -59,8 +61,6 @@ import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
 import { seekerFiles } from "../../types/users";
 import { useNavigate } from "react-router-dom";
-import { storage } from "../../firebase/config";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
@@ -160,7 +160,6 @@ const EditSeekerProfile = () => {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<string>("");
   const [originalSkills, setOriginalSkills] = useState<Skill[]>([]);
@@ -304,12 +303,6 @@ const EditSeekerProfile = () => {
     else setVideoFile(file);
   };
 
-  const uploadFile = async (file: File, path: string) =>
-    new Promise<string>((resolve, reject) => {
-      const uploadTask = uploadBytesResumable(ref(storage, path), file);
-      uploadTask.on("state_changed", (snap) => setProgress((snap.bytesTransferred / snap.totalBytes) * 100), reject, async () => resolve(await getDownloadURL(uploadTask.snapshot.ref)));
-    });
-
   const wrapUpdatePromise = (p: Promise<any>, label: string) => p.catch((err) => { console.error(`[EditProfile] ${label}`, err); throw err; });
 
   const getArrayDiffPromises = <T extends { id?: number }>(typeLabel: string, current: T[], original: T[], addFn: (i: T) => Promise<any>, updateFn: (i: T) => Promise<any>, deleteFn: (id: number) => Promise<any>) => {
@@ -344,9 +337,9 @@ const EditSeekerProfile = () => {
       if (minSalary !== null && maxSalary !== null && minSalary > maxSalary) { setErrorMsg("Minimum salary cannot be greater than maximum salary."); return; }
 
       const fileUploads: Promise<void>[] = [];
-      if (profileImage) fileUploads.push(uploadFile(profileImage, `profileImages/${seekerID}_${profileImage.name}`).then(async () => { await addSeekerFile(seekerID, profileImage, "image", seekerID); }));
-      if (cvFile) fileUploads.push(uploadFile(cvFile, `cvFiles/${seekerID}_${cvFile.name}`).then(async () => { await addSeekerFile(seekerID, cvFile, "CV", seekerID); }));
-      if (videoFile) fileUploads.push(uploadFile(videoFile, `videoFiles/${seekerID}_${videoFile.name}`).then(async () => { await addSeekerFile(seekerID, videoFile, "video", seekerID); }));
+      if (profileImage) fileUploads.push(addSeekerFile(seekerID, profileImage, "image", seekerID).then(() => undefined));
+      if (cvFile) fileUploads.push(addSeekerFile(seekerID, cvFile, "CV", seekerID).then(() => undefined));
+      if (videoFile) fileUploads.push(addSeekerFile(seekerID, videoFile, "video", seekerID).then(() => undefined));
       await Promise.all(fileUploads);
       try { const f = await getSeekerFiles(seekerID.toString()); setFiles(f || []); } catch (e) { console.warn("Failed to refresh files", e); }
 
@@ -359,6 +352,7 @@ const EditSeekerProfile = () => {
       PayPeriod: form.PayPeriod || "Monthly",
       JobType: form.JobType,
       WorkType: form.WorkType,
+      AllowHeadHunting: Boolean(form.AllowHeadHunting),
     };
       delete (updatedData as any).skills; delete (updatedData as any).educations; delete (updatedData as any).careers; delete (updatedData as any).languages;
       await updateSeeker(seekerID, updatedData);
@@ -385,7 +379,6 @@ const EditSeekerProfile = () => {
       console.error("[EditProfile] submit failed", err);
     } finally {
       setUploading(false);
-      setProgress(0);
     }
   };
 
@@ -431,11 +424,16 @@ const EditSeekerProfile = () => {
 
   const renderArraySection = (type: ArrayFieldKey, icon: React.ReactNode, title: string, subtitle: string, fields: string[]) => {
     const items = getArray(type);
+    const addLabel = type === "careers"
+      ? "Add Career"
+      : type === "educations"
+        ? "Add Education"
+        : `Add ${title.slice(0, -1)}`;
     return (
       <SectionCard icon={icon} title={title} subtitle={subtitle}>
         <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-          <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={() => addArrayItem(type)} sx={{ borderRadius: 2, textTransform: "none", borderColor: ACCENT, color: ACCENT, fontWeight: 600 }}>
-            Add {title.slice(0, -1)}
+          <Button variant="outlined" size="small" startIcon={<AddIcon />} onClick={() => addArrayItem(type)} sx={{ borderRadius: 2, textTransform: "none", borderColor: ACCENT, color: ACCENT, fontWeight: 600, whiteSpace: "nowrap" }}>
+            {addLabel}
           </Button>
           {type === "languages" && items.length > 0 && (
             <Button variant="outlined" size="small" color="error" startIcon={<DeleteOutlineIcon />} onClick={removeAllLanguages} sx={{ borderRadius: 2, textTransform: "none" }}>
@@ -607,6 +605,21 @@ const EditSeekerProfile = () => {
                 </Select>
               </FormControl>
             </Box>
+            <Divider sx={{ my: 2.5 }} />
+            <Typography variant="body2" sx={{ fontWeight: 600, color: TEXT_PRIMARY }}>
+              Profile visibility
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={Boolean(form.AllowHeadHunting)}
+                  onChange={(event) =>
+                    setForm({ ...form, AllowHeadHunting: event.target.checked })
+                  }
+                />
+              }
+              label="Allow employers to find me through headhunting"
+            />
           </SectionCard>
 
           {/* Documents */}
@@ -629,8 +642,8 @@ const EditSeekerProfile = () => {
             </Box>
             {uploading && (
               <Box sx={{ mt: 2 }}>
-                <LinearProgress variant="determinate" value={progress} sx={{ borderRadius: 2, height: 6 }} />
-                <Typography variant="caption" sx={{ color: TEXT_MUTED, mt: 0.5, display: "block" }}>Uploading… {Math.round(progress)}%</Typography>
+                <LinearProgress sx={{ borderRadius: 2, height: 6 }} />
+                <Typography variant="caption" sx={{ color: TEXT_MUTED, mt: 0.5, display: "block" }}>Saving profile and uploading files…</Typography>
               </Box>
             )}
           </SectionCard>

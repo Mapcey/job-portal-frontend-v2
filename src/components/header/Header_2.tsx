@@ -216,8 +216,9 @@ const Header_2 = () => {
         return userInfo.CompanyName.charAt(0).toUpperCase();
       }
     } else if (userRole == "seeker") {
-      if (userInfo && userInfo.Name) {
-        return userInfo.Name.charAt(0).toUpperCase();
+      const name = userInfo?.FirstName || userInfo?.Name;
+      if (name) {
+        return name.charAt(0).toUpperCase();
       }
     }
 
@@ -225,11 +226,10 @@ const Header_2 = () => {
   };
 
   useEffect(() => {
-    const fetchProfileImage = async () => {
-      console.log("Getting profile image");
+    let cancelled = false;
 
-      // Determine the correct user ID
-      let userId: undefined;
+    const fetchProfileImage = async () => {
+      let userId: string | number | undefined;
 
       if (userRole === "employer") {
         userId = userInfo?.EmployerId;
@@ -238,61 +238,45 @@ const Header_2 = () => {
       }
 
       if (!userId) {
-        console.log("No user ID available yet");
+        setProfileImage(null);
         return;
       }
 
-      // Separate cache for employer/seeker and each user
-      const cacheKey = `profileImage_${userRole}_${userId}`;
-
-      const cachedImage = localStorage.getItem(cacheKey);
-
-      if (cachedImage) {
-        console.log("Using cached profile image:", cachedImage);
-        setProfileImage(cachedImage);
-        return;
-      }
+      setProfileImage(null);
 
       try {
-        let files;
+        let files: any[] = [];
 
         if (userRole === "employer") {
-          console.log("Getting employer files:", userId);
           files = await getEmployerFiles(userId);
         } else if (userRole === "seeker") {
-          console.log("Getting seeker files:", userId);
-          files = await getSeekerFiles(userId);
+          files = await getSeekerFiles(String(userId));
         }
 
-        console.log("Files:", files);
+        const imageFiles = files.filter((file: any) => {
+          const fileName = file.file_name ?? file.FileName ?? "";
+          const fileType = String(file.file_type ?? file.FileCategory ?? "").toLowerCase();
+          return /\.(jpg|jpeg|png|webp|gif)$/i.test(fileName) || fileType.includes("image");
+        });
+        imageFiles.sort((a: any, b: any) => {
+          const dateA = new Date(a.uploaded_at ?? a.UploadedAt ?? 0).getTime();
+          const dateB = new Date(b.uploaded_at ?? b.UploadedAt ?? 0).getTime();
+          return dateB - dateA;
+        });
 
-        if (files) {
-          const imageFile = files.find(
-            (file: any) => file.FileCategory === "FileType.image",
-          );
-
-          console.log(imageFile);
-
-          if (imageFile?.FileUrl) {
-            console.log("Profile image:", imageFile.FileUrl);
-
-            setProfileImage(imageFile.FileUrl);
-            console.log();
-
-            // Cache for this specific account
-            localStorage.setItem(cacheKey, imageFile.FileUrl);
-          } else {
-            console.log("No profile image found");
-            setProfileImage(null);
-          }
-        }
+        const imageUrl = imageFiles[0]?.file_url ?? imageFiles[0]?.FileUrl ?? null;
+        if (!cancelled) setProfileImage(imageUrl);
       } catch (err) {
         console.error("Failed to fetch profile image:", err);
-        setProfileImage(null);
+        if (!cancelled) setProfileImage(null);
       }
     };
 
     fetchProfileImage();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userRole, userInfo]);
 
   const handleTest = () => {

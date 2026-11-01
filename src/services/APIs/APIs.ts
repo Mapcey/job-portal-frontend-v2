@@ -238,7 +238,16 @@ export const deleteLanguage = async (seekerId: number, languageId: number) => {
 // seeker profile data get
 export const getSeekerData = async (id: string): Promise<SEEKER_DATA> => {
   const response = await axiosInstance.get(`/seekers/${id}`);
-  return response.data;
+  const data = response.data?.data ?? response.data?.Data ?? response.data;
+  const allowHeadHunting =
+    data?.AllowHeadHunting ?? data?.allowHeadHunting ?? data?.allow_head_hunting;
+
+  return {
+    ...data,
+    ...(allowHeadHunting !== undefined
+      ? { AllowHeadHunting: allowHeadHunting === true || allowHeadHunting === 1 || allowHeadHunting === "true" }
+      : {}),
+  };
 };
 
 // seeker profile data update
@@ -268,10 +277,30 @@ export const addJobApplication = async (
 
 // seeker applications data get
 export const getSeekerApplications = async (
-  id: string
+  id: string | number
 ): Promise<ApplicationsSeeker[]> => {
-  const response = await axiosInstance.get(`/seekers/${id}/applications`);
-  return response.data;
+  const response = await axiosInstance.get(
+    `/seekers/${encodeURIComponent(String(id))}/applications`
+  );
+  const payload = response.data;
+  const applications = Array.isArray(payload)
+    ? payload
+    : payload?.applications ?? payload?.Applications ?? payload?.data ?? payload?.Data ?? [];
+
+  if (!Array.isArray(applications)) return [];
+
+  return applications.map((item: any) => ({
+    ApplicationId: Number(item.ApplicationId ?? item.application_id ?? item.applicationId ?? item.id),
+    JobId: Number(item.JobId ?? item.job_id ?? item.jobId),
+    CompanyId: Number(item.CompanyId ?? item.company_id ?? item.companyId),
+    JobTitle: item.JobTitle ?? item.job_title ?? item.jobTitle ?? "Job",
+    JobCategory: item.JobCategory ?? item.job_category ?? item.jobCategory ?? "",
+    Description: item.Description ?? item.description ?? "",
+    Status: item.Status ?? item.status ?? "Applied",
+    ApplicantName: item.ApplicantName ?? item.applicant_name ?? item.applicantName ?? "Applicant",
+    SeekerId: Number(item.SeekerId ?? item.seeker_id ?? item.seekerId ?? id),
+    AppliedDateTime: item.AppliedDateTime ?? item.applied_datetime ?? item.appliedDateTime ?? item.applied_at ?? "",
+  }));
 };
 
 // Delete application for a seeker
@@ -286,7 +315,21 @@ export const updateSeeker = async (
   SeekerId: number,
   data: Partial<SEEKER_DATA>
 ) => {
-  const response = await axiosInstance.put(`/seekers/${SeekerId}`, data);
+  const allowHeadHunting =
+    data.AllowHeadHunting ??
+    (data as any).allowHeadHunting ??
+    (data as any).allow_head_hunting;
+  const payload = { ...data } as Record<string, unknown>;
+
+  if (allowHeadHunting !== undefined) {
+    payload.AllowHeadHunting =
+      allowHeadHunting === true || allowHeadHunting === 1 || allowHeadHunting === "true";
+    delete payload.allowHeadHunting;
+    delete payload.allow_head_hunting;
+  }
+
+  console.log("Updating seeker payload:", payload);
+  const response = await axiosInstance.put(`/seekers/${SeekerId}`, payload);
   return response.data;
 };
 

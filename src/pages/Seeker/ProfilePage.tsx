@@ -249,20 +249,10 @@ return (
               variant="contained"
               sx={{ mt: 4 }}
               onClick={() => {
-                navigate("/jobs");
+                navigate("/job_posts");
               }}
             >
               Browse Jobs
-            </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{ mt: 4 }}
-              onClick={() => {
-                //navigate("/jobs");
-              }}
-            >
-              Allow head hunting
             </Button>
           </Box>
         )}
