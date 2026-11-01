@@ -24,7 +24,7 @@ import {
 import { Close } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import MailIcon from "@mui/icons-material/Mail";
+import AddIcon from "@mui/icons-material/Add";
 import { useAuth } from "../../context/AuthContext";
 import { deleteUser } from "firebase/auth";
 import { auth } from "../../firebase/config";
@@ -255,8 +255,13 @@ const Header_2 = () => {
 
         const imageFiles = files.filter((file: any) => {
           const fileName = file.file_name ?? file.FileName ?? "";
-          const fileType = String(file.file_type ?? file.FileCategory ?? "").toLowerCase();
-          return /\.(jpg|jpeg|png|webp|gif)$/i.test(fileName) || fileType.includes("image");
+          const fileType = String(
+            file.file_type ?? file.FileCategory ?? "",
+          ).toLowerCase();
+          return (
+            /\.(jpg|jpeg|png|webp|gif)$/i.test(fileName) ||
+            fileType.includes("image")
+          );
         });
         imageFiles.sort((a: any, b: any) => {
           const dateA = new Date(a.uploaded_at ?? a.UploadedAt ?? 0).getTime();
@@ -264,7 +269,8 @@ const Header_2 = () => {
           return dateB - dateA;
         });
 
-        const imageUrl = imageFiles[0]?.file_url ?? imageFiles[0]?.FileUrl ?? null;
+        const imageUrl =
+          imageFiles[0]?.file_url ?? imageFiles[0]?.FileUrl ?? null;
         if (!cancelled) setProfileImage(imageUrl);
       } catch (err) {
         console.error("Failed to fetch profile image:", err);
@@ -337,6 +343,33 @@ const Header_2 = () => {
 
             {/* menu */}
             <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+              {/* Post Job Button - Employers Only */}
+              {isAuthenticated && userRole === "employer" && (
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/employer/post")}
+                  startIcon={<AddIcon />}
+                  sx={{
+                    bgcolor: "transparent",
+                    color: "#747474",
+                    fontWeight: 600,
+                    fontSize: "1.3rem",
+                    textTransform: "none",
+                    borderRadius: "10px",
+                    mt: 1.2,
+                    boxShadow: "0 3px 10px rgba(25, 118, 210, 0.2)",
+                    transition: "all 0.25s ease",
+                    height: 1,
+
+                    "&:hover": {
+                      bgcolor: "#f36d00",
+                      color: "#faf8f8",
+                    },
+                  }}
+                >
+                  Post a Job
+                </Button>
+              )}
               {pages.map((page) => (
                 <Button
                   onClick={() => navigate(page.path)}
@@ -346,27 +379,6 @@ const Header_2 = () => {
                   {page.label}
                 </Button>
               ))}
-
-              {/* Post Job Button - Employers Only */}
-              {isAuthenticated && userRole === "employer" && (
-                <Button
-                  variant="contained"
-                  onClick={() => navigate("/employer/post")}
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "#fff",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    borderRadius: 2,
-                    px: 2.5,
-                    "&:hover": {
-                      bgcolor: "primary.dark",
-                    },
-                  }}
-                >
-                  Post Job
-                </Button>
-              )}
             </Box>
 
             {/* login/user section */}
@@ -377,13 +389,13 @@ const Header_2 = () => {
                 marginLeft: 4,
               }}
             >
-              <IconButton
+              {/* <IconButton
                 size="large"
                 aria-label="show 4 new mails"
                 onClick={handleTest}
               >
                 <MailIcon />
-              </IconButton>
+              </IconButton> */}
 
               <IconButton
                 size="large"
