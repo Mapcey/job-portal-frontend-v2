@@ -42,7 +42,7 @@ const settings = ["Profile", "Edit", "Deactivate", "Logout"];
 
 const Header_2 = () => {
   const [elevated, setElevated] = useState(false);
-  const { logout, userInfo, userRole, isAuthenticated, token } = useAuth();
+  const { logout, userInfo, userRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null,
@@ -285,12 +285,12 @@ const Header_2 = () => {
     };
   }, [userRole, userInfo]);
 
-  const handleTest = () => {
-    console.log("info: ", userInfo);
-    console.log("role: ", userRole);
-    console.log("is auth", isAuthenticated);
-    console.log("token", token);
-  };
+  // const handleTest = () => {
+  //   console.log("info: ", userInfo);
+  //   console.log("role: ", userRole);
+  //   console.log("is auth", isAuthenticated);
+  //   console.log("token", token);
+  // };
 
   const handleNavigate = (path: string) => {
     navigate(path);

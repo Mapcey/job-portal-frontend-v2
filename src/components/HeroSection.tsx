@@ -7,10 +7,13 @@ import { Search as SearchIcon } from "@mui/icons-material";
 import { JOB_CAT } from "../types/jobOptions";
 import { LOCATION_DATA } from "../types/locationOptions";
 
+import { useAuth } from "../context/AuthContext";
+
 const HeroSection = () => {
   const keywords = ["Software Engineer", "Product Manager", "UX Designer"];
 
   const navigate = useNavigate();
+  const { userRole, isAuthenticated } = useAuth();
 
   const [jobCategory, setJobCategory] = useState("");
   const [jobLocation, setJobLocation] = useState({
@@ -40,11 +43,28 @@ const HeroSection = () => {
     });
   };
 
+  const handlePostJob = () => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    if (userRole === "employer") {
+      navigate("/employer/post");
+      return;
+    }
+
+    if (userRole === "seeker") {
+      navigate("/signup");
+      return;
+    }
+  };
+
   return (
     <div className="hero-section-container">
       <div className="hero-section-right">
         <div className="hero-section-title">
-          Find Your Career <br /> ti Make a Better Life
+          Find Your Career <br /> It Make a Better Life
         </div>
         <div className="hero-section-sub-title">
           Discover the right opportunities, connect with great employers, and
@@ -55,8 +75,13 @@ const HeroSection = () => {
         <div className="hero-section-buttons">
           <Button
             variant="contained"
-            sx={{ borderRadius: 2, padding: "15px 10%", marginRight: "3%" }}
-            onClick={() => navigate("/employer/post")}
+            sx={{
+              borderRadius: 2,
+              padding: "15px 10%",
+              marginRight: "3%",
+              fontWeight: 600,
+            }}
+            onClick={handlePostJob}
           >
             Post a Job
           </Button>
@@ -81,7 +106,7 @@ const HeroSection = () => {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "1050px",
+                // maxWidth: "1050px",
                 margin: "0 auto",
                 padding: { xs: 1, sm: 1.5 },
                 display: "flex",

@@ -304,24 +304,40 @@ const JobFilterPanel = ({
         }}
       >
         {" "}
-        {/* Minimum Salary */}{" "}
+        {/* Minimum Salary */} {/* Minimum Salary */}
         <TextField
           fullWidth
           size="small"
-          type="number"
+          type="text"
           label="Min Salary"
           value={filters.min_salary}
-          onChange={(e) => handleChange("min_salary", e.target.value)}
-        />{" "}
-        {/* Maximum Salary */}{" "}
+          onChange={(e) =>
+            handleChange("min_salary", e.target.value.replace(/[^0-9]/g, ""))
+          }
+          slotProps={{
+            htmlInput: {
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            },
+          }}
+        />
+        {/* Maximum Salary */}
         <TextField
           fullWidth
           size="small"
-          type="number"
+          type="text"
           label="Max Salary"
           value={filters.max_salary}
-          onChange={(e) => handleChange("max_salary", e.target.value)}
-        />{" "}
+          onChange={(e) =>
+            handleChange("max_salary", e.target.value.replace(/[^0-9]/g, ""))
+          }
+          slotProps={{
+            htmlInput: {
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            },
+          }}
+        />
       </Box>{" "}
       {/* Buttons */}{" "}
       <Box

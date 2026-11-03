@@ -71,7 +71,7 @@ const PricingSection = () => {
             fontSize: { xs: "2rem", md: "2.7rem" },
           }}
         >
-          Find the Right Plan for Your Hiring Needs
+          Find the Right Plan for Your Career or Hiring Goals
         </Typography>
 
         <Typography
@@ -79,15 +79,15 @@ const PricingSection = () => {
           align="center"
           sx={{
             mt: 2,
-            maxWidth: 680,
+            maxWidth: 720,
             mx: "auto",
             color: "text.secondary",
             lineHeight: 1.8,
           }}
         >
-          Whether you're hiring for one position or building a growing team,
-          explore our pricing options and find the right solution for your
-          recruitment goals.
+          Whether you're looking for your next career opportunity or searching
+          for the right talent to grow your team, explore our pricing plans and
+          discover the features and solutions that support your goals.
         </Typography>
 
         <Grid container spacing={3} sx={{ mt: 4 }} justifyContent="center">
