@@ -88,9 +88,9 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
           onClick={handleSubmit}
           variant="contained"
           color="primary"
-          // disabled={loading}
+          disabled={loading}
         >
-          {/* {loading ? "Submitting…" : "Submit"} */}
+          {loading ? "Submitting…" : "Submit"}
         </Button>
       </DialogActions>
     </Dialog>

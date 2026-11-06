@@ -18,6 +18,12 @@ import { useNotification } from "../../context/NotificationsProvider";
 // import { COUNTRIES } from "../../assets/data/slCities";
 import { LOCATION_DATA } from "../../types/locationOptions";
 
+import { Paper, Divider } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import SendIcon from "@mui/icons-material/Send";
+
 import {
   JOB_CAT,
   JOB_TYPES,
@@ -110,46 +116,62 @@ const PostJob = () => {
   return (
     <div className="post-job-container">
       <Header_2 />
+
       <Breadcrumb
-        title={"Post a New Job"}
-        description={
-          "Fill out the details below to publish your opening and connect with top talent across our network."
-        }
-        backgroundImage={"/imgs/backgrounds/bg-1.jpg"}
+        title="Post a New Job"
+        description="Create a job listing and connect with talented professionals across our network."
+        backgroundImage="/imgs/backgrounds/bg-1.jpg"
       />
-      <Button sx={{ p: 2 }} onClick={() => navigate("/employer/profile")}>
-        Back to Profile
-      </Button>
-      <div className="post-job-content">
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <h3 style={{ marginBottom: "0", paddingTop: "0", marginTop: 30 }}>
-            Job Information
-          </h3>
+
+      <div className="post-job-page">
+        {/* Page Header */}
+        <div className="post-job-page-header">
+          <div>
+            <h2>Create Job Posting</h2>
+            <p>
+              Complete the information below to publish your job opportunity.
+            </p>
+          </div>
+
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/employer/profile")}
+            sx={{ borderRadius: 2, textTransform: "none" }}
+          >
+            Back to Profile
+          </Button>
         </div>
 
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <div className="post-job-content-section-1">
-            <div className="p-j-form-row">
+        <div className="post-job-content">
+          {/* Basic Information */}
+          <Paper className="post-job-card" elevation={0}>
+            <div className="post-job-section-header">
+              <div className="post-job-icon">
+                <WorkOutlineIcon />
+              </div>
+              <div>
+                <h3>Job Information</h3>
+                <p>Provide the essential details about this position.</p>
+              </div>
+            </div>
+
+            <Divider sx={{ my: 3 }} />
+
+            <div className="post-job-form-grid">
               <TextField
                 fullWidth
                 name="JobTitle"
                 label="Job Title"
-                variant="outlined"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                className="text-input-3"
+                placeholder="e.g. Senior Software Engineer"
                 value={formData.JobTitle}
                 onChange={handleChange}
                 required
               />
 
               <Autocomplete
+                sx={{ pb: 2 }}
                 fullWidth
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                className="text-input-3"
                 options={countries}
                 value={selectedCountry}
                 getOptionLabel={(option) => option.name}
@@ -165,20 +187,20 @@ const PostJob = () => {
                   <TextField
                     {...params}
                     label="Country"
-                    size="small"
-                    variant="outlined"
+                    placeholder="Select country"
+                    required
                   />
                 )}
               />
+
+              {/* Keep your other existing fields here */}
             </div>
 
-            <div className="p-j-form-row">
+            <div className="post-job-form-grid">
               {/* State / Province */}
               <Autocomplete
                 fullWidth
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                className="text-input-3"
+                sx={{ pb: 2 }}
                 options={states}
                 value={selectedState}
                 getOptionLabel={(option) => option.name}
@@ -194,45 +216,41 @@ const PostJob = () => {
                   <TextField
                     {...params}
                     label="State / Province"
-                    size="small"
-                    variant="outlined"
+                    placeholder="Select state or province"
                   />
                 )}
-              />{" "}
-              {/* City */}{" "}
+              />
+
+              {/* City */}
               <Autocomplete
                 fullWidth
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
-                className="text-input-3"
                 options={cities}
                 value={cities.find((city) => city === formData.City) || null}
                 disabled={!formData.State}
                 onChange={(_event, newValue) => {
-                  setFormData((prev) => ({ ...prev, City: newValue || "" }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    City: newValue || "",
+                  }));
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label="City"
-                    size="small"
-                    variant="outlined"
+                    placeholder="Select city"
                   />
                 )}
               />
             </div>
 
-            <div className="p-j-form-row">
+            <div className="post-job-form-grid">
+              {/* Job Category */}
               <TextField
                 fullWidth
+                sx={{ pb: 2 }}
                 select
                 name="JobCategory"
                 label="Job Category"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
                 value={formData.JobCategory}
                 onChange={handleChange}
                 required
@@ -243,39 +261,34 @@ const PostJob = () => {
                   </MenuItem>
                 ))}
               </TextField>
+
+              {/* Job Type */}
               <TextField
                 fullWidth
                 select
                 name="JobType"
                 label="Job Type"
-                variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
                 value={formData.JobType}
                 onChange={handleChange}
                 required
               >
-                {JOB_TYPES.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
+                {JOB_TYPES.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
                   </MenuItem>
                 ))}
               </TextField>
             </div>
 
-            <div className="p-j-form-row">
+            <div className="post-job-form-grid">
               <TextField
                 fullWidth
+                sx={{ pb: 2 }}
                 select
                 name="EducationLevel"
                 label="Education Level"
                 variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+                size="medium"
                 value={formData.EducationLevel}
                 onChange={handleChange}
               >
@@ -292,9 +305,7 @@ const PostJob = () => {
                 name="ProfExperience"
                 label="Professional Experience"
                 variant="outlined"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+                size="medium"
                 value={formData.ProfExperience}
                 onChange={handleChange}
               >
@@ -312,17 +323,16 @@ const PostJob = () => {
                 ))}
               </TextField>
             </div>
-            <div className="p-j-form-row">
+
+            <div className="post-job-form-grid">
               <TextField
                 fullWidth
+                sx={{ pb: 2 }}
                 select
                 name="Languages"
-                label="Prefered Languages"
+                label="Preferred Languages"
                 variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+                size="medium"
                 value={formData.Languages}
                 onChange={handleChange}
               >
@@ -332,16 +342,14 @@ const PostJob = () => {
                   </MenuItem>
                 ))}
               </TextField>
+
               <TextField
                 fullWidth
                 select
                 name="SalaryRange"
-                label="Salary Rage"
+                label="Salary Range"
                 variant="outlined"
-                placeholder="Add your full name"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+                size="medium"
                 value={formData.SalaryRange}
                 onChange={handleChange}
               >
@@ -352,16 +360,17 @@ const PostJob = () => {
                 ))}
               </TextField>
             </div>
-            <div className="p-j-form-row">
+
+            <div className="post-job-form-grid">
+              {/* Work Type */}
               <TextField
                 fullWidth
+                sx={{ pb: 2 }}
                 select
-                name="WorkType" // ✅ match the formData key exactly
+                name="WorkType"
                 label="Work Type"
                 variant="outlined"
-                className="text-input-3"
-                size="small"
-                sx={{ mr: 5, mt: 3 }}
+                size="medium"
                 value={formData.WorkType}
                 onChange={handleChange}
               >
@@ -372,13 +381,14 @@ const PostJob = () => {
                 ))}
               </TextField>
 
+              {/* Closing Date */}
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Closing Date"
                   value={
                     formData.ExpiryDate ? dayjs(formData.ExpiryDate) : null
                   }
-                  minDate={dayjs()} // ✅ prevents past dates
+                  minDate={dayjs()}
                   onChange={(newValue) => {
                     setFormData((prev) => ({
                       ...prev,
@@ -388,55 +398,79 @@ const PostJob = () => {
                   slotProps={{
                     textField: {
                       name: "ExpiryDate",
+                      label: "Application Closing Date",
                       variant: "outlined",
-                      size: "small",
-                      sx: { mr: 5, mt: 3 },
+                      size: "medium",
                       required: true,
-                      className: "text-input-3",
                       fullWidth: true,
                     },
                   }}
                 />
               </LocalizationProvider>
             </div>
-          </div>
-        </div>
+          </Paper>
 
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <h3 style={{ marginBottom: 5, paddingTop: "20", marginTop: 30 }}>
-            Job Description
-          </h3>
-          <p style={{ color: "#666", fontSize: "14px", marginTop: 0 }}>
-            <i>Add your job description below, or paste an existing one.</i>
-          </p>
-        </div>
+          {/* Job Description */}
+          <Paper className="post-job-card" elevation={0}>
+            <div className="post-job-section-header">
+              <div className="post-job-icon">
+                <DescriptionOutlinedIcon />
+              </div>
+              <div>
+                <h3>Job Description</h3>
+                <p>
+                  Explain the responsibilities, qualifications and expectations
+                  for this role.
+                </p>
+              </div>
+            </div>
 
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <RichTextBox
-            key={editorKey}
-            value={formData.Description}
-            onChange={(val) =>
-              setFormData((prev) => ({ ...prev, Description: val }))
-            }
-          />
-        </div>
+            <Divider sx={{ my: 3 }} />
 
-        {/* section */}
-        <div className="post-job-content-section-1">
-          <Button
-            variant="contained"
-            sx={{ marginTop: "20px" }}
-            onClick={handleSubmit}
-          >
-            Post Job
-          </Button>
+            <RichTextBox
+              key={editorKey}
+              value={formData.Description}
+              onChange={(val) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  Description: val,
+                }))
+              }
+            />
+          </Paper>
+
+          {/* Submit Section */}
+          <Paper className="post-job-submit-card" elevation={0}>
+            <div>
+              <h3>Ready to publish?</h3>
+              <p>
+                Review your job information before publishing it to potential
+                candidates.
+              </p>
+            </div>
+
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<SendIcon />}
+              onClick={handleSubmit}
+              sx={{
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 700,
+                textTransform: "none",
+                boxShadow: "none",
+              }}
+            >
+              Publish Job
+            </Button>
+          </Paper>
         </div>
       </div>
+
       <FooterSection_1 />
     </div>
   );
 };
-
 export default PostJob;

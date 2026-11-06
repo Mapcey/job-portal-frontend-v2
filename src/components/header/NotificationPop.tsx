@@ -237,7 +237,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({
                       sx={{
                         width: 40,
                         height: 40,
-                        bgcolor: isUnread ? "primary.light" : "action.hover",
+                        bgcolor: isUnread ? "primary.light" : "#f7f7f7",
                         color: isUnread ? "primary.dark" : "text.secondary",
                       }}
                     >

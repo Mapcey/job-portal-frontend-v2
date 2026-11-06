@@ -92,24 +92,13 @@ const JobDetailsContent = ({
           }}
         >
           {/* Company / Job image */}
-
-          {/* <Box
-            sx={{
-              width: { xs: 80, md: 110 },
-              height: { xs: 80, md: 110 },
-              borderRadius: 2.5,
-              flexShrink: 0,
-              backgroundImage: 'url("/imgs/grid/developing.jpg")',
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          /> */}
-
           <Box
             sx={{
               width: { xs: 80, md: 110 },
               height: { xs: 80, md: 110 },
               flexShrink: 0,
+              // boxShadow: 5,
+              borderRadius: 5,
             }}
           >
             <CompanyLogo
@@ -287,7 +276,7 @@ const JobDetailsContent = ({
         <Box
           sx={{
             position: { md: "sticky" },
-            top: { md: 24 },
+            top: { md: 90 },
           }}
         >
           {/* ACTION CARD */}
