@@ -115,22 +115,16 @@ const FooterSection_1 = () => {
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <IconButton
               color="inherit"
-              href="https://facebook.com"
-              sx={{ "&:hover": { color: "#3b5998" } }}
+              href="https://www.facebook.com/p/Suicul-61573533073265/"
+              sx={{ "&:hover": { color: "#e4e4e4" } }}
             >
               <FacebookIcon />
             </IconButton>
+
             <IconButton
               color="inherit"
-              href="https://twitter.com"
-              sx={{ "&:hover": { color: "#00acee" } }}
-            >
-              <TwitterIcon />
-            </IconButton>
-            <IconButton
-              color="inherit"
-              href="https://linkedin.com"
-              sx={{ "&:hover": { color: "#0e76a8" } }}
+              href="https://uk.linkedin.com/company/suicul"
+              sx={{ "&:hover": { color: "#e8eaeb" } }}
             >
               <LinkedInIcon />
             </IconButton>
