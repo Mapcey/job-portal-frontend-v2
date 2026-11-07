@@ -1,46 +1,99 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNotification } from "../../context/NotificationsProvider";
 import {
   Box,
   Typography,
   Card,
   CardContent,
-  Chip,
-  CircularProgress,
   Avatar,
   Button,
+  CircularProgress,
+  Stack,
 } from "@mui/material";
-import CardActionArea from "@mui/material/CardActionArea";
-import PersonRemoveAlt1Icon from "@mui/icons-material/PersonRemoveAlt1";
-import { Done } from "@mui/icons-material";
+import { DoneAll } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import { format } from "date-fns";
 
+import {
+  getAllCandidates,
+  getSeekerFiles,
+  applicationStatusUpdate,
+} from "../../services/APIs/APIs";
+
 import { useAuth } from "../../context/AuthContext";
-import { getAllCandidates } from "../../services/APIs/APIs";
-import { applicationStatusUpdate } from "../../services/APIs/APIs";
-import { candidate } from "../../types/candidates";
-import { useNotification } from "../../context/NotificationsProvider";
+// import type { Candidate } from "../../types/applicationsSeeker";
+
+interface Candidate {
+  ApplicationId: number;
+  SeekerId: number;
+  ApplicantName: string;
+  JobId: number;
+  JobTitle: string;
+  JobCategory?: string;
+  AppliedDateTime?: string;
+  Status: string;
+}
 
 const ManageCandidatesTab = () => {
   const { userInfo } = useAuth();
-  const [appliedCandidates, setAppliedCandidates] = useState<candidate[]>([]);
-  const [loading, setLoading] = useState(true);
   const { notify } = useNotification();
 
-  // Fetch applications for this employer
+  const [appliedCandidates, setAppliedCandidates] = useState<Candidate[]>([]);
+  const [profileImages, setProfileImages] = useState<Record<string, string>>(
+    {},
+  );
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<number | null>(null);
+
+  // Fetch selected candidates and their profile images
   useEffect(() => {
     const fetchApplications = async () => {
-      if (!userInfo || !("EmployerId" in userInfo)) return;
+      if (!userInfo || !("EmployerId" in userInfo)) {
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
+
         const data = await getAllCandidates(userInfo.EmployerId.toString());
-        // ✅ filter out rejected applications
-        setAppliedCandidates(
-          data.filter((a: candidate) => a.Status !== "Rejected"),
+
+        const selected: Candidate[] = data.filter(
+          (candidate: Candidate) => candidate.Status === "Selected",
         );
+
+        setAppliedCandidates(selected);
+
+        // Get unique seeker IDs
+        const seekerIds = Array.from(
+          new Set<number>(selected.map((c) => Number(c.SeekerId))),
+        );
+
+        // Fetch profile images
+        const images: Record<string, string> = {};
+
+        await Promise.all(
+          seekerIds.map(async (id) => {
+            try {
+              const files = await getSeekerFiles(id.toString());
+              const fileList = Array.isArray(files) ? files : [files];
+
+              const imageFile = fileList.find(
+                (file) => file.file_type === "FileType.image",
+              );
+
+              if (imageFile?.file_url) {
+                images[id.toString()] = imageFile.file_url;
+              }
+            } catch (error) {
+              console.error(`Failed to load image for seeker ${id}:`, error);
+            }
+          }),
+        );
+
+        setProfileImages(images);
       } catch (error) {
-        console.error("Failed to fetch applications:", error);
+        console.error("Failed to fetch candidates:", error);
       } finally {
         setLoading(false);
       }
@@ -49,60 +102,36 @@ const ManageCandidatesTab = () => {
     fetchApplications();
   }, [userInfo]);
 
-  // Utility function for random color
-  const getRandomColor = (name: string) => {
-    const colors = [
-      "#FF6B6B",
-      "#6BCB77",
-      "#4D96FF",
-      "#FFD93D",
-      "#845EC2",
-      "#FF9671",
-      "#00C9A7",
-    ];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
-
-  // ✅ Update status handler
-  const handleStatusUpdate = async (
-    applicationId: number,
-    newStatus: string,
-  ) => {
+  // Mark candidate as completed
+  const handleComplete = async (applicationId: number) => {
     try {
-      // Update status in backend
-      await applicationStatusUpdate(applicationId, {
-        Status: newStatus,
-      });
-      notify("Candidate selected", "success");
+      setUpdating(applicationId);
 
-      setAppliedCandidates((prev) => {
-        if (newStatus === "Rejected") {
-          // ❌ Remove rejected candidate
-          return prev.filter((a) => a.ApplicationId !== applicationId);
-        } else {
-          // ✅ Update status for Reviewed / Selected (or other statuses)
-          return prev.map((a) =>
-            a.ApplicationId === applicationId ? { ...a, Status: newStatus } : a,
-          );
-        }
+      await applicationStatusUpdate(applicationId, {
+        Status: "Completed",
       });
+
+      setAppliedCandidates((prev) =>
+        prev.filter((candidate) => candidate.ApplicationId !== applicationId),
+      );
+
+      notify("Candidate marked as completed", "success");
     } catch (error) {
-      console.error("Failed to update status:", error);
+      console.error("Failed to update candidate status:", error);
+      notify("Failed to update candidate status", "error");
+    } finally {
+      setUpdating(null);
     }
   };
 
   return (
-    <Box className="saved-jobs-tab-container" sx={{ p: 2 }}>
-      <Typography variant="h6" mb={2}>
-        Applied Candidates ({appliedCandidates.length})
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h6" fontWeight={700} mb={2}>
+        Selected Candidates ({appliedCandidates.length})
       </Typography>
 
       {loading ? (
-        <Box sx={{ textAlign: "center", py: 4 }}>
+        <Box textAlign="center" py={4}>
           <CircularProgress />
         </Box>
       ) : appliedCandidates.length === 0 ? (
@@ -111,177 +140,96 @@ const ManageCandidatesTab = () => {
             textAlign: "center",
             py: 6,
             border: "1px dashed",
-            borderColor: "grey.400",
+            borderColor: "divider",
             borderRadius: 2,
           }}
         >
-          <Typography variant="body1" color="lightgray">
-            No Applied Candidates yet.
+          <Typography color="text.secondary">
+            No selected candidates yet.
           </Typography>
         </Box>
       ) : (
-        <Box
-          className="saved-jobs-tab-content"
-          sx={{
-            maxHeight: "800px",
-            overflowY: "auto",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
+        <Stack spacing={2}>
           {appliedCandidates.map((job) => (
             <Card
               key={job.ApplicationId}
               variant="outlined"
-              sx={{
-                position: "relative",
-
-                marginBottom: "20px",
-                boxShadow: 2,
-                borderRadius: 2,
-              }}
+              sx={{ borderRadius: 2 }}
             >
-              <Button
-                sx={{
-                  position: "absolute",
-                  borderRadius: 2,
-                  top: 5,
-                  right: 5,
-                  zIndex: 1,
-                  backgroundColor: "error.main",
-                  opacity: 0.8,
-                  color: "white",
-                  boxShadow: 1,
-                  ":hover": { backgroundColor: "error.main", opacity: 1 },
-                }}
-                onClick={() =>
-                  handleStatusUpdate(job.ApplicationId, "Rejected")
-                }
-              >
-                <PersonRemoveAlt1Icon sx={{ mr: 1 }} />
-                Reject
-              </Button>
-
-              <Button
-                sx={{
-                  position: "absolute",
-                  borderRadius: 2,
-                  bottom: 5,
-                  right: 5,
-                  zIndex: 1,
-                  backgroundColor: "success.main",
-                  opacity: 0.8,
-                  color: "white",
-                  boxShadow: 1,
-                  ":hover": { backgroundColor: "success.main", opacity: 1 },
-                }}
-                onClick={() =>
-                  handleStatusUpdate(job.ApplicationId, "Selected")
-                }
-              >
-                <Done sx={{ mr: 1 }} />
-                Select
-              </Button>
-
-              <CardActionArea>
-                <CardContent>
-                  <Box display="flex" alignItems="center" mb={2}>
+              <CardContent>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "stretch", sm: "center" }}
+                  spacing={2}
+                >
+                  <Stack direction="row" alignItems="center" spacing={2}>
                     <Avatar
+                      src={profileImages[job.SeekerId?.toString()]}
                       alt={job.ApplicantName}
-                      src={"/default-avatar.png"}
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        mr: 2,
-                        bgcolor: getRandomColor(job.ApplicantName || "U"),
-                      }}
+                      sx={{ width: 50, height: 50 }}
                     />
-                    <Box>
-                      {/* Seeker name link */}
-                      <Link
+
+                    <Box minWidth={0}>
+                      <Typography
+                        component={Link}
                         to={`/seeker_account/${job.SeekerId}`}
-                        style={{ textDecoration: "none", color: "inherit" }}
+                        fontWeight={700}
+                        color="text.primary"
+                        sx={{
+                          textDecoration: "none",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
                       >
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            cursor: "pointer",
-                            "&:hover": {
-                              fontWeight: "bold",
-                              textDecoration: "underline",
-                            },
-                          }}
-                        >
-                          {job.ApplicantName}
-                        </Typography>
-                      </Link>
+                        {job.ApplicantName}
+                      </Typography>
 
-                      {/* Job title link */}
-                      <Link
+                      <Typography
+                        component={Link}
                         to={`/jobs/details/${job.JobId}`}
-                        style={{ textDecoration: "none", color: "inherit" }}
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          display: "block",
+                          textDecoration: "none",
+                          "&:hover": {
+                            color: "primary.main",
+                            textDecoration: "underline",
+                          },
+                        }}
                       >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            cursor: "pointer",
-                            "&:hover": {
-                              fontWeight: "bold",
-                              textDecoration: "underline",
-                            },
-                          }}
-                        >
-                          {job.JobTitle}
-                        </Typography>
-                      </Link>
-                    </Box>
-                  </Box>
+                        {job.JobTitle}
+                      </Typography>
 
-                  {/* Chips */}
-                  <Box
+                      <Typography variant="caption" color="text.secondary">
+                        Applied:{" "}
+                        {job.AppliedDateTime
+                          ? format(new Date(job.AppliedDateTime), "dd MMM yyyy")
+                          : "N/A"}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<DoneAll />}
+                    disabled={updating === job.ApplicationId}
+                    onClick={() => handleComplete(job.ApplicationId)}
                     sx={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: 1,
-                      mt: 2,
+                      textTransform: "none",
+                      alignSelf: { xs: "flex-start", sm: "center" },
                     }}
                   >
-                    <Chip
-                      label={job.JobCategory}
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                    />
-                    <Chip
-                      label={
-                        job.AppliedDateTime
-                          ? format(
-                              new Date(job.AppliedDateTime),
-                              "dd MMM yyyy, hh:mm a",
-                            )
-                          : "N/A"
-                      }
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                    />
-                  </Box>
-                </CardContent>
-              </CardActionArea>
+                    {updating === job.ApplicationId
+                      ? "Updating..."
+                      : "Mark as Completed"}
+                  </Button>
+                </Stack>
+              </CardContent>
             </Card>
           ))}
-
-          {appliedCandidates.length === 0 && !loading && (
-            <Typography
-              variant="h5"
-              color="secondary.light"
-              textAlign="center"
-              mt={4}
-            >
-              No Applications yet.
-            </Typography>
-          )}
-        </Box>
+        </Stack>
       )}
     </Box>
   );

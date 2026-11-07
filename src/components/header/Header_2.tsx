@@ -346,24 +346,26 @@ const Header_2 = () => {
               {/* Post Job Button - Employers Only */}
               {isAuthenticated && userRole === "employer" && (
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   onClick={() => navigate("/employer/post")}
                   startIcon={<AddIcon />}
                   sx={{
                     bgcolor: "transparent",
                     color: "#747474",
+                    border: "1px solid #f36d00",
+                    boxShadow: "none",
                     fontWeight: 600,
-                    fontSize: "1.3rem",
+                    fontSize: "1.1rem",
                     textTransform: "none",
                     borderRadius: "10px",
-                    mt: 1.2,
-                    boxShadow: "0 3px 10px rgba(25, 118, 210, 0.2)",
-                    transition: "all 0.25s ease",
+                    mt: 1.4,
                     height: 1,
-
+                    transition: "all 0.25s ease",
                     "&:hover": {
                       bgcolor: "#f36d00",
-                      color: "#faf8f8",
+                      color: "#fff",
+                      borderColor: "#f36d00",
+                      boxShadow: "none",
                     },
                   }}
                 >

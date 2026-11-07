@@ -48,6 +48,8 @@ const AppRoutes = () => (
       <Route path="/editor_login" element={<EditorLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
       <Route path="/job_posts/details/:id" element={<JobDetailsPage />} />
 
       <Route path="/terms" element={<LegalPage />} />

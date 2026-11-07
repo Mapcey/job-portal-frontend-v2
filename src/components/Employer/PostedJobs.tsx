@@ -1,35 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { differenceInDays } from "date-fns";
+import { Link } from "react-router-dom";
 
 import {
   Box,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   Button,
   Stack,
   Chip,
   CircularProgress,
   Badge,
   IconButton,
-  useMediaQuery,
 } from "@mui/material";
-import {
-  Delete,
-  Cancel,
-  RemoveRedEye,
-  DocumentScanner,
-} from "@mui/icons-material";
+import { DeleteOutline, DocumentScanner } from "@mui/icons-material";
+
+import { Card, CardContent, Divider } from "@mui/material";
 
 import { useAuth } from "../../context/AuthContext";
 import { EMP_POSTED_JOBS } from "../../types/job";
 import {
   getEmployerPostedJobs,
   deleteJob,
-  // editJob,
   getCandidatesOfJob,
   applicationStatusUpdate,
   updateJobPost,
@@ -45,7 +37,7 @@ const PostedJobs = () => {
   const [applicationCounts, setApplicationCounts] = useState<{
     [jobId: string]: number;
   }>({});
-  const isMobile = useMediaQuery("(max-width:600px)");
+  // const isMobile = useMediaQuery("(max-width:600px)");
 
   const [openApplicantsDialog, setOpenApplicantsDialog] = useState(false);
   const [selectedJobCandidates, setSelectedJobCandidates] = useState<any[]>([]);
@@ -80,9 +72,9 @@ const PostedJobs = () => {
         setLoading(true);
         const response = await getEmployerPostedJobs(userInfo.EmployerId);
         console.log(response);
-        
+
         const filteredJobs = response.filter(
-          (job: any) => job.Status !== "Pending"
+          (job: any) => job.Status !== "Pending",
         );
 
         setJobs(filteredJobs);
@@ -117,16 +109,14 @@ const PostedJobs = () => {
 
   const handleDelete = async (id: number) => {
     try {
+      console.log(id);
+
       await deleteJob(id.toString()); // API expects string id
       // remove job from state
       setJobs((prevJobs) => prevJobs.filter((job) => job.JobId !== id));
     } catch (err) {
       console.error("Failed to delete job:", err);
     }
-  };
-
-  const handleview = (id: number) => {
-    navigate(`/jobs/details/${id}`);
   };
 
   const BrowsePostJob = () => {
@@ -145,237 +135,193 @@ const PostedJobs = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Header and Button */}
+    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+      {/* Header */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: "wrap",
+          gap: 2,
           mb: 3,
         }}
       >
-        <Typography variant="h6">Manage Jobs ({jobs.length})</Typography>
+        <Box>
+          <Typography variant="h5" fontWeight={700}>
+            Manage Jobs
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {jobs.length} job postings
+          </Typography>
+        </Box>
+
         <Button
           variant="contained"
-          color="secondary"
-          sx={{ borderRadius: 2, textTransform: "none" }}
           onClick={BrowsePostJob}
+          sx={{
+            borderRadius: 2,
+            textTransform: "none",
+            fontWeight: 650,
+            px: 2.5,
+            boxShadow: "none",
+          }}
         >
-          Post a New Job
+          + Post a Job
         </Button>
       </Box>
 
+      {/* Loading */}
       {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
           <CircularProgress />
         </Box>
       ) : jobs.length === 0 ? (
         <Box
           sx={{
             textAlign: "center",
-            py: 6,
+            py: 7,
             border: "1px dashed",
-            borderColor: "grey.400",
-            borderRadius: 2,
+            borderColor: "divider",
+            borderRadius: 3,
+            bgcolor: "background.paper",
           }}
         >
-          <Typography variant="body1" color="lightgray">
-            No jobs posted yet.
+          <Typography fontWeight={650} mb={1}>
+            No jobs posted yet
           </Typography>
-          <Button
-            variant="outlined"
-            color="secondary"
-            sx={{ mt: 2 }}
-            onClick={BrowsePostJob}
-          >
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            Create your first job posting to start receiving applications.
+          </Typography>
+          <Button variant="contained" onClick={BrowsePostJob}>
             Post a Job
           </Button>
         </Box>
       ) : (
-        <List>
+        <Stack spacing={2}>
           {jobs.map((job) => {
             const expiryDate = new Date(job.ExpiryDate);
             const daysRemaining = differenceInDays(expiryDate, new Date());
 
-            return (
-              <Box key={job.JobId}>
-                <ListItem
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: 2,
-                    mb: 1,
-                    px: 3,
-                    py: 2,
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {job.JobTitle}
-                      </Typography>
-                    }
-                    secondary={
-                      <div>
-                        {/* Status Chip */}
-                        <Chip
-                          label={`Status: ${job.Status}`}
-                          color={job.Status === "Active" ? "success" : "error"}
-                          size="small"
-                          sx={{ mt: 0.5 }}
-                        />
+            const isExpired =
+              !Number.isNaN(expiryDate.getTime()) && daysRemaining < 0;
 
-                        {/* Expiry Info */}
+            const isClosed = job.Status === "Closed";
+            const isActive = job.Status === "Active" && !isExpired;
+
+            return (
+              <Card key={job.JobId} variant="outlined" sx={{ borderRadius: 3 }}>
+                <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+                  <Box display="flex" justifyContent="space-between" gap={2}>
+                    <Box flex={1} minWidth={0}>
+                      <Link
+                        to={`/job_posts/details/${job.JobId}`}
+                        style={{ color: "inherit", textDecoration: "none" }}
+                      >
                         <Typography
-                          variant="body2"
+                          fontWeight={700}
                           sx={{
-                            mt: 1,
-                            color: "black",
+                            wordBreak: "break-word",
+                            "&:hover": {
+                              color: "primary.main",
+                              textDecoration: "underline",
+                            },
                           }}
                         >
-                          Expires on: {expiryDate.toDateString()}{" "}
-                          {daysRemaining > 0
-                            ? `(${daysRemaining} days left)`
-                            : "(Expired)"}
+                          {job.JobTitle}
                         </Typography>
-                      </div>
-                    }
-                  />
-                  <ListItemSecondaryAction>
+                      </Link>
+
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        mt={0.8}
+                      >
+                        Expires:{" "}
+                        {Number.isNaN(expiryDate.getTime())
+                          ? "Date unavailable"
+                          : expiryDate.toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                        {" · "}
+                        {isExpired
+                          ? "Expired"
+                          : daysRemaining === 0
+                            ? "Expires today"
+                            : `${daysRemaining} days remaining`}
+                      </Typography>
+                    </Box>
+
+                    <Chip
+                      label={isExpired && !isClosed ? "Expired" : job.Status}
+                      size="small"
+                      color={
+                        isActive ? "success" : isExpired ? "default" : "error"
+                      }
+                    />
+                  </Box>
+
+                  <Divider sx={{ my: 2 }} />
+
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Badge
+                      badgeContent={applicationCounts[job.JobId] || 0}
+                      color="primary"
+                    >
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<DocumentScanner />}
+                        onClick={() => handleApplicants(job.JobId)}
+                        sx={{ borderRadius: 2, textTransform: "none" }}
+                      >
+                        Applicants
+                      </Button>
+                    </Badge>
+
                     <Stack direction="row" spacing={1}>
-                      {isMobile ? (
-                        <>
-                          <IconButton
-                            onClick={() => handleview(job.JobId)}
-                            color="secondary"
-                          >
-                            <RemoveRedEye />
-                          </IconButton>
-
-                          <Badge
-                            badgeContent={applicationCounts[job.JobId] || 0}
-                            color="primary"
-                            overlap="circular"
-                          >
-                            <IconButton
-                              onClick={() => handleApplicants(job.JobId)}
-                              color="secondary"
-                            >
-                              <DocumentScanner />
-                            </IconButton>
-                          </Badge>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="small"
-                            sx={{ color: "secondary.main" }}
-                            startIcon={<RemoveRedEye />}
-                            onClick={() => handleview(job.JobId)}
-                          >
-                            Preview
-                          </Button>
-
-                          <Badge
-                            badgeContent={applicationCounts[job.JobId] || 0}
-                            color="primary"
-                            overlap="circular"
-                          >
-                            <Button
-                              size="small"
-                              sx={{ color: "secondary.main" }}
-                              startIcon={<DocumentScanner />}
-                              onClick={() => handleApplicants(job.JobId)}
-                            >
-                              Applicants
-                            </Button>
-                          </Badge>
-                        </>
+                      {!isClosed && !isExpired && (
+                        <Button
+                          size="small"
+                          color="warning"
+                          onClick={() =>
+                            window.confirm(
+                              "Are you sure you want to close this job?",
+                            ) && handleClose(job.JobId, job.JobTitle)
+                          }
+                          sx={{ textTransform: "none" }}
+                        >
+                          Close
+                        </Button>
                       )}
+
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() =>
+                          window.confirm(
+                            "Are you sure you want to delete this job?",
+                          ) && handleDelete(job.JobId)
+                        }
+                      >
+                        <DeleteOutline />
+                      </IconButton>
                     </Stack>
-
-                    <Stack direction="row" spacing={1} marginBottom={4}>
-                      {isMobile ? (
-                        <>
-                          <IconButton
-                            color="warning"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to close this post?",
-                                )
-                              ) {
-                                handleClose(job.JobId, job.JobTitle);
-                              }
-                            }}
-                            disabled={job.Status === "Closed"}
-                          >
-                            <Cancel />
-                          </IconButton>
-
-                          <IconButton
-                            color="error"
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to delete this post?",
-                                )
-                              ) {
-                                handleDelete(job.JobId);
-                              }
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="small"
-                            color="warning"
-                            startIcon={<Cancel />}
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to close this post?",
-                                )
-                              ) {
-                                handleClose(job.JobId, job.JobTitle);
-                              }
-                            }}
-                            disabled={job.Status === "Closed"}
-                          >
-                            Close Post
-                          </Button>
-
-                          <Button
-                            size="small"
-                            color="error"
-                            variant="outlined"
-                            startIcon={<Delete />}
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to delete this post?",
-                                )
-                              ) {
-                                handleDelete(job.JobId);
-                              }
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </>
-                      )}
-                    </Stack>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              </Box>
+                  </Box>
+                </CardContent>
+              </Card>
             );
           })}
-        </List>
+        </Stack>
       )}
+
+      {/* Applicants Dialog */}
       <ApplicantsDialog
         open={openApplicantsDialog}
         onClose={() => setOpenApplicantsDialog(false)}
@@ -383,12 +329,10 @@ const PostedJobs = () => {
         candidates={selectedJobCandidates}
         onStatusChange={async (candidate, newStatus) => {
           try {
-            // Call the API to update the status
             await applicationStatusUpdate(candidate.ApplicationId, {
               Status: newStatus,
             });
 
-            // Update state locally
             setSelectedJobCandidates((prev) =>
               prev.map((c) =>
                 c.ApplicationId === candidate.ApplicationId

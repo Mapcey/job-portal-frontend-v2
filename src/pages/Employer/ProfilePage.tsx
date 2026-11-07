@@ -70,29 +70,35 @@ const EmployerProfilePage = () => {
         break;
       case 1:
         setBreadcrumb({
-          title: "Manage Posted Jobs",
-          desc: "Check your updates and alerts here.",
+          title: "Selected Candidates",
+          desc: "Candidated Ready to inteview.",
         });
         break;
       case 2:
         setBreadcrumb({
-          title: "Notifications",
+          title: "Posted Jobs",
           desc: "Check your applications here.",
         });
         break;
       case 3:
         setBreadcrumb({
-          title: "Pending Approvals",
-          desc: "Check your applications here.",
+          title: "Notifications",
+          desc: "Check your updates and alerts here.",
         });
         break;
       case 4:
         setBreadcrumb({
-          title: "Manage Editors",
-          desc: "Manage editors accounts here.",
+          title: "Pending Approvals",
+          desc: "Job posts waiting for approval.",
         });
         break;
       case 5:
+        setBreadcrumb({
+          title: "Manage Editors",
+          desc: "Create or manage editor profiles.",
+        });
+        break;
+      case 6:
         setBreadcrumb({
           title: "Subscriptions",
           desc: "Manage your subscription status and payslips.",
@@ -164,7 +170,7 @@ const EmployerProfilePage = () => {
               indicatorColor="primary"
             >
               <Tab label="My Profile" sx={tabStyle} />
-              <Tab label="Manage Candidates" sx={tabStyle} />
+              <Tab label="Selected Candidates" sx={tabStyle} />
               <Tab label="Posted Jobs" sx={tabStyle} />
               <Tab label="Notifications" sx={tabStyle} />
               <Tab label="Pending Approvals" sx={tabStyle} />

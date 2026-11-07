@@ -7,8 +7,6 @@ import {
   DialogActions,
   List,
   ListItem,
-  ListItemAvatar,
-  Avatar,
   ListItemText,
   Button,
   Typography,
@@ -66,7 +64,7 @@ const statusOptions = {
 const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
   open,
   onClose,
-  jobId,
+  // jobId,
   candidates,
   onStatusChange,
 }) => {
@@ -87,7 +85,7 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
       maxWidth="md"
       fullScreen={isMobile} // go fullscreen on mobile
     >
-      <DialogTitle>Applicants for Job #{jobId}</DialogTitle>
+      <DialogTitle>Applicants</DialogTitle>
       <DialogContent dividers>
         {candidates.length > 0 ? (
           <List>
@@ -102,11 +100,6 @@ const ApplicantsDialog: React.FC<ApplicantsDialogProps> = ({
                   gap: 2,
                 }}
               >
-                {/* Avatar */}
-                <ListItemAvatar>
-                  <Avatar src={"/default-avatar.png"} />
-                </ListItemAvatar>
-
                 {/* Text info */}
                 <ListItemText
                   primary={candidate.ApplicantName}

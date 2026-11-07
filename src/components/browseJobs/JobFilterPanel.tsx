@@ -28,7 +28,7 @@ interface JobFilterPanelProps {
 const JobFilterPanel = ({
   filters,
   setFilters,
-  onApply,
+  // onApply,
   onClear,
 }: JobFilterPanelProps) => {
   // const handleChange = (name: string, value: string) => {
@@ -690,7 +690,7 @@ const JobFilterPanel = ({
 
       {/* Actions */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
-        <Button
+        {/* <Button
           variant="contained"
           fullWidth
           onClick={onApply}
@@ -706,7 +706,7 @@ const JobFilterPanel = ({
           }}
         >
           Apply Filters
-        </Button>
+        </Button> */}
 
         <Button
           variant="text"
@@ -721,7 +721,7 @@ const JobFilterPanel = ({
             textTransform: "none",
             "&:hover": {
               bgcolor: "action.hover",
-              color: "primary.main",
+              color: "white",
             },
           }}
         >
