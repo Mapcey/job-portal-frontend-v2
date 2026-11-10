@@ -30,6 +30,26 @@ const formatEnum = (value: string) => {
   return value.split(".").pop()?.replace(/_/g, " ") || value;
 };
 
+const getPaymentStatus = (subscription: any) =>
+  formatEnum(String(subscription?.Status ?? subscription?.status ?? subscription?.PaymentStatus ?? ""))
+    .trim()
+    .toLowerCase();
+
+interface SeekerSubscriptionRecord {
+  SubId?: string | number;
+  Id?: string | number;
+  Status?: string;
+  status?: string;
+  SubscriptionTier?: string;
+  planName?: string;
+  Plan?: string;
+  Price?: number;
+  price?: number;
+  CreatedDateTime?: string;
+  StartDate?: string;
+  [key: string]: unknown;
+}
+
 const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
   const [showAll, setShowAll] = useState(false);
   const [localSubs, setLocalSubs] = useState<any[]>(subscriptions || []);
@@ -130,6 +150,9 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
   };
 
   const handleApprove = async (id: number) => {
+    const currentSubscription = localSubs.find((subscription) => subscription.ProofId === id);
+    if (getPaymentStatus(currentSubscription) !== "pending") return;
+
     try {
       setLoadingActionId(id);
       setActionMessage(null);
@@ -162,6 +185,9 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
   };
 
   const handleReject = async (id: number) => {
+    const currentSubscription = localSubs.find((subscription) => subscription.ProofId === id);
+    if (getPaymentStatus(currentSubscription) !== "pending") return;
+
     try {
       setLoadingActionId(id);
       setActionMessage(null);
@@ -170,18 +196,72 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
 
       const subscription = localSubs.find(s => s.ProofId === id);
       if (subscription) {
+        let subscriptionUpdateError: unknown = null;
+        try {
+        let linkedSubscriptionId: string | number | undefined =
+          subscription.SubscriptionId ?? subscription.SubId ?? subscription.SeekerSubscriptionId;
+
+        // Some payment-proof responses do not include the linked subscription ID.
+        // In that case, find the pending subscription for this seeker and selected tier.
+        if (!linkedSubscriptionId && subscription.UserId != null) {
+          const response = await axiosInstance.get<SeekerSubscriptionRecord[] | { items?: SeekerSubscriptionRecord[] }>(
+            `/seekers/${subscription.UserId}/subscriptions`,
+          );
+          const seekerSubscriptions = Array.isArray(response.data)
+            ? response.data
+            : response.data?.items ?? [];
+          const matchingSubscription = seekerSubscriptions
+            .filter((entry) =>
+              String(entry.Status ?? entry.status).toLowerCase() === "pending" &&
+              String(entry.SubscriptionTier ?? entry.planName ?? entry.Plan).toLowerCase() ===
+                String(subscription.SubscriptionTier).toLowerCase() &&
+              Number(entry.Price ?? entry.price) === Number(subscription.Price),
+            )
+            .sort((a, b) =>
+              new Date(String(b.CreatedDateTime ?? b.StartDate ?? 0)).getTime() -
+              new Date(String(a.CreatedDateTime ?? a.StartDate ?? 0)).getTime(),
+            )[0];
+          linkedSubscriptionId = matchingSubscription?.SubId ?? matchingSubscription?.Id;
+        }
+
+        if (linkedSubscriptionId != null) {
+          const detailsResponse = await axiosInstance.get(
+            `/admin/seeker-subs/${linkedSubscriptionId}`,
+          );
+          const subscriptionDetails = detailsResponse.data;
+          await axiosInstance.put(`/admin/seeker-subs/${linkedSubscriptionId}`, {
+            ...subscriptionDetails,
+            Status: "rejected",
+          });
+        } else {
+          throw new Error("Its pending seeker subscription could not be found to update.");
+        }
+        } catch (error) {
+          subscriptionUpdateError = error;
+          console.error("Payment proof rejected, but seeker subscription update failed:", error);
+        }
+
         try {
           await sendNotificationEmail(subscription.UserId, 'rejected', subscription);
-          setActionMessage("Payment proof rejected and email sent.");
+          setActionMessage(subscriptionUpdateError
+            ? "Payment proof rejected and email sent, but the seeker subscription status could not be updated."
+            : "Payment proof and seeker subscription rejected; email sent.");
         } catch (emailErr) {
-          setActionMessage("Payment proof rejected but email failed to send.");
+          setActionMessage(subscriptionUpdateError
+            ? "Payment proof rejected, but the subscription status and email could not be updated."
+            : "Payment proof and seeker subscription rejected, but email failed to send.");
           setSnackSeverity('error');
           setSnackOpen(true);
           return;
         }
+
+        if (subscriptionUpdateError) setSnackSeverity("error");
+        else setSnackSeverity('success');
+      } else {
+        setActionMessage("Payment proof rejected, but the seeker subscription could not be identified.");
+        setSnackSeverity("error");
       }
 
-      setSnackSeverity('success');
       setSnackOpen(true);
     } catch (err: any) {
       console.error(err);
@@ -233,8 +313,10 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {visibleSubscriptions.map((subscription) => (
-              <TableRow
+            {visibleSubscriptions.map((subscription) => {
+              const canReview = getPaymentStatus(subscription) === "pending";
+
+              return <TableRow
                 key={subscription.ProofId}
                 sx={{ "&:hover": { backgroundColor: "#fafafa" } }}
               >
@@ -287,42 +369,8 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
                   />
                 </TableCell>
                 <TableCell>
-                  {subscription.Status !== "approved" && subscription.Status !== "rejected" && subscription.Status !== "Approved" && subscription.Status !== "Rejected" ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => openDetails(subscription)}
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="success"
-                          onClick={() => handleApprove(subscription.ProofId)}
-                          disabled={loadingActionId === subscription.ProofId}
-                        >
-                          {loadingActionId === subscription.ProofId ? <CircularProgress size={16} color="inherit" /> : 'Approve'}
-                        </Button>
-                        <Button
-                          size="small"
-                          variant="contained"
-                          color="error"
-                          onClick={() => handleReject(subscription.ProofId)}
-                          disabled={loadingActionId === subscription.ProofId}
-                        >
-                          {loadingActionId === subscription.ProofId ? <CircularProgress size={16} color="inherit" /> : 'Reject'}
-                        </Button>
-                      </Box>
-                      {sendingEmail === subscription.ProofId && (
-                        <Typography variant="caption" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <CircularProgress size={12} /> Sending email...
-                        </Typography>
-                      )}
-                    </Box>
-                  ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: "wrap" }}>
                     <Button
                       size="small"
                       variant="outlined"
@@ -330,10 +378,39 @@ const SubscriptionSection = ({ subscriptions }: { subscriptions: any[] }) => {
                     >
                       View Details
                     </Button>
-                  )}
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="success"
+                        onClick={() => handleApprove(subscription.ProofId)}
+                        disabled={!canReview || loadingActionId === subscription.ProofId}
+                      >
+                        {loadingActionId === subscription.ProofId ? <CircularProgress size={16} color="inherit" /> : 'Approve'}
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleReject(subscription.ProofId)}
+                        disabled={!canReview || loadingActionId === subscription.ProofId}
+                      >
+                        {loadingActionId === subscription.ProofId ? <CircularProgress size={16} color="inherit" /> : 'Reject'}
+                      </Button>
+                    </Box>
+                    {!canReview && (
+                      <Typography variant="caption" color="text.secondary">
+                        Only pending payments can be modified.
+                      </Typography>
+                    )}
+                    {sendingEmail === subscription.ProofId && (
+                      <Typography variant="caption" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CircularProgress size={12} /> Sending email...
+                      </Typography>
+                    )}
+                  </Box>
                 </TableCell>
               </TableRow>
-            ))}
+            })}
           </TableBody>
         </Table>
       </TableContainer>

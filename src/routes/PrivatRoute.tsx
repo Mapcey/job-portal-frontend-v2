@@ -6,9 +6,10 @@ import Loading from "../components/Loading";
 interface ProtectedRouteProps {
   children: ReactNode;
   allowedRoles?: string[];
+  loginPath?: string;
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, allowedRoles, loginPath = "/login" }: ProtectedRouteProps) => {
   const { isAuthenticated, loading, userRole, logout } = useAuth();
 
   console.log("privetroute: ", isAuthenticated, userRole);
@@ -22,7 +23,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   if (!isAuthenticated) {
     logout();
     console.log("privetroute: log out");
-    return <Navigate to="/login" replace />;
+    return <Navigate to={loginPath} replace />;
   }
 
   // 3. (Optional) Check role-based access

@@ -27,6 +27,7 @@ import { useAuth } from "../context/AuthContext";
 import {
   employerPricingPlans,
   seekerPricingPlans,
+  type PricingPlan,
 } from "../assets/data/pricePlane";
 
 const PricingPage = () => {
@@ -45,8 +46,7 @@ const PricingPage = () => {
     ? "Explore opportunities and take the next step in your career."
     : "Choose the right plan to find talent and grow your team.";
 
-  const handleChoosePlan = (planTitle: string) => {
-    // Job seekers do not need an employer subscription.
+  const handleChoosePlan = (plan: PricingPlan) => {
     if (isSeeker) {
       navigate(isAuthenticated ? "/job_posts" : "/login");
       return;
@@ -61,7 +61,7 @@ const PricingPage = () => {
     // Only employers should purchase employer plans.
     if (isEmployer) {
       navigate(
-        `/employer/subscription-upload?plan=${encodeURIComponent(planTitle)}`,
+        `/employer/subscription-upload?plan=${encodeURIComponent(plan.title)}`,
       );
     }
   };
@@ -119,9 +119,9 @@ const PricingPage = () => {
                   borderRadius: 4,
                   border: "1px solid",
                   borderColor:
-                    index === 1 && !isSeeker ? "primary.main" : "grey.200",
+                    index === 1 ? "primary.main" : "grey.200",
                   boxShadow:
-                    index === 1 && !isSeeker
+                    index === 1
                       ? "0 12px 36px rgba(243, 109, 0, 0.12)"
                       : "0 4px 20px rgba(0, 0, 0, 0.04)",
                   bgcolor: "#fff",
@@ -133,7 +133,7 @@ const PricingPage = () => {
                 }}
               >
                 {/* Recommended plan label */}
-                {index === 1 && !isSeeker && (
+                {index === 1 && (
                   <Chip
                     label="MOST POPULAR"
                     color="primary"
@@ -194,10 +194,10 @@ const PricingPage = () => {
                       mb: 3,
                       p: 2.5,
                       borderRadius: 3,
-                      bgcolor: index === 1 && !isSeeker ? "#fff1e5" : "#f8fafc",
+                      bgcolor: index === 1 ? "#fff1e5" : "#f8fafc",
                       border: "1px solid",
                       borderColor:
-                        index === 1 && !isSeeker ? "#ffe0c2" : "#edf0f3",
+                        index === 1 ? "#ffe0c2" : "#edf0f3",
                     }}
                   >
                     <Typography
@@ -284,9 +284,9 @@ const PricingPage = () => {
                   <Button
                     fullWidth
                     variant={
-                      index === 1 && !isSeeker ? "contained" : "outlined"
+                      index === 1 ? "contained" : "outlined"
                     }
-                    onClick={() => handleChoosePlan(plan.title)}
+                    onClick={() => handleChoosePlan(plan)}
                     endIcon={<CheckCircleOutlineIcon />}
                     sx={{
                       minHeight: 48,
@@ -299,7 +299,7 @@ const PricingPage = () => {
                       "&:hover": {
                         borderWidth: 1.5,
                         boxShadow:
-                          index === 1 && !isSeeker
+                          index === 1
                             ? "0 5px 14px rgba(243, 109, 0, 0.2)"
                             : "none",
                       },

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ScrollToTop from "./ScrollToTop";
 
 import LandingPage from "../pages/HomePage";
@@ -23,7 +23,7 @@ import UnauthorizedPage from "../pages/UnauthorizedPage";
 import { EditorProfilePage } from "../pages/Editor/EditorProfilePage";
 import EditorLogin from "../pages/Editor/EditorLogin";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
-import SeekerSubscriptionUpload from "../pages/Seeker/SubscriptionUpload";
+import AdminLogin from "../pages/Admin/AdminLogin";
 import EmployerSubscriptionUpload from "../pages/Employer/SubscriptionUpload";
 import HeadHuntingPage from "../pages/Employer/HeadHuntPage";
 import LegalPage from "../pages/LegalPage";
@@ -46,7 +46,15 @@ const AppRoutes = () => (
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
       <Route path="/editor_login" element={<EditorLogin />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]} loginPath="/admin/login">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/job_posts/details/:id" element={<JobDetailsPage />} />
 
@@ -76,7 +84,7 @@ const AppRoutes = () => (
         path="/seeker/subscription-upload"
         element={
           <ProtectedRoute allowedRoles={["seeker"]}>
-            <SeekerSubscriptionUpload />
+            <Navigate to="/job_posts" replace />
           </ProtectedRoute>
         }
       />

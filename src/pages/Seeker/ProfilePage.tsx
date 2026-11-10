@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
+  Alert,
   Box,
   Tabs,
   Tab,
@@ -10,6 +11,7 @@ import {
   MenuItem,
   Select,
   useMediaQuery,
+  Paper,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -24,11 +26,14 @@ import NotificationsTab from "../../components/Seeker/NotificationsTab";
 import ManageApplicationsTab from "../../components/Seeker/ManageApplicationsTab";
 import SubscriptionStatusTab from "../../components/Subscription/SubscriptionStatusTab";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
+import { deleteUser } from "firebase/auth";
+import { auth } from "../../firebase/config";
+import { deleteSeeker } from "../../services/APIs/APIs";
 // import Loading from "../../components/Loading";
  
 const SeekerProfilePage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
-  const { userInfo } = useAuth();
+  const { userInfo, logout } = useAuth();
   const [latestVideo, setLatestVideo] = useState<any>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -72,6 +77,36 @@ const SeekerProfilePage = () => {
     title: "My Profile",
     desc: "Job seeker account. Manage your profile and preferences.",
   });
+
+  const handleDeactivateAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to deactivate your account? This permanently deletes your account and cannot be undone.",
+    );
+    if (!confirmed) return;
+
+    const user = auth.currentUser;
+    const seekerId = Number(userInfo?.UserId);
+    if (!user || !Number.isFinite(seekerId) || seekerId <= 0) {
+      window.alert("Unable to identify your account. Please log in again.");
+      return;
+    }
+
+    try {
+      await deleteSeeker(seekerId);
+      await deleteUser(user);
+      logout();
+      navigate("/");
+      window.alert("Your account has been deactivated.");
+    } catch (error) {
+      console.error("Failed to deactivate seeker account:", error);
+      const authError = error as { code?: string; message?: string };
+      if (authError.code === "auth/requires-recent-login") {
+        window.alert("Please sign in again, then retry deactivating your account.");
+      } else {
+        window.alert(authError.message || "Failed to deactivate your account. Please try again.");
+      }
+    }
+  };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -157,6 +192,23 @@ const SeekerProfilePage = () => {
               </Typography>
             )}
           </Box>
+
+          <Paper
+            variant="outlined"
+            sx={{ mt: 4, p: { xs: 2, sm: 3 }, borderColor: "error.light", bgcolor: "#fffafa" }}
+          >
+            <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
+              <Box>
+                <Typography variant="h6" fontWeight={700}>Deactivate account</Typography>
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  This permanently deletes your seeker account and cannot be undone.
+                </Alert>
+              </Box>
+              <Button color="error" variant="outlined" onClick={handleDeactivateAccount}>
+                Deactivate account
+              </Button>
+            </Box>
+          </Paper>
         </Box>
       );
       case 1:

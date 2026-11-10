@@ -4,7 +4,10 @@ export interface PricingPlan {
   price: string;
   description: string;
   features: string[];
+  tier?: SeekerPlanTier;
 }
+
+export type SeekerPlanTier = "basic" | "pro" | "enterprise";
 
 export const employerPricingPlans: PricingPlan[] = [
   {
@@ -53,7 +56,7 @@ export const seekerPricingPlans: PricingPlan[] = [
     features: [
       "Create your job seeker profile",
       "Browse available job listings",
-      "Apply for suitable jobs",
+      "Apply for suitable opportunities",
       "Manage your applications",
       "Receive application notifications",
     ],

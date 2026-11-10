@@ -83,7 +83,7 @@ const SavedJobsTab = () => {
 
   // Navigate to job details
   const handleOpenJob = (jobId: number) => {
-    navigate(`/jobs/details/${jobId}`);
+    navigate(`/job_posts/details/${jobId}`);
   };
 
   return (

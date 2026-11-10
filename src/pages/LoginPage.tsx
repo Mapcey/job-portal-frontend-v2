@@ -35,7 +35,7 @@ const TEXT_MUTED  = "#64748b";
 const LoginPage = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
 
   const [email, setEmail]               = useState("");
   const [password, setPassword]         = useState("");
@@ -80,7 +80,10 @@ const LoginPage = () => {
       const success = await login(token);
       if (success === "employer") navigate("/employer/profile/");
       else if (success === "seeker") navigate("/seeker/profile/");
-      else if (success === "admin")  navigate("/admin/dashboard");
+      else if (success === "admin") {
+        logout();
+        setError("Administrator accounts must sign in through the admin login.");
+      }
       else setError("Authentication failed. Please try again.");
     } catch (err: any) {
       setError(firebaseErrorMessage(err));
@@ -109,7 +112,10 @@ const LoginPage = () => {
       const role   = await login(token);
       if (role === "employer")     navigate("/employer/profile/");
       else if (role === "seeker")  navigate("/seeker/profile/");
-      else if (role === "admin")   navigate("/admin/dashboard");
+      else if (role === "admin") {
+        logout();
+        setError("Administrator accounts must sign in through the admin login.");
+      }
       else setError("Your Google account is not registered in the job portal.");
     } catch (err: any) {
       setError(firebaseErrorMessage(err));

@@ -442,7 +442,9 @@ const Header_2 = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {settings.map((setting) => (
+                {settings
+                  .filter((setting) => !(userRole === "seeker" && setting === "Deactivate"))
+                  .map((setting) => (
                   <MenuItem
                     key={setting}
                     onClick={() => handleMenuItemClick(setting)}
@@ -451,7 +453,7 @@ const Header_2 = () => {
                       {setting}
                     </Typography>
                   </MenuItem>
-                ))}
+                  ))}
               </Menu>
             </Box>
           </Toolbar>

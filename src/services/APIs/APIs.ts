@@ -498,6 +498,11 @@ export const deleteEmployer = async (employer_id:number) => {
   return response.data;
 };
 
+export const deleteSeeker = async (seekerId: number) => {
+  const response = await axiosInstance.delete(`/seekers/${seekerId}`);
+  return response.data;
+};
+
 // -----------------------EDITORS--------------------------
 // create a new editor
 export const createNewEditor = async (employer_id: string, data: any) => {
@@ -704,35 +709,6 @@ export const createReport = async (reportData: {
   }
 };
 
-const getSubscriptionTierCandidates = (tier: string) => {
-  const raw = tier?.trim() || "";
-  const lower = raw.toLowerCase();
-  const upper = raw.toUpperCase();
-  const title = raw ? raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase() : "";
-
-  const values = new Set<string>();
-  [raw, lower, upper, title].forEach((value) => {
-    if (value) values.add(value);
-  });
-
-  const planAliases = ["free", "basic", "standard", "premium"];
-  if (planAliases.includes(lower)) {
-    values.add(lower);
-    values.add(upper);
-    values.add(title);
-  }
-
-  return Array.from(values);
-};
-
-const normalizeSubscriptionTier = (tier: string) => {
-  const normalized = tier?.trim().toLowerCase();
-  if (normalized === "basic") return "free";
-  if (normalized === "standard") return "free";
-  if (normalized === "premium") return "free";
-  return normalized || "free";
-};
-
 // Submit payment proof for subscription
 export const submitPaymentProof = async (data: {
   SubscriptionTier: string;
@@ -740,7 +716,7 @@ export const submitPaymentProof = async (data: {
   file: File;
 }) => {
   const form = new FormData();
-  form.append("SubscriptionTier", normalizeSubscriptionTier(data.SubscriptionTier));
+  form.append("SubscriptionTier", data.SubscriptionTier);
   form.append("Price", data.Price.toString());
   form.append("file", data.file);
 
@@ -761,26 +737,11 @@ export const createSeekerSubscription = async (
     Status: string;
   }
 ) => {
-  const candidates = getSubscriptionTierCandidates(data.SubscriptionTier);
-  const orderedCandidates = ["free", ...candidates.filter((value) => value !== "free")];
-  let lastError: any = null;
-
-  for (const candidate of orderedCandidates) {
-    try {
-      const response = await axiosInstance.post(
-        `/seekers/${seekerId}/subscriptions`,
-        {
-          ...data,
-          SubscriptionTier: candidate,
-        }
-      );
-      return response.data;
-    } catch (error: any) {
-      lastError = error;
-    }
-  }
-
-  throw lastError || new Error("Unable to create subscription with the provided tier value.");
+  const response = await axiosInstance.post(
+    `/seekers/${seekerId}/subscriptions`,
+    data
+  );
+  return response.data;
 };
 
 // Get subscription details by ID

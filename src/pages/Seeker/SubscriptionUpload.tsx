@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { createSeekerSubscription, submitPaymentProof } from "../../services/APIs/APIs";
+import { seekerPricingPlans, type SeekerPlanTier } from "../../assets/data/pricePlane";
 import Header_1 from "../../components/header/Header_1";
 import Header_2 from "../../components/header/Header_2";
 import FooterSection_1 from "../../components/footer/FooterSection_1";
@@ -21,12 +22,6 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
-const priceMap: Record<string, string> = {
-  Basic: "$20/month",
-  Standard: "$45/month",
-  Premium: "$70/month",
-};
-
 const BANK_DETAILS = [
   { label: "Bank", value: "ACME Bank" },
   { label: "Account name", value: "ACME Careers Pvt Ltd" },
@@ -34,18 +29,11 @@ const BANK_DETAILS = [
   { label: "Branch", value: "Colombo Main" },
 ];
 
-const getPriceNumber = (search: string, plan: string): number => {
-  const priceParam = new URLSearchParams(search).get("price");
-  const raw = priceParam || priceMap[plan] || "";
-  const match = raw.match(/\$(\d+)/);
-  return match ? parseInt(match[1]) : 0;
-};
-
 const SeekerSubscriptionUpload = () => {
   const { search } = useLocation();
   const { isAuthenticated, userInfo } = useAuth();
   const [file, setFile] = useState<File | null>(null);
-  const [plan, setPlan] = useState<string | null>(null);
+  const [plan, setPlan] = useState<SeekerPlanTier | null>(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
@@ -55,14 +43,15 @@ const SeekerSubscriptionUpload = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(search);
-    const p = params.get("plan");
-    if (p) setPlan(p);
+    const requestedPlan = params.get("plan")?.toLowerCase();
+    const selectedPlan = seekerPricingPlans.find(
+      (item) => item.tier === requestedPlan,
+    );
+    setPlan(selectedPlan?.tier ?? null);
   }, [search]);
 
-  const displayedPrice =
-    new URLSearchParams(search).get("price") ||
-    (plan ? priceMap[plan] : null) ||
-    "—";
+  const selectedPlan = seekerPricingPlans.find((item) => item.tier === plan);
+  const displayedPrice = selectedPlan?.price ?? "—";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0] || null;
@@ -99,7 +88,7 @@ const SeekerSubscriptionUpload = () => {
       setSnackOpen(true);
       return;
     }
-    if (!plan) {
+    if (!plan || !selectedPlan?.tier) {
       setSnackMessage("No plan selected. Please go back and choose a plan.");
       setSnackSeverity("error");
       setSnackOpen(true);
@@ -116,14 +105,18 @@ const SeekerSubscriptionUpload = () => {
 
     try {
       setLoading(true);
-      const price = getPriceNumber(search, plan);
+      const priceMatch = selectedPlan.price.match(/\$(\d+)/);
+      const price = priceMatch ? Number(priceMatch[1]) : 0;
+      if (!price) {
+        throw new Error("The selected plan has an invalid price.");
+      }
       const today = new Date();
       const startDate = today.toISOString().split("T")[0];
       const endDate = new Date(today);
       endDate.setDate(endDate.getDate() + 30);
 
       await createSeekerSubscription(seekerId, {
-        SubscriptionTier: plan,
+        SubscriptionTier: selectedPlan.tier,
         Price: price,
         StartDate: startDate,
         EndDate: endDate.toISOString().split("T")[0],
@@ -131,7 +124,7 @@ const SeekerSubscriptionUpload = () => {
       });
 
       await submitPaymentProof({
-        SubscriptionTier: plan,
+        SubscriptionTier: selectedPlan.tier,
         Price: price,
         file,
       });
@@ -179,7 +172,7 @@ const SeekerSubscriptionUpload = () => {
               </Typography>
               <Typography variant="body2" sx={{ color: "#4b5563" }}>
                 Our admin team will verify your payment and activate your{" "}
-                <strong>{plan}</strong> plan within 24–48 hours. You'll be notified once it's confirmed.
+                <strong>{selectedPlan?.title ?? "selected"}</strong> plan within 24–48 hours. You'll be notified once it's confirmed.
               </Typography>
             </Box>
           ) : (
@@ -212,7 +205,7 @@ const SeekerSubscriptionUpload = () => {
                       Selected plan
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: "#1e3a8a", lineHeight: 1.2 }}>
-                      {plan}
+                      {selectedPlan?.title}
                     </Typography>
                   </Box>
                   <Chip
